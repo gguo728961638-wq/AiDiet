@@ -1,0 +1,27 @@
+name: Build iOS IPA
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build IPA
+        run: |
+          cd ios
+          xcodebuild -project AiDiet.xcodeproj -scheme AiDiet -configuration Release -sdk iphoneos -destination "generic/platform=iOS" -archivePath build/AiDiet.xcarchive archive
+
+      - name: Export IPA
+        run: |
+          cd ios
+          xcodebuild -exportArchive -archivePath build/AiDiet.xcarchive -exportOptionsPlist exportOptions.plist -exportPath build/output
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: AiDiet
+          path: ios/build/output/*.ipa

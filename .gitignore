@@ -1,3 +1,10 @@
 qa-*.png
 .superpowers/
 .claude/worktrees/
+android/**/build/
+android/.gradle/
+ios/build/
+DerivedData/
+*.apk
+*.ipa
+*.xcarchive

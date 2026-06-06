@@ -1,0 +1,25 @@
+workflows:
+  ios-build:
+    name: Build iOS IPA
+    max_build_duration: 30
+    environment:
+      flutter: none
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+    scripts:
+      - name: Build IPA
+        scripts:
+          - |
+            cd ios
+            xcodebuild -project AiDiet.xcodeproj -scheme AiDiet -configuration Release -sdk iphoneos -destination "generic/platform=iOS" -archivePath build/AiDiet.xcarchive archive
+          - |
+            cd ios
+            xcodebuild -exportArchive -archivePath build/AiDiet.xcarchive -exportOptionsPlist exportOptions.plist -exportPath build/output
+    artifacts:
+      - ios/build/output/*.ipa
