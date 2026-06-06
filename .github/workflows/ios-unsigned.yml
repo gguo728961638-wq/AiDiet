@@ -1,0 +1,59 @@
+name: Build iOS Unsigned
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-ios-unsigned:
+    name: Build unsigned iOS archive
+    runs-on: macos-14
+
+    env:
+      APP_SCHEME: AiDiet
+      PROJECT_PATH: ios/AiDiet.xcodeproj
+      ARCHIVE_PATH: build/AiDiet-unsigned.xcarchive
+      EXPORT_PATH: build/unsigned-export
+      UNSIGNED_BUNDLE_ID: com.aidiet.unsigned
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show Xcode project
+        run: |
+          xcodebuild -version
+          xcodebuild -project "${PROJECT_PATH}" -list
+
+      - name: Archive without code signing
+        run: |
+          xcodebuild \
+            -project "${PROJECT_PATH}" \
+            -scheme "${APP_SCHEME}" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination "generic/platform=iOS" \
+            -archivePath "${ARCHIVE_PATH}" \
+            PRODUCT_BUNDLE_IDENTIFIER="${UNSIGNED_BUNDLE_ID}" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            clean archive
+
+      - name: Package unsigned app bundle
+        run: |
+          mkdir -p "${EXPORT_PATH}"
+          APP_PATH="${ARCHIVE_PATH}/Products/Applications/${APP_SCHEME}.app"
+          test -d "${APP_PATH}" || (echo "Unsigned app bundle missing at ${APP_PATH}" && exit 1)
+          ditto -c -k --sequesterRsrc --keepParent "${APP_PATH}" "${EXPORT_PATH}/${APP_SCHEME}-unsigned-app.zip"
+          ditto -c -k --sequesterRsrc --keepParent "${ARCHIVE_PATH}" "${EXPORT_PATH}/${APP_SCHEME}-unsigned-xcarchive.zip"
+
+      - name: Upload unsigned artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: LingGuang-iOS-unsigned
+          path: |
+            build/unsigned-export/*.zip
+          if-no-files-found: error
