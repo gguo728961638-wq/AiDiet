@@ -8,13 +8,13 @@ on:
 
 jobs:
   build-ios-unsigned:
-    name: Build unsigned iOS archive
+    name: Build unsigned iOS app
     runs-on: macos-14
 
     env:
-      APP_SCHEME: AiDiet
+      APP_TARGET: AiDiet
       PROJECT_PATH: ios/AiDiet.xcodeproj
-      ARCHIVE_PATH: build/AiDiet-unsigned.xcarchive
+      BUILD_DIR: build/unsigned-build
       EXPORT_PATH: build/unsigned-export
       UNSIGNED_BUNDLE_ID: com.aidiet.unsigned
 
@@ -22,33 +22,33 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show Xcode project
+      - name: Inspect iOS project
         run: |
-          xcodebuild -version
-          xcodebuild -project "${PROJECT_PATH}" -list
+          test -f "${PROJECT_PATH}/project.pbxproj" || (echo "Missing Xcode project file" && exit 1)
+          test -f "ios/AiDiet/Info.plist" || (echo "Missing Info.plist" && exit 1)
+          plutil -lint "ios/AiDiet/Info.plist"
 
-      - name: Archive without code signing
+      - name: Build without code signing
         run: |
           xcodebuild \
             -project "${PROJECT_PATH}" \
-            -scheme "${APP_SCHEME}" \
+            -target "${APP_TARGET}" \
             -configuration Release \
             -sdk iphoneos \
-            -destination "generic/platform=iOS" \
-            -archivePath "${ARCHIVE_PATH}" \
+            -derivedDataPath "${BUILD_DIR}" \
             PRODUCT_BUNDLE_IDENTIFIER="${UNSIGNED_BUNDLE_ID}" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            clean archive
+            clean build
 
       - name: Package unsigned app bundle
         run: |
           mkdir -p "${EXPORT_PATH}"
-          APP_PATH="${ARCHIVE_PATH}/Products/Applications/${APP_SCHEME}.app"
+          APP_PATH="${BUILD_DIR}/Build/Products/Release-iphoneos/${APP_TARGET}.app"
           test -d "${APP_PATH}" || (echo "Unsigned app bundle missing at ${APP_PATH}" && exit 1)
-          ditto -c -k --sequesterRsrc --keepParent "${APP_PATH}" "${EXPORT_PATH}/${APP_SCHEME}-unsigned-app.zip"
-          ditto -c -k --sequesterRsrc --keepParent "${ARCHIVE_PATH}" "${EXPORT_PATH}/${APP_SCHEME}-unsigned-xcarchive.zip"
+          ditto -c -k --sequesterRsrc --keepParent "${APP_PATH}" "${EXPORT_PATH}/${APP_TARGET}-unsigned-app.zip"
+          ditto -c -k --sequesterRsrc --keepParent "${BUILD_DIR}" "${EXPORT_PATH}/${APP_TARGET}-unsigned-build.zip"
 
       - name: Upload unsigned artifacts
         uses: actions/upload-artifact@v4
