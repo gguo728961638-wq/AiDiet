@@ -247,8 +247,8 @@ extension ViewController: UIImagePickerControllerDelegate, UINavigationControlle
 
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true) { [weak self] in
-            self.imagePickerCompletion?(nil)
-            self.imagePickerCompletion = nil
+            self?.imagePickerCompletion?(nil)
+            self?.imagePickerCompletion = nil
         }
     }
 }

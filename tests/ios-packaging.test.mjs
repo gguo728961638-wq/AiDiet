@@ -25,6 +25,7 @@ assert.doesNotMatch(launchScreen, /targetRuntime="AppleSDK"/, "LaunchScreen stor
 const viewController = read("ios/AiDiet/ViewController.swift");
 const htmlBaseName = bundledHtml.replace(/\.html$/, "");
 assert.match(viewController, new RegExp(`forResource: "${htmlBaseName}"`), "WKWebView loads the actual bundled HTML filename");
+assert.match(viewController, /picker\.dismiss\(animated: true\) \{ \[weak self\] in\s+self\?\.imagePickerCompletion\?\(nil\)\s+self\?\.imagePickerCompletion = nil\s+\}/s, "image picker cancel closure safely handles weak self");
 
 const project = read("ios/AiDiet.xcodeproj/project.pbxproj");
 assert.match(project, /PRODUCT_BUNDLE_IDENTIFIER = "\$\(BUNDLE_ID\)";/, "Bundle ID is driven by GitHub secret");
