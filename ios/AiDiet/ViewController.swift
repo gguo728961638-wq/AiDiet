@@ -93,9 +93,11 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
             let inject = "<script>window.__nativeStorageData='\\('" + escaped + "');</script>"
             html = html.replacingOccurrences(of: "<head>", with: "<head>" + inject)
         }
-        /* 用 loadHTMLString 加载，baseURL 指向 Resources 目录确保 CSS/JS 相对路径正确 */
-        let baseURL = htmlURL.deletingLastPathComponent()
-        webView.loadHTMLString(html, baseURL: baseURL)
+        /* 写入 Documents 目录后用 loadFileURL 加载，确保 file:// URL 和注入脚本同时生效 */
+        let docsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let tempHTML = docsDir.appendingPathComponent("index_injected.html")
+        try? html.write(to: tempHTML, atomically: true, encoding: .utf8)
+        webView.loadFileURL(tempHTML, allowingReadAccessTo: htmlURL.deletingLastPathComponent())
     }
 
     // MARK: - Progress
