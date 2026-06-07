@@ -4487,6 +4487,7 @@
     let cameraStream = null;
     var detectionScanning = false;
     var detectionIntervalId = null;
+    var lastDetectionFrame = null;
     var foodDetected = false;
     var detectionTimeoutId = null;
 
@@ -4524,6 +4525,7 @@
         if (!m) return;
         var parsed = JSON.parse(m[0]);
         if (parsed.detected && (parsed.confidence || 0) > 0.5) {
+          lastDetectionFrame = thumb;
           showFoodOutline(parsed.label || "食物");
         }
       } catch (e) { /* 静默失败 */ }
@@ -4623,8 +4625,15 @@
 
       var aiResult = await recognizeFoodAI(imageSrc, true);
       if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
-        showToast(aiResult.reason || "识别不确定，请重新拍摄或手动选择");
-        return;
+        if (isRealPhoto) {
+          showToast(aiResult.reason || "识别不确定，请重新拍摄或手动选择");
+          return;
+        }
+        aiResult = {
+          needs_retake: false,
+          foods: fallbackFoodsFromLocal(imageSrc, "午餐", sourceLabel || "检测食物"),
+          reason: "图像质量不足，已进入本地兜底确认"
+        };
       }
       if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
         aiResult = {
@@ -6713,12 +6722,17 @@
       /* 优先使用真实摄像头拍摄的照片 */
       var imageSrc = captureFrameFromCamera();
       var isRealPhoto = Boolean(imageSrc);
+      if (!imageSrc && lastDetectionFrame) {
+        imageSrc = lastDetectionFrame;
+        isRealPhoto = false;
+      }
       if (!imageSrc) {
         triggerNativeCamera();
         return;
       }
+      lastDetectionFrame = null;
 
-      await runRecognitionFromImage(imageSrc, isRealPhoto ? "拍摄照片" : "鸡胸沙拉", isRealPhoto);
+      await runRecognitionFromImage(imageSrc, isRealPhoto ? "拍摄照片" : "检测照片", isRealPhoto);
     }
 
     function showDeleteConfirm(mealId) {
