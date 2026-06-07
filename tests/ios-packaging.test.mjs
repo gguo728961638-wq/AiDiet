@@ -46,7 +46,7 @@ assert.match(workflow, /TARGET_NAME="\$\{APP_SCHEME\}"/, "signed workflow provid
 const unsignedWorkflow = read(".github/workflows/ios-unsigned.yml");
 assert.match(unsignedWorkflow, /name: Build iOS Unsigned/, "unsigned workflow has a clear name");
 assert.match(unsignedWorkflow, /xcodebuild[\s\S]*build/, "unsigned workflow builds the iOS app");
-assert.match(unsignedWorkflow, /-target "\$\{APP_TARGET\}"/, "unsigned workflow builds the explicit target");
+assert.match(unsignedWorkflow, /-scheme "\$\{APP_TARGET\}"/, "unsigned workflow builds the explicit scheme required by xcodebuild with derivedDataPath");
 assert.match(unsignedWorkflow, /TARGET_NAME="\$\{APP_TARGET\}"/, "unsigned workflow provides TARGET_NAME for Xcode product expansion");
 assert.match(unsignedWorkflow, /BUNDLE_ID="\$\{UNSIGNED_BUNDLE_ID\}"/, "unsigned workflow provides BUNDLE_ID for Xcode build setting expansion");
 assert.match(unsignedWorkflow, /tee "\$\{EXPORT_PATH\}\/xcodebuild\.log"/, "unsigned workflow captures xcodebuild output to a log file");

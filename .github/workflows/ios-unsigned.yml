@@ -34,7 +34,7 @@ jobs:
           set -o pipefail
           xcodebuild \
             -project "${PROJECT_PATH}" \
-            -target "${APP_TARGET}" \
+            -scheme "${APP_TARGET}" \
             -configuration Release \
             -sdk iphoneos \
             -destination "generic/platform=iOS" \
