@@ -48,6 +48,9 @@ assert.match(unsignedWorkflow, /name: Build iOS Unsigned/, "unsigned workflow ha
 assert.match(unsignedWorkflow, /xcodebuild[\s\S]*build/, "unsigned workflow builds the iOS app");
 assert.match(unsignedWorkflow, /-target "\$\{APP_TARGET\}"/, "unsigned workflow builds the explicit target");
 assert.match(unsignedWorkflow, /TARGET_NAME="\$\{APP_TARGET\}"/, "unsigned workflow provides TARGET_NAME for Xcode product expansion");
+assert.match(unsignedWorkflow, /BUNDLE_ID="\$\{UNSIGNED_BUNDLE_ID\}"/, "unsigned workflow provides BUNDLE_ID for Xcode build setting expansion");
+assert.match(unsignedWorkflow, /tee "\$\{EXPORT_PATH\}\/xcodebuild\.log"/, "unsigned workflow captures xcodebuild output to a log file");
+assert.match(unsignedWorkflow, /if: always\(\)/, "unsigned workflow uploads diagnostics even after failures");
 assert.match(unsignedWorkflow, /CODE_SIGNING_ALLOWED=NO/, "unsigned workflow disables code signing");
 assert.match(unsignedWorkflow, /actions\/upload-artifact@v4/, "unsigned workflow uploads unsigned artifacts");
 assert.doesNotMatch(unsignedWorkflow, /secrets\.(IOS_CERTIFICATE_P12_BASE64|IOS_CERTIFICATE_PASSWORD|IOS_PROVISIONING_PROFILE_BASE64|APPLE_TEAM_ID|BUNDLE_ID)/, "unsigned workflow should not depend on Apple signing secrets");

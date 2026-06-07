@@ -30,6 +30,8 @@ jobs:
 
       - name: Build without code signing
         run: |
+          mkdir -p "${EXPORT_PATH}"
+          set -o pipefail
           xcodebuild \
             -project "${PROJECT_PATH}" \
             -target "${APP_TARGET}" \
@@ -38,26 +40,27 @@ jobs:
             -destination "generic/platform=iOS" \
             -derivedDataPath "${BUILD_DIR}" \
             TARGET_NAME="${APP_TARGET}" \
+            BUNDLE_ID="${UNSIGNED_BUNDLE_ID}" \
             PRODUCT_BUNDLE_IDENTIFIER="${UNSIGNED_BUNDLE_ID}" \
             DEVELOPMENT_TEAM="" \
             PROVISIONING_PROFILE_SPECIFIER="" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            clean build
+            clean build 2>&1 | tee "${EXPORT_PATH}/xcodebuild.log"
 
       - name: Package unsigned app bundle
         run: |
-          mkdir -p "${EXPORT_PATH}"
           APP_PATH="${BUILD_DIR}/Build/Products/Release-iphoneos/${APP_TARGET}.app"
           test -d "${APP_PATH}" || (echo "Unsigned app bundle missing at ${APP_PATH}" && exit 1)
           ditto -c -k --sequesterRsrc --keepParent "${APP_PATH}" "${EXPORT_PATH}/${APP_TARGET}-unsigned-app.zip"
           ditto -c -k --sequesterRsrc --keepParent "${BUILD_DIR}" "${EXPORT_PATH}/${APP_TARGET}-unsigned-build.zip"
 
       - name: Upload unsigned artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: LingGuang-iOS-unsigned
           path: |
-            build/unsigned-export/*.zip
+            build/unsigned-export/*
           if-no-files-found: error
