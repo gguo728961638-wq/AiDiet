@@ -77,7 +77,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
             showError("无法加载应用资源")
             return
         }
-        var html = try? String(contentsOf: htmlURL, encoding: .utf8) ?? ""
+        var html = (try? String(contentsOf: htmlURL, encoding: .utf8)) ?? ""
         /* 读取原生存储数据，注入到页面中供 JS 同步使用 */
         if let data = try? Data(contentsOf: storageFileURL),
            let json = String(data: data, encoding: .utf8) {
