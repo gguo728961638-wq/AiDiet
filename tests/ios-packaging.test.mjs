@@ -26,6 +26,7 @@ const project = read("ios/AiDiet.xcodeproj/project.pbxproj");
 assert.match(project, /PRODUCT_BUNDLE_IDENTIFIER = "\$\(BUNDLE_ID\)";/, "Bundle ID is driven by GitHub secret");
 assert.match(project, /DEVELOPMENT_TEAM = "\$\(DEVELOPMENT_TEAM\)";/, "Development team is driven by GitHub secret");
 assert.match(project, /CODE_SIGN_STYLE = Manual;/, "Release signing is manual for CI export");
+assert.doesNotMatch(project, /path = "Resources\//, "resources group children should use paths relative to the Resources group");
 const pbxObjectIds = [...project.matchAll(/^\s*([A-F0-9]{24})\s+\/\*.*\*\/\s*=\s*\{/gm)].map((match) => match[1]);
 assert.equal(new Set(pbxObjectIds).size, pbxObjectIds.length, "Xcode project object IDs should be unique");
 
