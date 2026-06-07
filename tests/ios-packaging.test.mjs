@@ -60,6 +60,7 @@ assert.match(unsignedWorkflow, /-scheme "\$\{APP_TARGET\}"/, "unsigned workflow 
 assert.match(unsignedWorkflow, /TARGET_NAME="\$\{APP_TARGET\}"/, "unsigned workflow provides TARGET_NAME for Xcode product expansion");
 assert.match(unsignedWorkflow, /BUNDLE_ID="\$\{UNSIGNED_BUNDLE_ID\}"/, "unsigned workflow provides BUNDLE_ID for Xcode build setting expansion");
 assert.match(unsignedWorkflow, /tee "\$\{EXPORT_PATH\}\/xcodebuild\.log"/, "unsigned workflow captures xcodebuild output to a log file");
+assert.match(unsignedWorkflow, /swift-errors\.log/, "unsigned workflow saves a concise build error summary");
 assert.match(unsignedWorkflow, /if: always\(\)/, "unsigned workflow uploads diagnostics even after failures");
 assert.match(unsignedWorkflow, /CODE_SIGNING_ALLOWED=NO/, "unsigned workflow disables code signing");
 assert.match(unsignedWorkflow, /actions\/upload-artifact@v4/, "unsigned workflow uploads unsigned artifacts");

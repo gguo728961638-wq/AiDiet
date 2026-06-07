@@ -5,10 +5,11 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
 
     private var webView: WKWebView!
     private var progressObservation: NSKeyValueObservation?
+    private var imagePickerCompletion: (([URL]?) -> Void)?
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor(red: 244/255, green: 241/255, blue: 234/255, alpha: 1)
+        view.backgroundColor = UIColor(red: 244 / 255, green: 241 / 255, blue: 234 / 255, alpha: 1)
 
         setupWebView()
         setupConstraints()
@@ -44,7 +45,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         webView.uiDelegate = self
         webView.navigationDelegate = self
         webView.isOpaque = false
-        webView.backgroundColor = UIColor(red: 244/255, green: 241/255, blue: 234/255, alpha: 1)
+        webView.backgroundColor = UIColor(red: 244 / 255, green: 241 / 255, blue: 234 / 255, alpha: 1)
         webView.scrollView.bounces = false
         webView.scrollView.contentInsetAdjustmentBehavior = .never
 
@@ -163,7 +164,6 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         completionHandler: @escaping ([URL]?) -> Void
     ) {
         let allowMultiple = parameters.allowsMultipleSelection
-
         let alert = UIAlertController(title: "选择图片", message: nil, preferredStyle: .actionSheet)
 
         if UIImagePickerController.isSourceTypeAvailable(.camera) {
@@ -198,8 +198,6 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
     }
 
     // MARK: - Image Picker
-
-    private var imagePickerCompletion: (([URL]?) -> Void)?
 
     private func presentImagePicker(source: UIImagePickerController.SourceType, allowMultiple: Bool, completion: @escaping ([URL]?) -> Void) {
         imagePickerCompletion = completion
