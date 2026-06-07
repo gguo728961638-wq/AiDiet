@@ -18,6 +18,10 @@ assert.match(plist, /<key>NSCameraUsageDescription<\/key>\s*<string>[^<]+<\/stri
 assert.match(plist, /<key>NSPhotoLibraryUsageDescription<\/key>\s*<string>[^<]+<\/string>/, "photo library usage description is valid XML");
 assert.doesNotMatch(plist, /\?\/string>/, "Info.plist should not contain broken string tags");
 
+const launchScreen = read("ios/AiDiet/Resources/LaunchScreen.storyboard");
+assert.match(launchScreen, /targetRuntime="iOS\.CocoaTouch"/, "LaunchScreen storyboard uses an iOS target runtime Xcode can compile");
+assert.doesNotMatch(launchScreen, /targetRuntime="AppleSDK"/, "LaunchScreen storyboard should not use unsupported AppleSDK runtime");
+
 const viewController = read("ios/AiDiet/ViewController.swift");
 const htmlBaseName = bundledHtml.replace(/\.html$/, "");
 assert.match(viewController, new RegExp(`forResource: "${htmlBaseName}"`), "WKWebView loads the actual bundled HTML filename");
