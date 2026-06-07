@@ -35,8 +35,12 @@ jobs:
             -target "${APP_TARGET}" \
             -configuration Release \
             -sdk iphoneos \
+            -destination "generic/platform=iOS" \
             -derivedDataPath "${BUILD_DIR}" \
+            TARGET_NAME="${APP_TARGET}" \
             PRODUCT_BUNDLE_IDENTIFIER="${UNSIGNED_BUNDLE_ID}" \
+            DEVELOPMENT_TEAM="" \
+            PROVISIONING_PROFILE_SPECIFIER="" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \

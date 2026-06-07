@@ -72,6 +72,7 @@ jobs:
             -sdk iphoneos \
             -destination "generic/platform=iOS" \
             -archivePath "${ARCHIVE_PATH}" \
+            TARGET_NAME="${APP_SCHEME}" \
             DEVELOPMENT_TEAM="${DEVELOPMENT_TEAM}" \
             PRODUCT_BUNDLE_IDENTIFIER="${BUNDLE_ID}" \
             PROVISIONING_PROFILE_SPECIFIER="${PROVISIONING_PROFILE_SPECIFIER}" \

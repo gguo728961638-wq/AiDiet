@@ -41,11 +41,13 @@ assert.match(workflow, /security create-keychain/, "workflow creates a temporary
 assert.match(workflow, /xcodebuild[\s\S]*archive/, "workflow archives the iOS app");
 assert.match(workflow, /xcodebuild -exportArchive/, "workflow exports an IPA");
 assert.match(workflow, /actions\/upload-artifact@v4/, "workflow uploads the IPA artifact");
+assert.match(workflow, /TARGET_NAME="\$\{APP_SCHEME\}"/, "signed workflow provides TARGET_NAME for Xcode product expansion");
 
 const unsignedWorkflow = read(".github/workflows/ios-unsigned.yml");
 assert.match(unsignedWorkflow, /name: Build iOS Unsigned/, "unsigned workflow has a clear name");
 assert.match(unsignedWorkflow, /xcodebuild[\s\S]*build/, "unsigned workflow builds the iOS app");
 assert.match(unsignedWorkflow, /-target "\$\{APP_TARGET\}"/, "unsigned workflow builds the explicit target");
+assert.match(unsignedWorkflow, /TARGET_NAME="\$\{APP_TARGET\}"/, "unsigned workflow provides TARGET_NAME for Xcode product expansion");
 assert.match(unsignedWorkflow, /CODE_SIGNING_ALLOWED=NO/, "unsigned workflow disables code signing");
 assert.match(unsignedWorkflow, /actions\/upload-artifact@v4/, "unsigned workflow uploads unsigned artifacts");
 assert.doesNotMatch(unsignedWorkflow, /secrets\.(IOS_CERTIFICATE_P12_BASE64|IOS_CERTIFICATE_PASSWORD|IOS_PROVISIONING_PROFILE_BASE64|APPLE_TEAM_ID|BUNDLE_ID)/, "unsigned workflow should not depend on Apple signing secrets");
