@@ -1,5 +1,6 @@
 import UIKit
 import WebKit
+import AVFoundation
 
 class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
 
@@ -10,6 +11,8 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 244 / 255, green: 241 / 255, blue: 234 / 255, alpha: 1)
+
+        AVCaptureDevice.requestAccess(for: .video) { _ in }
 
         setupWebView()
         setupConstraints()
@@ -40,6 +43,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         )
         config.userContentController.addUserScript(hapticScript)
         config.userContentController.add(self, name: "hapticHandler")
+        config.userContentController.add(self, name: "storageHandler")
 
         webView = WKWebView(frame: .zero, configuration: config)
         webView.uiDelegate = self
@@ -73,7 +77,19 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
             showError("无法加载应用资源")
             return
         }
-        webView.loadFileURL(htmlURL, allowingReadAccessTo: htmlURL.deletingLastPathComponent())
+        var html = try? String(contentsOf: htmlURL, encoding: .utf8) ?? ""
+        /* 读取原生存储数据，注入到页面中供 JS 同步使用 */
+        if let data = try? Data(contentsOf: storageFileURL),
+           let json = String(data: data, encoding: .utf8) {
+            let escaped = json.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'")
+            let inject = "<script>window.__nativeStorageData='\\('" + escaped + "');</script>"
+            html = html.replacingOccurrences(of: "<head>", with: "<head>" + inject)
+        }
+        /* 写入临时文件再用 loadFileURL 加载，确保 bundle 资源可访问 */
+        let tempDir = FileManager.default.temporaryDirectory
+        let tempHTML = tempDir.appendingPathComponent("index_injected.html")
+        try? html.write(to: tempHTML, atomically: true, encoding: .utf8)
+        webView.loadFileURL(tempHTML, allowingReadAccessTo: htmlURL.deletingLastPathComponent())
     }
 
     // MARK: - Progress
@@ -112,6 +128,40 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
             guard let body = message.body as? [String: Any],
                   let pattern = body["pattern"] as? String else { return }
             triggerHaptic(pattern)
+        } else if message.name == "storageHandler" {
+            guard let body = message.body as? [String: Any],
+                  let action = body["action"] as? String else { return }
+            handleStorage(action: action, body: body)
+        }
+    }
+
+    // MARK: - Native Storage
+
+    private var storageFileURL: URL {
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        return docs.appendingPathComponent("aiDietAppState.json")
+    }
+
+    private func handleStorage(action: String, body: [String: Any]) {
+        switch action {
+        case "save":
+            if let json = body["data"] as? String {
+                try? json.write(to: storageFileURL, atomically: true, encoding: .utf8)
+                let js = "window.__storageCallback && window.__storageCallback(true)"
+                webView.evaluateJavaScript(js)
+            }
+        case "load":
+            if let data = try? Data(contentsOf: storageFileURL),
+               let json = String(data: data, encoding: .utf8) {
+                let escaped = json.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'")
+                let js = "window.__storageCallback && window.__storageCallback('\(escaped)')"
+                webView.evaluateJavaScript(js)
+            } else {
+                let js = "window.__storageCallback && window.__storageCallback(null)"
+                webView.evaluateJavaScript(js)
+            }
+        default:
+            break
         }
     }
 

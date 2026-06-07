@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
   <title>饮食减肥 App</title>
   <style>
     :root {
@@ -30,6 +30,10 @@
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
     }
 
     body {
@@ -815,17 +819,20 @@
     .dinner-card {
       position: relative;
       margin-top: 28px;
-      min-height: 190px;
       border-radius: var(--radius-lg);
       background: var(--sage-soft);
       overflow: hidden;
+      display: flex;
+      align-items: center;
       padding: 25px 20px 20px 25px;
+      gap: 12px;
     }
 
     .dinner-content {
       position: relative;
       z-index: 2;
-      width: 205px;
+      flex: 1;
+      min-width: 0;
     }
 
     .dinner-title {
@@ -905,16 +912,14 @@
     }
 
     .dinner-image {
-      position: absolute;
-      right: -13px;
-      top: 23px;
-      width: 205px;
-      height: 146px;
-      border-radius: 24px;
+      width: 170px;
+      height: 140px;
+      border-radius: 20px;
       object-fit: cover;
       object-position: center;
       filter: saturate(0.92);
-      box-shadow: 0 18px 32px rgba(55, 61, 49, 0.12);
+      box-shadow: 0 12px 28px rgba(55, 61, 49, 0.12);
+      flex-shrink: 0;
     }
 
     /* ===== 加载状态通用 ===== */
@@ -2844,6 +2849,45 @@
       50% { opacity: 1; transform: scale(1.1); }
     }
 
+    /* 拍照处理遮罩 */
+    .capture-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(244, 241, 234, 0.96);
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .capture-overlay.active {
+      display: flex;
+    }
+    .capture-overlay-image {
+      width: 280px;
+      height: 350px;
+      object-fit: cover;
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    }
+    .capture-overlay-text {
+      font-size: 15px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .capture-cost-text {
+      font-size: 13px;
+      color: #999;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .capture-cost-text.show {
+      opacity: 1;
+    }
+
     .viewfinder {
       position: relative;
       width: 342px;
@@ -4069,8 +4113,8 @@
           <button class="text-button" type="button" data-route="meals">查看全部 <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>
         </div>
         <div class="meal-list" data-meal-list>
-          <button class="meal-card" type="button" data-route="meal-lunch" aria-label="查看午餐详情">
-            <img class="meal-thumb" src="chicken-salad.png" alt="鸡胸沙拉" />
+          <button class="meal-card" type="button" data-route="meal-lunch-chicken-salad" aria-label="查看午餐详情">
+            <img class="meal-thumb" src="assets/food/chicken-salad.png" alt="鸡胸沙拉" />
             <span class="meal-info">
               <span class="meal-time">12:40 · 午餐</span>
               <span class="meal-name">鸡胸沙拉</span>
@@ -4082,8 +4126,8 @@
             </span>
           </button>
 
-          <button class="meal-card" type="button" data-route="meal-breakfast" aria-label="查看早餐详情">
-            <img class="meal-thumb" src="oatmeal-latte.png" alt="燕麦拿铁" />
+          <button class="meal-card" type="button" data-route="meal-breakfast-oatmeal-latte" aria-label="查看早餐详情">
+            <img class="meal-thumb" src="assets/food/oatmeal-latte.png" alt="燕麦拿铁" />
             <span class="meal-info">
               <span class="meal-time">08:30 · 早餐</span>
               <span class="meal-name">燕麦拿铁</span>
@@ -4115,7 +4159,7 @@
             <span id="dinnerGoalText">符合今日减脂目标</span>
           </div>
         </div>
-        <img class="dinner-image" id="dinnerImage" src="dinner-steamed-fish.png" alt="推荐晚餐" />
+        <img class="dinner-image" id="dinnerImage" src="assets/food/dinner-steamed-fish.png" alt="推荐晚餐" />
       </section>
       </div>
 
@@ -4257,7 +4301,7 @@
 
             <div class="scan-food-wrap" id="scanFoodWrap">
               <span class="scan-halo"></span>
-              <img class="scan-food" src="chicken-salad.png" alt="待识别食物" />
+              <img class="scan-food" src="assets/food/chicken-salad.png" alt="待识别食物" />
               <svg class="scan-rings" viewBox="0 0 320 320" aria-hidden="true">
                 <path class="scan-ring-faint" d="M159 33c37 0 69 15 92 40 21 23 35 55 35 91 0 35-17 65-39 88-24 25-54 39-91 39-36 0-69-12-93-36-24-24-38-56-38-91 0-37 13-68 39-93 23-22 56-38 95-38Z" />
                 <path class="scan-ring-soft" d="M158 46c31-2 63 12 84 34 23 24 31 58 29 90-2 35-17 61-40 81-24 21-58 32-91 27-32-4-57-20-76-45-18-23-31-51-27-82 4-35 21-65 48-84 21-14 45-20 73-21Z" />
@@ -4286,6 +4330,16 @@
         </div>
       </section>
 
+      <!-- 拍照处理遮罩层 -->
+      <div class="capture-overlay" id="captureOverlay">
+        <img class="capture-overlay-image" id="captureOverlayImage" src="" alt="拍摄照片" />
+        <div class="capture-overlay-text">
+          <span>识别中...</span>
+          <span class="loading-dots" aria-hidden="true"><span></span><span></span><span></span></span>
+        </div>
+        <div class="capture-cost-text" id="captureCostText"></div>
+      </div>
+
       <section class="page-content result-content" aria-label="识别结果页">
         <div class="result-nav">
           <button class="round-control" type="button" data-route="camera" aria-label="返回">
@@ -4305,7 +4359,7 @@
               <span>识别有误？点击修改</span>
             </button>
           </div>
-          <img class="result-thumb" src="chicken-salad.png" alt="鸡胸沙拉" />
+          <img class="result-thumb" src="assets/food/chicken-salad.png" alt="鸡胸沙拉" />
         </section>
 
         <div class="result-food-list" id="resultFoodList"></div>
@@ -4753,7 +4807,7 @@
           name: "鸡胸沙拉",
           summary: "鸡胸肉、生菜、牛油果、番茄…",
           calories: 526,
-          image: "chicken-salad.png"
+          image: "assets/food/chicken-salad.png"
         },
         {
           id: "breakfast-oatmeal-latte",
@@ -4763,7 +4817,7 @@
           name: "燕麦拿铁",
           summary: "燕麦、牛奶、蓝莓、杏仁",
           calories: 186,
-          image: "oatmeal-latte.png"
+          image: "assets/food/oatmeal-latte.png"
         }
       ],
       mealHistory: {
@@ -4776,7 +4830,7 @@
             name: "蒸鱼糙米饭",
             summary: "蒸鱼、西兰花、糙米饭",
             calories: 600,
-            image: "dinner-steamed-fish.png"
+            image: "assets/food/dinner-steamed-fish.png"
           },
           {
             id: "breakfast-oatmeal-latte-0603",
@@ -4786,7 +4840,7 @@
             name: "燕麦拿铁",
             summary: "燕麦、牛奶、蓝莓、杏仁",
             calories: 186,
-            image: "oatmeal-latte.png"
+            image: "assets/food/oatmeal-latte.png"
           }
         ],
         "2026-06-02": [
@@ -4798,7 +4852,7 @@
             name: "鸡胸沙拉",
             summary: "鸡胸肉、生菜、牛油果、番茄…",
             calories: 526,
-            image: "chicken-salad.png"
+            image: "assets/food/chicken-salad.png"
           }
         ]
       },
@@ -4814,7 +4868,7 @@
         consumptionRatio: 100,
         startCalories: 120,
         goalPercent: 29,
-        image: "chicken-salad.png",
+        image: "assets/food/chicken-salad.png",
         tags: ["轻盈午餐", "蛋白质充足", "符合减脂目标"],
         note: "这是一份轻盈均衡的午餐，适合今天的减脂目标。",
         needs_retake: false,
@@ -4858,19 +4912,26 @@
 
     function loadState() {
       try {
-        const saved = JSON.parse(localStorage.getItem("aiDietAppState") || "null");
-        if (!saved) return JSON.parse(JSON.stringify(defaultState));
+        /* iOS 原生存储优先 */
+        var raw = null;
+        if (window.__nativeStorageData) {
+          raw = JSON.parse(window.__nativeStorageData);
+        }
+        if (!raw) {
+          raw = JSON.parse(localStorage.getItem("aiDietAppState") || "null");
+        }
+        if (!raw) return JSON.parse(JSON.stringify(defaultState));
         return {
           ...JSON.parse(JSON.stringify(defaultState)),
-          ...saved,
-          user: { ...defaultState.user, ...(saved.user || {}) },
-          nutrition: { ...defaultState.nutrition, ...(saved.nutrition || {}) },
-          settings: { ...defaultState.settings, ...(saved.settings || {}) },
-          pendingRecognition: { ...defaultState.pendingRecognition, ...(saved.pendingRecognition || {}) },
-          mealHistory: { ...defaultState.mealHistory, ...(saved.mealHistory || {}) },
-          selectedDate: saved.selectedDate || defaultState.selectedDate,
-          meals: Array.isArray(saved.meals) ? saved.meals : defaultState.meals,
-          weightHistory: Array.isArray(saved.weightHistory) ? saved.weightHistory : defaultState.weightHistory
+          ...raw,
+          user: { ...defaultState.user, ...(raw.user || {}) },
+          nutrition: { ...defaultState.nutrition, ...(raw.nutrition || {}) },
+          settings: { ...defaultState.settings, ...(raw.settings || {}) },
+          pendingRecognition: { ...defaultState.pendingRecognition, ...(raw.pendingRecognition || {}) },
+          mealHistory: { ...defaultState.mealHistory, ...(raw.mealHistory || {}) },
+          selectedDate: raw.selectedDate || defaultState.selectedDate,
+          meals: Array.isArray(raw.meals) ? raw.meals : defaultState.meals,
+          weightHistory: Array.isArray(raw.weightHistory) ? raw.weightHistory : defaultState.weightHistory
         };
       } catch(e) {
         return JSON.parse(JSON.stringify(defaultState));
@@ -4900,7 +4961,13 @@
     }
 
     function saveState() {
-      localStorage.setItem("aiDietAppState", JSON.stringify(sanitizeStateForStorage(appState)));
+      var data = JSON.stringify(sanitizeStateForStorage(appState));
+      /* iOS 原生存储优先 */
+      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.storageHandler) {
+        window.webkit.messageHandlers.storageHandler.postMessage({ action: "save", data: data });
+      }
+      /* 同时写 localStorage 作为备份 */
+      localStorage.setItem("aiDietAppState", data);
     }
 
     function consumedCalories() {
@@ -5465,7 +5532,7 @@
 
     function fallbackFoodsFromLocal(imageSrc, mealType, preferredName) {
       var local = null;
-      if (imageSrc && imageSrc.indexOf("") === 0) {
+      if (imageSrc && imageSrc.indexOf("data:") === 0) {
         local = recognizeFoodLocal(imageSrc, mealType);
       }
       if (!local && preferredName) {
@@ -5573,24 +5640,23 @@
 
     async function recognizeFoodAI(imageSrc, forceFresh) {
       try {
-        if (imageSrc.indexOf("") === 0) {
-          var assetFoods = fallbackFoodsFromLocal(imageSrc, "午餐", "");
-          var assetDish = assetFoods[0];
-          logRecognitionStep("图片尺寸", { source: imageSrc, local_demo_asset: true, compressionRatio: 1 });
-          logRecognitionStep("AI 原始返回", { local_demo_asset: true, foods: assetFoods });
-          logRecognitionStep("解析后的 foods", assetFoods);
-          return {
-            needs_retake: false,
-            best_display_name: (assetDish && assetDish.name) || "",
-            dish_candidates: assetDish ? [assetDish] : [],
-            visible_ingredients: [],
-            foods: assetFoods,
-            meta: { source: imageSrc, compressionRatio: 1 },
-            quality: { passed: true, issues: [] }
-          };
+        /* 如果不是 data URL，先转换（相册文件路径等） */
+        if (imageSrc.indexOf("data:") !== 0) {
+          try {
+            var resp = await fetch(imageSrc);
+            var blob = await resp.blob();
+            imageSrc = await new Promise(function(resolve) {
+              var reader = new FileReader();
+              reader.onload = function() { resolve(reader.result); };
+              reader.readAsDataURL(blob);
+            });
+          } catch (e) {
+            logRecognitionStep("图片转换失败", e.message || e);
+            return { needs_retake: true, foods: [], reason: "无法读取图片，请重新选择。" };
+          }
         }
         var prepared = await prepareRecognitionImage(imageSrc);
-        if (!prepared.quality.passed && imageSrc.indexOf("") !== 0) {
+        if (!prepared.quality.passed) {
           return {
             needs_retake: true,
             foods: [],
@@ -6725,7 +6791,7 @@
 
     async function captureAndRecognize() {
       stopDetection();
-      /* 冻结摄像头画面，给用户"拍照"的感觉 */
+      /* 冻结摄像头画面 */
       var video = document.getElementById("cameraVideo");
       if (video) video.pause();
       var shutterBtn = document.querySelector('.shutter-button');
@@ -6754,7 +6820,61 @@
       lastDetectionFrame = null;
       lastRecognitionFrame = null;
 
-      await runRecognitionFromImage(imageSrc, isRealPhoto ? "拍摄照片" : "检测照片", isRealPhoto);
+      /* ── Step 1: 显示拍摄照片 ── */
+      var overlay = document.getElementById("captureOverlay");
+      var overlayImg = document.getElementById("captureOverlayImage");
+      var costText = document.getElementById("captureCostText");
+      if (overlayImg) overlayImg.src = imageSrc;
+      if (costText) { costText.textContent = ""; costText.classList.remove("show"); }
+      if (overlay) overlay.classList.add("active");
+
+      /* 等待 400ms 让用户看到照片 */
+      await new Promise(function(r) { setTimeout(r, 400); });
+
+      /* ── Step 2: API 识别 ── */
+      var startTime = Date.now();
+      var aiResult = await recognizeFoodAI(imageSrc, true);
+      var elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+      if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
+        if (isRealPhoto) {
+          if (overlay) overlay.classList.remove("active");
+          if (shutterBtn) shutterBtn.classList.remove('processing');
+          showToast(aiResult.reason || "识别不确定，请重新拍摄或手动选择");
+          return;
+        }
+        aiResult = {
+          needs_retake: false,
+          foods: fallbackFoodsFromLocal(imageSrc, "午餐", "检测食物"),
+          reason: "图像质量不足，已进入本地兜底确认"
+        };
+      }
+      if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
+        aiResult = {
+          needs_retake: false,
+          foods: fallbackFoodsFromLocal(imageSrc, "午餐", isRealPhoto ? "拍摄照片" : "检测食物"),
+          reason: "AI 未返回可用结果，已进入本地兜底确认"
+        };
+      }
+      applyRecognitionToPending(aiResult, imageSrc, "午餐", aiResult.meta);
+
+      /* ── Step 3: 显示识别完成信息 ── */
+      var foodName = appState.pendingRecognition.name || "未知食物";
+      var cal = appState.pendingRecognition.calories || 0;
+      if (costText) {
+        costText.textContent = foodName + " · " + cal + " kcal · " + elapsed + "s";
+        costText.classList.add("show");
+      }
+      await new Promise(function(r) { setTimeout(r, 800); });
+
+      /* ── Step 4: 跳转结果页 ── */
+      if (overlay) overlay.classList.remove("active");
+      if (shutterBtn) shutterBtn.classList.remove('processing');
+      stopCamera();
+      saveState();
+      resultAnimationPlayed = false;
+      window.location.hash = "result";
+      applyRoute("result");
     }
 
     function showDeleteConfirm(mealId) {
@@ -7144,18 +7264,18 @@
               <div class="album-section-label">或从示例中选择</div>
               <div class="album-photo-grid">
                 <div class="album-photo-grid-items" id="albumPhotoGrid">
-                  <div class="album-photo-thumb" data-photo="chicken-salad.png" data-name="鸡胸沙拉" tabindex="0" role="button" aria-label="选择鸡胸沙拉">
-                    <img src="chicken-salad.png" alt="鸡胸沙拉" loading="lazy" />
+                  <div class="album-photo-thumb" data-photo="assets/food/chicken-salad.png" data-name="鸡胸沙拉" tabindex="0" role="button" aria-label="选择鸡胸沙拉">
+                    <img src="assets/food/chicken-salad.png" alt="鸡胸沙拉" loading="lazy" />
                     <span class="album-photo-thumb-name">鸡胸沙拉</span>
                     <span class="album-photo-thumb-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                   </div>
-                  <div class="album-photo-thumb" data-photo="oatmeal-latte.png" data-name="燕麦拿铁" tabindex="0" role="button" aria-label="选择燕麦拿铁">
-                    <img src="oatmeal-latte.png" alt="燕麦拿铁" loading="lazy" />
+                  <div class="album-photo-thumb" data-photo="assets/food/oatmeal-latte.png" data-name="燕麦拿铁" tabindex="0" role="button" aria-label="选择燕麦拿铁">
+                    <img src="assets/food/oatmeal-latte.png" alt="燕麦拿铁" loading="lazy" />
                     <span class="album-photo-thumb-name">燕麦拿铁</span>
                     <span class="album-photo-thumb-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                   </div>
-                  <div class="album-photo-thumb" data-photo="dinner-steamed-fish.png" data-name="清蒸鲈鱼" tabindex="0" role="button" aria-label="选择清蒸鲈鱼">
-                    <img src="dinner-steamed-fish.png" alt="清蒸鲈鱼" loading="lazy" />
+                  <div class="album-photo-thumb" data-photo="assets/food/dinner-steamed-fish.png" data-name="清蒸鲈鱼" tabindex="0" role="button" aria-label="选择清蒸鲈鱼">
+                    <img src="assets/food/dinner-steamed-fish.png" alt="清蒸鲈鱼" loading="lazy" />
                     <span class="album-photo-thumb-name">清蒸鲈鱼</span>
                     <span class="album-photo-thumb-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                   </div>
@@ -7271,11 +7391,12 @@
             `
           }
         : detailConfig[route] || {
-            eyebrow: "功能",
-            title: routeMap[route] || "详情",
+            eyebrow: route.startsWith("meal-") ? "餐食记录" : "功能",
+            title: route.startsWith("meal-") ? "未找到记录" : (routeMap[route] || "详情"),
             body: `
               <section class="detail-card">
-                <p class="detail-summary">这个入口已连接，可以正常打开。后续可继续扩展实际业务内容。</p>
+                <p class="detail-summary">${route.startsWith("meal-") ? "该餐食记录可能已被删除，请返回首页重新识别。" : "这个入口已连接，可以正常打开。后续可继续扩展实际业务内容。"}</p>
+                <button class="detail-empty-action" type="button" data-route="home">返回首页</button>
               </section>
             `
           };
@@ -7607,8 +7728,8 @@
       album: "相册",
       manual: "手动输入",
       meals: "饮食记录列表",
-      "meal-lunch": "午餐详情",
-      "meal-breakfast": "早餐详情",
+      "meal-lunch-chicken-salad": "午餐详情",
+      "meal-breakfast-oatmeal-latte": "早餐详情",
       calendar: "日期切换",
       home: "首页"
     };
