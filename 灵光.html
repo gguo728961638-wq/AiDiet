@@ -2634,7 +2634,7 @@
       background:
         radial-gradient(ellipse at 18% 16%, rgba(117, 132, 103, 0.34), transparent 24%),
         radial-gradient(ellipse at 80% 8%, rgba(251, 250, 246, 0.50), transparent 18%),
-        url("assets/food/chicken-salad.png");
+        url("chicken-salad.png");
       background-size: 760px 760px, 420px 420px, 560px 560px;
       background-position: left -260px top -160px, right -170px top -70px, center 208px;
       background-repeat: no-repeat;
@@ -4062,7 +4062,7 @@
         </div>
         <div class="meal-list" data-meal-list>
           <button class="meal-card" type="button" data-route="meal-lunch" aria-label="查看午餐详情">
-            <img class="meal-thumb" src="assets/food/chicken-salad.png" alt="鸡胸沙拉" />
+            <img class="meal-thumb" src="chicken-salad.png" alt="鸡胸沙拉" />
             <span class="meal-info">
               <span class="meal-time">12:40 · 午餐</span>
               <span class="meal-name">鸡胸沙拉</span>
@@ -4075,7 +4075,7 @@
           </button>
 
           <button class="meal-card" type="button" data-route="meal-breakfast" aria-label="查看早餐详情">
-            <img class="meal-thumb" src="assets/food/oatmeal-latte.png" alt="燕麦拿铁" />
+            <img class="meal-thumb" src="oatmeal-latte.png" alt="燕麦拿铁" />
             <span class="meal-info">
               <span class="meal-time">08:30 · 早餐</span>
               <span class="meal-name">燕麦拿铁</span>
@@ -4107,7 +4107,7 @@
             <span id="dinnerGoalText">符合今日减脂目标</span>
           </div>
         </div>
-        <img class="dinner-image" id="dinnerImage" src="assets/food/dinner-steamed-fish.png" alt="推荐晚餐" />
+        <img class="dinner-image" id="dinnerImage" src="dinner-steamed-fish.png" alt="推荐晚餐" />
       </section>
       </div>
 
@@ -4249,7 +4249,7 @@
 
             <div class="scan-food-wrap" id="scanFoodWrap">
               <span class="scan-halo"></span>
-              <img class="scan-food" src="assets/food/chicken-salad.png" alt="待识别食物" />
+              <img class="scan-food" src="chicken-salad.png" alt="待识别食物" />
               <svg class="scan-rings" viewBox="0 0 320 320" aria-hidden="true">
                 <path class="scan-ring-faint" d="M159 33c37 0 69 15 92 40 21 23 35 55 35 91 0 35-17 65-39 88-24 25-54 39-91 39-36 0-69-12-93-36-24-24-38-56-38-91 0-37 13-68 39-93 23-22 56-38 95-38Z" />
                 <path class="scan-ring-soft" d="M158 46c31-2 63 12 84 34 23 24 31 58 29 90-2 35-17 61-40 81-24 21-58 32-91 27-32-4-57-20-76-45-18-23-31-51-27-82 4-35 21-65 48-84 21-14 45-20 73-21Z" />
@@ -4297,7 +4297,7 @@
               <span>识别有误？点击修改</span>
             </button>
           </div>
-          <img class="result-thumb" src="assets/food/chicken-salad.png" alt="鸡胸沙拉" />
+          <img class="result-thumb" src="chicken-salad.png" alt="鸡胸沙拉" />
         </section>
 
         <div class="result-food-list" id="resultFoodList"></div>
@@ -4742,7 +4742,7 @@
           name: "鸡胸沙拉",
           summary: "鸡胸肉、生菜、牛油果、番茄…",
           calories: 526,
-          image: "assets/food/chicken-salad.png"
+          image: "chicken-salad.png"
         },
         {
           id: "breakfast-oatmeal-latte",
@@ -4752,7 +4752,7 @@
           name: "燕麦拿铁",
           summary: "燕麦、牛奶、蓝莓、杏仁",
           calories: 186,
-          image: "assets/food/oatmeal-latte.png"
+          image: "oatmeal-latte.png"
         }
       ],
       mealHistory: {
@@ -4765,7 +4765,7 @@
             name: "蒸鱼糙米饭",
             summary: "蒸鱼、西兰花、糙米饭",
             calories: 600,
-            image: "assets/food/dinner-steamed-fish.png"
+            image: "dinner-steamed-fish.png"
           },
           {
             id: "breakfast-oatmeal-latte-0603",
@@ -4775,7 +4775,7 @@
             name: "燕麦拿铁",
             summary: "燕麦、牛奶、蓝莓、杏仁",
             calories: 186,
-            image: "assets/food/oatmeal-latte.png"
+            image: "oatmeal-latte.png"
           }
         ],
         "2026-06-02": [
@@ -4787,7 +4787,7 @@
             name: "鸡胸沙拉",
             summary: "鸡胸肉、生菜、牛油果、番茄…",
             calories: 526,
-            image: "assets/food/chicken-salad.png"
+            image: "chicken-salad.png"
           }
         ]
       },
@@ -4803,7 +4803,7 @@
         consumptionRatio: 100,
         startCalories: 120,
         goalPercent: 29,
-        image: "assets/food/chicken-salad.png",
+        image: "chicken-salad.png",
         tags: ["轻盈午餐", "蛋白质充足", "符合减脂目标"],
         note: "这是一份轻盈均衡的午餐，适合今天的减脂目标。",
         needs_retake: false,
@@ -5454,7 +5454,7 @@
 
     function fallbackFoodsFromLocal(imageSrc, mealType, preferredName) {
       var local = null;
-      if (imageSrc && imageSrc.indexOf("assets/food/") === 0) {
+      if (imageSrc && imageSrc.indexOf("") === 0) {
         local = recognizeFoodLocal(imageSrc, mealType);
       }
       if (!local && preferredName) {
@@ -5562,7 +5562,7 @@
 
     async function recognizeFoodAI(imageSrc, forceFresh) {
       try {
-        if (imageSrc.indexOf("assets/food/") === 0) {
+        if (imageSrc.indexOf("") === 0) {
           var assetFoods = fallbackFoodsFromLocal(imageSrc, "午餐", "");
           var assetDish = assetFoods[0];
           logRecognitionStep("图片尺寸", { source: imageSrc, local_demo_asset: true, compressionRatio: 1 });
@@ -5579,7 +5579,7 @@
           };
         }
         var prepared = await prepareRecognitionImage(imageSrc);
-        if (!prepared.quality.passed && imageSrc.indexOf("assets/food/") !== 0) {
+        if (!prepared.quality.passed && imageSrc.indexOf("") !== 0) {
           return {
             needs_retake: true,
             foods: [],
@@ -5690,12 +5690,12 @@
       { name:"糖醋排骨", calories:450, summary:"糖醋排骨一份", tags:["高热量","偶尔食用","解馋"], note:"糖醋排骨糖和油都多，偶尔吃一次解解馋就好。", category:"中式", image:"" },
 
       /* 沙拉 / 西式 */
-      { name:"鸡胸沙拉", calories:320, summary:"鸡胸肉配混合生菜沙拉", tags:["低脂","高蛋白","减脂餐"], note:"鸡胸肉沙拉是减脂期经典搭配，蛋白质充足热量适中。", category:"沙拉", image:"assets/food/chicken-salad.png" },
+      { name:"鸡胸沙拉", calories:320, summary:"鸡胸肉配混合生菜沙拉", tags:["低脂","高蛋白","减脂餐"], note:"鸡胸肉沙拉是减脂期经典搭配，蛋白质充足热量适中。", category:"沙拉", image:"chicken-salad.png" },
       { name:"凯撒沙拉", calories:380, summary:"凯撒沙拉配面包丁", tags:["沙拉","中热量","口感丰富"], note:"凯撒酱热量偏高，可以选择少酱版本。", category:"沙拉", image:"" },
       { name:"牛油果沙拉", calories:350, summary:"牛油果配混合蔬菜沙拉", tags:["健康脂肪","纤维","优质脂肪"], note:"牛油果富含单不饱和脂肪酸，对心脏有益。", category:"沙拉", image:"" },
 
       /* 饮品 / 早餐 */
-      { name:"燕麦拿铁", calories:180, summary:"燕麦奶拿铁一杯", tags:["饮品","早餐","中热量"], note:"燕麦奶比全脂牛奶热量略低，拿铁咖啡提神醒脑。", category:"饮品", image:"assets/food/oatmeal-latte.png" },
+      { name:"燕麦拿铁", calories:180, summary:"燕麦奶拿铁一杯", tags:["饮品","早餐","中热量"], note:"燕麦奶比全脂牛奶热量略低，拿铁咖啡提神醒脑。", category:"饮品", image:"oatmeal-latte.png" },
       { name:"美式咖啡", calories:10, summary:"黑咖啡一杯", tags:["饮品","极低卡","提神"], note:"黑咖啡几乎零卡，还有助于提高代谢率。", category:"饮品", image:"" },
       { name:"拿铁咖啡", calories:150, summary:"全脂拿铁一杯", tags:["饮品","钙质","早餐"], note:"拿铁含牛奶，提供钙质和蛋白质，比加糖饮品更健康。", category:"饮品", image:"" },
       { name:"果汁", calories:120, summary:"鲜榨果汁一杯", tags:["饮品","维生素","注意糖分"], note:"果汁虽然含维C，但缺少纤维且糖分浓缩，不如直接吃水果。", category:"饮品", image:"" },
@@ -7122,18 +7122,18 @@
               <div class="album-section-label">或从示例中选择</div>
               <div class="album-photo-grid">
                 <div class="album-photo-grid-items" id="albumPhotoGrid">
-                  <div class="album-photo-thumb" data-photo="assets/food/chicken-salad.png" data-name="鸡胸沙拉" tabindex="0" role="button" aria-label="选择鸡胸沙拉">
-                    <img src="assets/food/chicken-salad.png" alt="鸡胸沙拉" loading="lazy" />
+                  <div class="album-photo-thumb" data-photo="chicken-salad.png" data-name="鸡胸沙拉" tabindex="0" role="button" aria-label="选择鸡胸沙拉">
+                    <img src="chicken-salad.png" alt="鸡胸沙拉" loading="lazy" />
                     <span class="album-photo-thumb-name">鸡胸沙拉</span>
                     <span class="album-photo-thumb-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                   </div>
-                  <div class="album-photo-thumb" data-photo="assets/food/oatmeal-latte.png" data-name="燕麦拿铁" tabindex="0" role="button" aria-label="选择燕麦拿铁">
-                    <img src="assets/food/oatmeal-latte.png" alt="燕麦拿铁" loading="lazy" />
+                  <div class="album-photo-thumb" data-photo="oatmeal-latte.png" data-name="燕麦拿铁" tabindex="0" role="button" aria-label="选择燕麦拿铁">
+                    <img src="oatmeal-latte.png" alt="燕麦拿铁" loading="lazy" />
                     <span class="album-photo-thumb-name">燕麦拿铁</span>
                     <span class="album-photo-thumb-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                   </div>
-                  <div class="album-photo-thumb" data-photo="assets/food/dinner-steamed-fish.png" data-name="清蒸鲈鱼" tabindex="0" role="button" aria-label="选择清蒸鲈鱼">
-                    <img src="assets/food/dinner-steamed-fish.png" alt="清蒸鲈鱼" loading="lazy" />
+                  <div class="album-photo-thumb" data-photo="dinner-steamed-fish.png" data-name="清蒸鲈鱼" tabindex="0" role="button" aria-label="选择清蒸鲈鱼">
+                    <img src="dinner-steamed-fish.png" alt="清蒸鲈鱼" loading="lazy" />
                     <span class="album-photo-thumb-name">清蒸鲈鱼</span>
                     <span class="album-photo-thumb-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>
                   </div>
