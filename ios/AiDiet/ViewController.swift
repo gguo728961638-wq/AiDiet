@@ -79,17 +79,12 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
     // MARK: - Progress
 
     private func updateProgress() {
-        if webView.estimatedProgress >= 1.0 {
-            UIView.animate(withDuration: 0.3, delay: 0.1) {
-                self.webView.evaluateJavaScript("document.body.style.opacity = '1'")
-            }
-        }
     }
 
     // MARK: - WKNavigationDelegate
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        webView.evaluateJavaScript("document.body.style.opacity = '0'; document.body.style.transition = 'opacity 0.3s'")
+        // Page is visible, no opacity tricks needed
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
