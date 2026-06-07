@@ -4686,29 +4686,37 @@
 
     async function runRecognitionFromImage(imageSrc, sourceLabel, isRealPhoto) {
       showToast("正在识别食物...");
-
-      var aiResult = await recognizeFoodAI(imageSrc, true);
-      if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
-        if (isRealPhoto) {
-          showToast(aiResult.reason || "识别不确定，请重新拍摄或手动选择");
-          return;
+      try {
+        var aiResult = await recognizeFoodAI(imageSrc, true);
+        if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
+          if (isRealPhoto) {
+            showToast(aiResult.reason || "识别不确定，请重新拍摄或手动选择");
+            return;
+          }
+          aiResult = {
+            needs_retake: false,
+            foods: fallbackFoodsFromLocal(imageSrc, "午餐", sourceLabel || "检测食物"),
+            reason: "图像质量不足，已进入本地兜底确认"
+          };
         }
-        aiResult = {
-          needs_retake: false,
-          foods: fallbackFoodsFromLocal(imageSrc, "午餐", sourceLabel || "检测食物"),
-          reason: "图像质量不足，已进入本地兜底确认"
-        };
-      }
-      if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
-        aiResult = {
+        if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
+          aiResult = {
+            needs_retake: false,
+            foods: fallbackFoodsFromLocal(imageSrc, "午餐", isRealPhoto ? "拍摄照片" : (sourceLabel || "鸡胸沙拉")),
+            reason: "AI 未返回可用结果，已进入本地兜底确认"
+          };
+        }
+        applyRecognitionToPending(aiResult, imageSrc, "午餐", aiResult.meta);
+      } catch (e) {
+        console.log("[AI] runRecognition异常: " + e.message);
+        var fallbackResult = {
           needs_retake: false,
           foods: fallbackFoodsFromLocal(imageSrc, "午餐", isRealPhoto ? "拍摄照片" : (sourceLabel || "鸡胸沙拉")),
-          reason: "AI 未返回可用结果，已进入本地兜底确认"
+          reason: "识别异常，已进入本地兜底确认"
         };
+        applyRecognitionToPending(fallbackResult, imageSrc, "午餐", fallbackResult.meta);
       }
-      applyRecognitionToPending(aiResult, imageSrc, "午餐", aiResult.meta);
       showToast(appState.pendingRecognition.uncertain ? "识别不确定，请确认结果" : "识别完成，请确认结果");
-
       stopCamera();
       saveState();
       resultAnimationPlayed = false;
@@ -5135,6 +5143,15 @@
         if (!str) return 0;
         if (typeof str === "number") return str;
         var s = String(str);
+        /* 优先匹配"约XXX大卡"格式 */
+        var calMatch = s.match(/约(\d+)[-~](\d+)\s*大卡/);
+        if (calMatch) return Math.round((parseInt(calMatch[1]) + parseInt(calMatch[2])) / 2);
+        var calMatch2 = s.match(/约(\d+)\s*大卡/);
+        if (calMatch2) return parseInt(calMatch2[1]);
+        /* 匹配末尾的大卡数字 */
+        var tailMatch = s.match(/(\d+)\s*大卡/);
+        if (tailMatch) return parseInt(tailMatch[1]);
+        /* fallback：匹配第一个数字 */
         var numMatch = s.match(/(\d+)/);
         if (numMatch) return parseInt(numMatch[1]);
         if (/少量|偏少|小份/.test(s)) return 120;
@@ -5176,14 +5193,21 @@
             /* 新格式：{ needs_retake, foods: [...] } */
             if (r.foods && Array.isArray(r.foods) && r.foods.length > 0) {
               if (r.needs_retake) { console.log("[AI] needs_retake=true"); return null; }
-              var best = r.foods[0];
-              for (var k = 1; k < r.foods.length; k++) {
-                if (r.foods[k].confidence > best.confidence) best = r.foods[k];
+              /* 汇总所有食物的热量，取置信度最高的作为主名称 */
+              var totalCal = 0;
+              var mainFood = r.foods[0];
+              var foodNames = [];
+              for (var k = 0; k < r.foods.length; k++) {
+                var f = r.foods[k];
+                var fc = parseCalories(f.portion_level);
+                if (fc > 0) totalCal += fc;
+                if (f.confidence > mainFood.confidence) mainFood = f;
+                if (f.name) foodNames.push(f.name);
               }
-              var cal = parseCalories(best.portion_level);
-              if (best.name && cal > 0) {
-                console.log("[AI] 新格式成功! name=" + best.name + ", cal=" + cal);
-                return { name: best.name, calories: Math.max(1, Math.min(9999, cal)) };
+              var displayName = foodNames.length > 1 ? foodNames.join("、") : mainFood.name;
+              if (displayName && totalCal > 0) {
+                console.log("[AI] 新格式成功! name=" + displayName + ", totalCal=" + totalCal);
+                return { name: displayName, calories: Math.max(1, Math.min(9999, totalCal)) };
               }
             }
             /* 旧格式：{ name, calories } */

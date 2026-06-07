@@ -78,6 +78,11 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
             return
         }
         var html = (try? String(contentsOf: htmlURL, encoding: .utf8)) ?? ""
+        /* 将相对图片路径转为绝对 file:// URL，解决 WKWebView 资源加载问题 */
+        let bundlePath = htmlURL.deletingLastPathComponent().path
+        html = html.replacingOccurrences(of: "src=\"assets/", with: "src=\"file://\(bundlePath)/assets/")
+        html = html.replacingOccurrences(of: "src='assets/", with: "src='file://\(bundlePath)/assets/")
+        html = html.replacingOccurrences(of: "data-photo=\"assets/", with: "data-photo=\"file://\(bundlePath)/assets/")
         /* 读取原生存储数据，注入到页面中供 JS 同步使用 */
         if let data = try? Data(contentsOf: storageFileURL),
            let json = String(data: data, encoding: .utf8) {
@@ -85,9 +90,11 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
             let inject = "<script>window.__nativeStorageData='\\('" + escaped + "');</script>"
             html = html.replacingOccurrences(of: "<head>", with: "<head>" + inject)
         }
-        /* 使用 loadHTMLString + baseURL，确保图片等资源相对路径正确解析 */
-        let baseURL = htmlURL.deletingLastPathComponent()
-        webView.loadHTMLString(html, baseURL: baseURL)
+        /* 写入 Documents 目录，用 loadFileURL 加载 */
+        let docsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let tempHTML = docsDir.appendingPathComponent("index_injected.html")
+        try? html.write(to: tempHTML, atomically: true, encoding: .utf8)
+        webView.loadFileURL(tempHTML, allowingReadAccessTo: htmlURL.deletingLastPathComponent())
     }
 
     // MARK: - Progress
