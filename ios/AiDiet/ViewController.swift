@@ -69,7 +69,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
     // MARK: - Load HTML
 
     private func loadHTML() {
-        guard let htmlURL = Bundle.main.url(forResource: "灵光", withExtension: "html") else {
+        guard let htmlURL = Bundle.main.url(forResource: "index", withExtension: "html") else {
             showError("无法加载应用资源")
             return
         }

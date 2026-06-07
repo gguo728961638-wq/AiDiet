@@ -10,7 +10,7 @@
 		BB000000000000000000001 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000001 /* AppDelegate.swift */; };
 		BB000000000000000000002 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000002 /* ViewController.swift */; };
 		BB000000000000000000003 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000004 /* Assets.xcassets */; };
-		BB000000000000000000004 /* 灵光.html in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000005 /* 灵光.html */; };
+		BB000000000000000000004 /* index.html in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000005 /* index.html */; };
 		BB000000000000000000005 /* chicken-salad.png in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000006 /* chicken-salad.png */; };
 		BB000000000000000000006 /* dinner-steamed-fish.png in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000007 /* dinner-steamed-fish.png */; };
 		BB000000000000000000007 /* oatmeal-latte.png in Resources */ = {isa = PBXBuildFile; fileRef = AA000000000000000000008 /* oatmeal-latte.png */; };
@@ -22,7 +22,7 @@
 		AA000000000000000000002 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		AA000000000000000000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA000000000000000000004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		AA000000000000000000005 /* 灵光.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "灵光.html"; path = "灵光.html"; sourceTree = "<group>"; };
+		AA000000000000000000005 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "index.html"; path = "index.html"; sourceTree = "<group>"; };
 		AA000000000000000000006 /* chicken-salad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "chicken-salad.png"; path = "assets/food/chicken-salad.png"; sourceTree = "<group>"; };
 		AA000000000000000000007 /* dinner-steamed-fish.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "dinner-steamed-fish.png"; path = "assets/food/dinner-steamed-fish.png"; sourceTree = "<group>"; };
 		AA000000000000000000008 /* oatmeal-latte.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "oatmeal-latte.png"; path = "assets/food/oatmeal-latte.png"; sourceTree = "<group>"; };
@@ -65,7 +65,7 @@
 		FF000000000000000000020 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				AA000000000000000000005 /* 灵光.html */,
+				AA000000000000000000005 /* index.html */,
 				FF000000000000000000021 /* assets */,
 			);
 			name = Resources;
@@ -158,7 +158,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BB000000000000000000003 /* Assets.xcassets in Resources */,
-				BB000000000000000000004 /* 灵光.html in Resources */,
+				BB000000000000000000004 /* index.html in Resources */,
 				BB000000000000000000005 /* chicken-salad.png in Resources */,
 				BB000000000000000000006 /* dinner-steamed-fish.png in Resources */,
 				BB000000000000000000007 /* oatmeal-latte.png in Resources */,
