@@ -25,7 +25,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         config.allowsInlineMediaPlayback = true
         config.mediaTypesRequiringUserActionForPlayback = []
         config.allowsAirPlayForMediaPlayback = true
-        config.preferences.javaScriptEnabled = true
+        config.defaultWebpagePreferences.allowsContentJavaScript = true
 
         let hapticScript = WKUserScript(
             source: """
@@ -155,6 +155,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
 
     // MARK: - WKUIDelegate (File Chooser)
 
+    #if targetEnvironment(macCatalyst)
     func webView(
         _ webView: WKWebView,
         runOpenPanelWith parameters: WKOpenPanelParameters,
@@ -181,6 +182,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
 
         present(alert, animated: true)
     }
+    #endif
 
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
         let alert = UIAlertController(title: nil, message: message, preferredStyle: .alert)
