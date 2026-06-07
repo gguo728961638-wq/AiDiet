@@ -42,6 +42,20 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
             forMainFrameOnly: true
         )
         config.userContentController.addUserScript(hapticScript)
+
+        /* 在页面脚本执行前注入原生存储数据，供 loadState() 读取 */
+        var storageJSON = "null"
+        if let data = try? Data(contentsOf: storageFileURL),
+           let json = String(data: data, encoding: .utf8) {
+            storageJSON = "'" + json.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'") + "'"
+        }
+        let storageScript = WKUserScript(
+            source: "window.__nativeStorageData = \(storageJSON);",
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: true
+        )
+        config.userContentController.addUserScript(storageScript)
+
         config.userContentController.add(self, name: "hapticHandler")
         config.userContentController.add(self, name: "storageHandler")
 
@@ -86,18 +100,9 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         /* JS 数据中的 "assets/ 路径（如 image 字段）也转为绝对路径 */
         html = html.replacingOccurrences(of: "\"assets/", with: "\"file://\(bundlePath)/assets/")
         html = html.replacingOccurrences(of: "'assets/", with: "'file://\(bundlePath)/assets/")
-        /* 读取原生存储数据，注入到页面中供 JS 同步使用 */
-        if let data = try? Data(contentsOf: storageFileURL),
-           let json = String(data: data, encoding: .utf8) {
-            let escaped = json.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'")
-            let inject = "<script>window.__nativeStorageData='\\('" + escaped + "');</script>"
-            html = html.replacingOccurrences(of: "<head>", with: "<head>" + inject)
-        }
-        /* 写入 Documents 目录后用 loadFileURL 加载，确保 file:// URL 和注入脚本同时生效 */
-        let docsDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let tempHTML = docsDir.appendingPathComponent("index_injected.html")
-        try? html.write(to: tempHTML, atomically: true, encoding: .utf8)
-        webView.loadFileURL(tempHTML, allowingReadAccessTo: htmlURL.deletingLastPathComponent())
+        /* 通过 loadHTMLString + baseURL 加载，确保页面不空白 */
+        let baseURL = htmlURL.deletingLastPathComponent()
+        webView.loadHTMLString(html, baseURL: baseURL)
     }
 
     // MARK: - Progress
