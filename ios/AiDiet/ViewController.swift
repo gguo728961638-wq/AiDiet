@@ -83,6 +83,8 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         html = html.replacingOccurrences(of: "src=\"assets/", with: "src=\"file://\(bundlePath)/assets/")
         html = html.replacingOccurrences(of: "src='assets/", with: "src='file://\(bundlePath)/assets/")
         html = html.replacingOccurrences(of: "data-photo=\"assets/", with: "data-photo=\"file://\(bundlePath)/assets/")
+        html = html.replacingOccurrences(of: "\"assets/", with: "\"file://\(bundlePath)/assets/")
+        html = html.replacingOccurrences(of: "'assets/", with: "'file://\(bundlePath)/assets/")
         /* 读取原生存储数据，注入到页面中供 JS 同步使用 */
         if let data = try? Data(contentsOf: storageFileURL),
            let json = String(data: data, encoding: .utf8) {
