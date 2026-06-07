@@ -4686,37 +4686,29 @@
 
     async function runRecognitionFromImage(imageSrc, sourceLabel, isRealPhoto) {
       showToast("正在识别食物...");
-      try {
-        var aiResult = await recognizeFoodAI(imageSrc, true);
-        if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
-          if (isRealPhoto) {
-            showToast(aiResult.reason || "识别不确定，请重新拍摄或手动选择");
-            return;
-          }
-          aiResult = {
-            needs_retake: false,
-            foods: fallbackFoodsFromLocal(imageSrc, "午餐", sourceLabel || "检测食物"),
-            reason: "图像质量不足，已进入本地兜底确认"
-          };
+
+      var aiResult = await recognizeFoodAI(imageSrc, true);
+      if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
+        if (isRealPhoto) {
+          showToast(aiResult.reason || "识别不确定，请重新拍摄或手动选择");
+          return;
         }
-        if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
-          aiResult = {
-            needs_retake: false,
-            foods: fallbackFoodsFromLocal(imageSrc, "午餐", isRealPhoto ? "拍摄照片" : (sourceLabel || "鸡胸沙拉")),
-            reason: "AI 未返回可用结果，已进入本地兜底确认"
-          };
-        }
-        applyRecognitionToPending(aiResult, imageSrc, "午餐", aiResult.meta);
-      } catch (e) {
-        console.log("[AI] runRecognition异常: " + e.message);
-        var fallbackResult = {
+        aiResult = {
+          needs_retake: false,
+          foods: fallbackFoodsFromLocal(imageSrc, "午餐", sourceLabel || "检测食物"),
+          reason: "图像质量不足，已进入本地兜底确认"
+        };
+      }
+      if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
+        aiResult = {
           needs_retake: false,
           foods: fallbackFoodsFromLocal(imageSrc, "午餐", isRealPhoto ? "拍摄照片" : (sourceLabel || "鸡胸沙拉")),
-          reason: "识别异常，已进入本地兜底确认"
+          reason: "AI 未返回可用结果，已进入本地兜底确认"
         };
-        applyRecognitionToPending(fallbackResult, imageSrc, "午餐", fallbackResult.meta);
       }
+      applyRecognitionToPending(aiResult, imageSrc, "午餐", aiResult.meta);
       showToast(appState.pendingRecognition.uncertain ? "识别不确定，请确认结果" : "识别完成，请确认结果");
+
       stopCamera();
       saveState();
       resultAnimationPlayed = false;
