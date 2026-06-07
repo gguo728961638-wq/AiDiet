@@ -16,7 +16,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         loadHTML()
     }
 
-    override var preferredStatusBarHidden: Bool { true }
+    override var prefersStatusBarHidden: Bool { true }
     override var prefersHomeIndicatorAutoHidden: Bool { true }
 
     // MARK: - WebView Setup
@@ -160,7 +160,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
     func webView(
         _ webView: WKWebView,
         runOpenPanelWith parameters: WKOpenPanelParameters,
-        for initiatedByFrame frame: WKFrameInfo,
+        initiatedByFrame frame: WKFrameInfo,
         completionHandler: @escaping ([URL]?) -> Void
     ) {
         let allowMultiple = parameters.allowsMultipleSelection

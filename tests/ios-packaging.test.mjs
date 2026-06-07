@@ -27,7 +27,8 @@ const htmlBaseName = bundledHtml.replace(/\.html$/, "");
 assert.match(viewController, new RegExp(`forResource: "${htmlBaseName}"`), "WKWebView loads the actual bundled HTML filename");
 assert.match(viewController, /picker\.dismiss\(animated: true\) \{ \[weak self\] in\s+self\?\.imagePickerCompletion\?\(nil\)\s+self\?\.imagePickerCompletion = nil\s+\}/s, "image picker cancel closure safely handles weak self");
 assert.match(viewController, /defaultWebpagePreferences\.allowsContentJavaScript = true/, "WKWebView enables JavaScript using the modern API");
-assert.match(viewController, /#if targetEnvironment\(macCatalyst\)[\s\S]*runOpenPanelWith parameters: WKOpenPanelParameters[\s\S]*#endif/, "open panel delegate is only compiled where WKOpenPanelParameters is available");
+assert.match(viewController, /override var prefersStatusBarHidden: Bool \{ true \}/, "status bar override uses the correct UIViewController property");
+assert.match(viewController, /#if targetEnvironment\(macCatalyst\)[\s\S]*runOpenPanelWith parameters: WKOpenPanelParameters,\s*initiatedByFrame frame: WKFrameInfo,[\s\S]*#endif/, "open panel delegate uses the correct WebKit method signature and is only compiled where available");
 
 const project = read("ios/AiDiet.xcodeproj/project.pbxproj");
 assert.match(project, /PRODUCT_BUNDLE_IDENTIFIER = "\$\(BUNDLE_ID\)";/, "Bundle ID is driven by GitHub secret");
