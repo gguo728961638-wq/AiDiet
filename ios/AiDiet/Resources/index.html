@@ -3039,6 +3039,14 @@
       background: var(--sage);
       border: 8px solid rgba(251, 250, 246, 0.96);
       box-shadow: 0 18px 34px rgba(83, 96, 74, 0.26);
+      transition: transform 0.15s ease, opacity 0.2s ease;
+    }
+    .shutter-button:active {
+      transform: scale(0.92);
+    }
+    .shutter-button.processing {
+      opacity: 0.6;
+      pointer-events: none;
     }
 
     .result-content {
@@ -4488,6 +4496,7 @@
     var detectionScanning = false;
     var detectionIntervalId = null;
     var lastDetectionFrame = null;
+    var lastRecognitionFrame = null;
     var foodDetected = false;
     var detectionTimeoutId = null;
 
@@ -4508,7 +4517,7 @@
     }
 
     async function detectFrame() {
-      if (!detectionScanning || foodDetected) return;
+      if (!detectionScanning) return;
       var thumb = captureDetectionFrame();
       if (!thumb) return;
       try {
@@ -4526,6 +4535,9 @@
         var parsed = JSON.parse(m[0]);
         if (parsed.detected && (parsed.confidence || 0) > 0.5) {
           lastDetectionFrame = thumb;
+          /* 同时保存高分辨率帧用于识别，确保识别和检测使用同一帧 */
+          var hiResFrame = captureFrameFromCamera();
+          lastRecognitionFrame = hiResFrame || thumb;
           showFoodOutline(parsed.label || "食物");
         }
       } catch (e) { /* 静默失败 */ }
@@ -4535,6 +4547,7 @@
       if (detectionScanning) return;
       detectionScanning = true;
       foodDetected = false;
+      lastRecognitionFrame = null;
       var label = document.getElementById("detectionLabel");
       if (label) { label.classList.remove("active"); }
       var outline = document.getElementById("foodOutline");
@@ -4562,19 +4575,16 @@
     }
 
     function showFoodOutline(name) {
+      var isFirstDetection = !foodDetected;
       foodDetected = true;
-      stopDetection();
-      haptic("success");
+      if (isFirstDetection) haptic("success");
       var outline = document.getElementById("foodOutline");
       if (outline) outline.classList.add("active");
       var label = document.getElementById("detectionLabel");
       var labelText = document.getElementById("detectionLabelText");
       if (labelText) labelText.textContent = "检测到 " + name;
       if (label) label.classList.add("active");
-      /* 1.2秒后自动开始识别 */
-      setTimeout(function() {
-        if (foodDetected) captureAndRecognize();
-      }, 1200);
+      /* 不再自动触发识别，等待用户点击拍照按钮 */
     }
 
     /* --- 真实摄像头控制 --- */
@@ -4661,6 +4671,7 @@
 
     function stopCamera() {
       stopDetection();
+      lastRecognitionFrame = null;
       if (cameraStream) {
         cameraStream.getTracks().forEach(function(t) { t.stop(); });
         cameraStream = null;
@@ -6714,23 +6725,34 @@
 
     async function captureAndRecognize() {
       stopDetection();
+      /* 冻结摄像头画面，给用户"拍照"的感觉 */
+      var video = document.getElementById("cameraVideo");
+      if (video) video.pause();
+      var shutterBtn = document.querySelector('.shutter-button');
+      if (shutterBtn) shutterBtn.classList.add('processing');
       var outline = document.getElementById("foodOutline");
       if (outline) outline.classList.remove("active");
       var label = document.getElementById("detectionLabel");
       if (label) label.classList.remove("active");
 
-      /* 优先使用真实摄像头拍摄的照片 */
-      var imageSrc = captureFrameFromCamera();
-      var isRealPhoto = Boolean(imageSrc);
+      /* 优先使用检测时保存的高分辨率帧（与检测使用完全相同的图片） */
+      var imageSrc = lastRecognitionFrame || null;
+      var isRealPhoto = Boolean(imageSrc && imageSrc !== lastDetectionFrame);
+      if (!imageSrc) {
+        imageSrc = captureFrameFromCamera();
+        isRealPhoto = Boolean(imageSrc);
+      }
       if (!imageSrc && lastDetectionFrame) {
         imageSrc = lastDetectionFrame;
         isRealPhoto = false;
       }
       if (!imageSrc) {
+        if (shutterBtn) shutterBtn.classList.remove('processing');
         triggerNativeCamera();
         return;
       }
       lastDetectionFrame = null;
+      lastRecognitionFrame = null;
 
       await runRecognitionFromImage(imageSrc, isRealPhoto ? "拍摄照片" : "检测照片", isRealPhoto);
     }
