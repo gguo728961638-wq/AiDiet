@@ -98,7 +98,7 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
             return
         }
 
-        if url.scheme == "http" || url.scheme == "https" {
+        if url.scheme == "http" || url.scheme == "https" || url.scheme == "file" {
             decisionHandler(.allow)
         } else {
             decisionHandler(.cancel)
