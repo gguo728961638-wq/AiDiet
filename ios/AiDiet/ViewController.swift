@@ -105,25 +105,22 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         }
         /* 将 src / data-photo 的相对路径转为绝对 file:// URL，确保图片在 WKWebView 中可加载 */
         let bundlePath = htmlURL.deletingLastPathComponent().path
-        html = html.replacingOccurrences(of: "src=\"assets/", with: "src=\"file://\(bundlePath)/assets/")
-        html = html.replacingOccurrences(of: "src='assets/", with: "src='file://\(bundlePath)/assets/")
-        html = html.replacingOccurrences(of: "data-photo=\"assets/", with: "data-photo=\"file://\(bundlePath)/assets/")
+        let encodedBundlePath = bundlePath.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? bundlePath
+        html = html.replacingOccurrences(of: "src=\"assets/", with: "src=\"file://\(encodedBundlePath)/assets/")
+        html = html.replacingOccurrences(of: "src='assets/", with: "src='file://\(encodedBundlePath)/assets/")
+        html = html.replacingOccurrences(of: "data-photo=\"assets/", with: "data-photo=\"file://\(encodedBundlePath)/assets/")
         /* JS 数据中的 "assets/ 路径（如 image 字段）也转为绝对路径 */
-        html = html.replacingOccurrences(of: "\"assets/", with: "\"file://\(bundlePath)/assets/")
-        html = html.replacingOccurrences(of: "'assets/", with: "'file://\(bundlePath)/assets/")
+        html = html.replacingOccurrences(of: "\"assets/", with: "\"file://\(encodedBundlePath)/assets/")
+        html = html.replacingOccurrences(of: "'assets/", with: "'file://\(encodedBundlePath)/assets/")
 
-        /*
-         * 优先用 loadFileURL 加载临时文件（file:// origin 可访问 bundle 资源）。
-         * 若写入临时文件失败，回退到 loadHTMLString + baseURL。
-         */
+        /* 写入临时目录后用 loadFileURL 加载（file:// origin 可正常访问 bundle 资源） */
         let tempDir = FileManager.default.temporaryDirectory
-        let tempHTML = tempDir.appendingPathComponent("aiDiet_\(ProcessInfo.processInfo.processIdentifier).html")
+        let tempHTML = tempDir.appendingPathComponent("index.html")
         let baseURL = htmlURL.deletingLastPathComponent()
 
         if (try? html.write(to: tempHTML, atomically: true, encoding: .utf8)) != nil {
             webView.loadFileURL(tempHTML, allowingReadAccessTo: baseURL)
         } else {
-            /* 写入临时文件失败时回退到 loadHTMLString */
             webView.loadHTMLString(html, baseURL: baseURL)
         }
     }

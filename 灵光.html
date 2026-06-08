@@ -4522,7 +4522,7 @@
     /* 全局错误捕获：iOS 空白页调试 */
     window.onerror = function(msg, url, line, col, err) {
       var el = document.createElement("div");
-      el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:red;color:#fff;padding:12px;font:14px monospace;word-break:break-all;";
+      el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:red;color:#fff;padding:16px;font:14px monospace;word-break:break-all;";
       el.textContent = "[JS ERROR] " + msg + " (" + line + ":" + col + ")";
       document.body.appendChild(el);
       console.error("[JS ERROR]", msg, url, line, col, err);
@@ -4530,7 +4530,24 @@
     };
     window.addEventListener("unhandledrejection", function(e) {
       console.error("[Unhandled Promise]", e.reason);
+      var el = document.createElement("div");
+      el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:orange;color:#000;padding:16px;font:14px monospace;word-break:break-all;";
+      el.textContent = "[PROMISE ERROR] " + (e.reason && e.reason.message ? e.reason.message : e.reason);
+      document.body.appendChild(el);
     });
+
+    /* 诊断：3 秒后检查 body 是否有可见内容 */
+    (function() {
+      setTimeout(function() {
+        if (document.body && document.body.children.length <= 1) {
+          var el = document.createElement("div");
+          el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:navy;color:#fff;padding:16px;font:14px monospace;word-break:break-all;";
+          el.textContent = "[DIAG] body children=" + document.body.children.length + " innerHTML=" + document.body.innerHTML.substring(0, 200);
+          document.body.appendChild(el);
+          console.error("[DIAG] body may be empty, children=" + document.body.children.length);
+        }
+      }, 3000);
+    })();
 
     const mainRoutes = new Set(["home", "profile", "camera", "result"]);
     const routableRoutes = new Set([
@@ -7914,7 +7931,7 @@
       applyRoute(window.location.hash.replace("#", "") || "home");
     } catch(initErr) {
       console.error("[INIT ERROR]", initErr);
-      document.body.innerHTML = '<div style="padding:40px;font:16px sans-serif;text-align:center;"><h2>应用加载出错</h2><p style="color:#999;margin-top:12px;">' + String(initErr.message || initErr) + '</p></div>';
+      document.body.innerHTML = '<div style="padding:40px;font:16px sans-serif;text-align:center;background:#fff;"><h2 style="color:red;">应用加载出错</h2><p style="color:#333;margin-top:12px;">' + String(initErr.message || initErr) + '</p><p style="color:#999;margin-top:8px;font-size:12px;">' + String(initErr.stack || "") + '</p></div>';
     }
 
     var _editResultHandled = false;
