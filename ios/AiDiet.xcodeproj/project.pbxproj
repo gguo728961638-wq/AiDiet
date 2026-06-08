@@ -23,9 +23,9 @@
 		AA000000000000000000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA000000000000000000004 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		AA000000000000000000005 /* index.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = "index.html"; path = "index.html"; sourceTree = "<group>"; };
-		AA000000000000000000006 /* chicken-salad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "chicken-salad.png"; sourceTree = "<group>"; };
-		AA000000000000000000007 /* dinner-steamed-fish.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "dinner-steamed-fish.png"; sourceTree = "<group>"; };
-		AA000000000000000000008 /* oatmeal-latte.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "oatmeal-latte.png"; sourceTree = "<group>"; };
+		AA000000000000000000006 /* chicken-salad.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "assets/food/chicken-salad.png"; sourceTree = "<group>"; };
+		AA000000000000000000007 /* dinner-steamed-fish.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "assets/food/dinner-steamed-fish.png"; sourceTree = "<group>"; };
+		AA000000000000000000008 /* oatmeal-latte.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "assets/food/oatmeal-latte.png"; sourceTree = "<group>"; };
 		AA000000000000000000009 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Resources/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AA000000000000000000010 /* AiDiet.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AiDiet.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
