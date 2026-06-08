@@ -66,12 +66,28 @@
 			isa = PBXGroup;
 			children = (
 				AA000000000000000000005 /* index.html */,
+				FF000000000000000000021 /* assets */,
+			);
+			name = Resources;
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		FF000000000000000000021 /* assets */ = {
+			isa = PBXGroup;
+			children = (
+				FF000000000000000000022 /* food */,
+			);
+			path = assets;
+			sourceTree = "<group>";
+		};
+		FF000000000000000000022 /* food */ = {
+			isa = PBXGroup;
+			children = (
 				AA000000000000000000006 /* chicken-salad.png */,
 				AA000000000000000000007 /* dinner-steamed-fish.png */,
 				AA000000000000000000008 /* oatmeal-latte.png */,
 			);
-			name = Resources;
-			path = Resources;
+			path = food;
 			sourceTree = "<group>";
 		};
 		FF000000000000000000011 /* Products */ = {

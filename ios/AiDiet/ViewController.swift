@@ -97,11 +97,22 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
             showError("无法加载应用资源")
             return
         }
-        let html = (try? String(contentsOf: htmlURL, encoding: .utf8)) ?? ""
+        var html = (try? String(contentsOf: htmlURL, encoding: .utf8)) ?? ""
         if html.isEmpty {
             showError("HTML 内容为空")
             return
         }
+
+        /*
+         * Xcode 将 assets/food/ 下的图片打包到 app 根目录（与 index.html 同级），
+         * 但 HTML 引用的是 assets/food/xxx.png。需要将相对路径替换为绝对 file:// URL。
+         */
+        let bundleRoot = Bundle.main.bundlePath
+        html = html.replacingOccurrences(of: "src=\"assets/food/", with: "src=\"file://\(bundleRoot)/")
+        html = html.replacingOccurrences(of: "src='assets/food/", with: "src='file://\(bundleRoot)/")
+        html = html.replacingOccurrences(of: "\"assets/food/", with: "\"file://\(bundleRoot)/")
+        html = html.replacingOccurrences(of: "'assets/food/", with: "'file://\(bundleRoot)/")
+
         let baseURL = htmlURL.deletingLastPathComponent()
         webView.loadHTMLString(html, baseURL: baseURL)
     }
