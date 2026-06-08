@@ -208,8 +208,8 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
                 let ts = Int(Date().timeIntervalSince1970 * 1000)
                 let filename = "\(ts)_\(Int.random(in: 1000...9999)).jpg"
                 let fileURL = imagesDir.appendingPathComponent(filename)
-                if let data = Data(base64Encoded: String(value.dropFirst(value.firstIndex(of: ",")!.utf16Offset(in: value) + 1))),
-                   try? data.write(to: fileURL) {
+                if let data = Data(base64Encoded: String(value.dropFirst(value.firstIndex(of: ",")!.utf16Offset(in: value) + 1))) {
+                    try? data.write(to: fileURL)
                     let path = fileURL.absoluteString
                     result = result.replacingOccurrences(of: value, with: path)
                 }
