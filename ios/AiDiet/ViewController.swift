@@ -158,7 +158,9 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
     private func handleStorage(action: String, body: [String: Any]) {
         switch action {
         case "save":
-            if let json = body["data"] as? String {
+            if var json = body["data"] as? String {
+                /* 将 base64 图片存为文件，避免状态数据过大被截断 */
+                json = extractAndSaveImages(from: json)
                 try? json.write(to: storageFileURL, atomically: true, encoding: .utf8)
                 let js = "window.__storageCallback && window.__storageCallback(true)"
                 webView.evaluateJavaScript(js)
@@ -176,6 +178,49 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         default:
             break
         }
+    }
+
+    /// 扫描 JSON 中的 base64 图片数据，保存为文件后替换为 file:// 路径
+    private func extractAndSaveImages(from json: String) -> String {
+        guard var obj = try? JSONSerialization.jsonObject(with: Data(json.utf8)) as? [String: Any] else { return json }
+
+        let imagesDir = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+            .appendingPathComponent("meal_images")
+        try? FileManager.default.createDirectory(at: imagesDir, withIntermediateDirectories: true)
+
+        let imageKeys = ["image"]
+        var result = json
+
+        func processItem(_ item: inout [String: Any]) {
+            for key in imageKeys {
+                guard let value = item[key] as? String,
+                      value.hasPrefix("data:image/") else { continue }
+                let ts = Int(Date().timeIntervalSince1970 * 1000)
+                let filename = "\(ts)_\(Int.random(in: 1000...9999)).jpg"
+                let fileURL = imagesDir.appendingPathComponent(filename)
+                if let data = Data(base64Encoded: String(value.dropFirst(value.firstIndex(of: ",")!.utf16Offset(in: value) + 1))),
+                   try? data.write(to: fileURL) {
+                    let path = fileURL.absoluteString
+                    result = result.replacingOccurrences(of: value, with: path)
+                }
+            }
+        }
+
+        if var pending = obj["pendingRecognition"] as? [String: Any] { processItem(&pending); obj["pendingRecognition"] = pending }
+        if var meals = obj["meals"] as? [[String: Any]] {
+            for i in meals.indices { processItem(&meals[i]) }
+            obj["meals"] = meals
+        }
+        if var history = obj["mealHistory"] as? [String: [[String: Any]]] {
+            for (day, var dayMeals) in history {
+                for i in dayMeals.indices { processItem(&dayMeals[i]) }
+                history[day] = dayMeals
+            }
+            obj["mealHistory"] = history
+        }
+        if let newData = try? JSONSerialization.data(withJSONObject: obj),
+           let newJSON = String(data: newData, encoding: .utf8) { return newJSON }
+        return result
     }
 
     // MARK: - Haptic Feedback
