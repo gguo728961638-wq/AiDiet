@@ -4519,35 +4519,13 @@
   </div>
 
   <script>
-    /* 全局错误捕获：iOS 空白页调试 */
     window.onerror = function(msg, url, line, col, err) {
-      var el = document.createElement("div");
-      el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:red;color:#fff;padding:16px;font:14px monospace;word-break:break-all;";
-      el.textContent = "[JS ERROR] " + msg + " (" + line + ":" + col + ")";
-      document.body.appendChild(el);
       console.error("[JS ERROR]", msg, url, line, col, err);
       return true;
     };
     window.addEventListener("unhandledrejection", function(e) {
       console.error("[Unhandled Promise]", e.reason);
-      var el = document.createElement("div");
-      el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:orange;color:#000;padding:16px;font:14px monospace;word-break:break-all;";
-      el.textContent = "[PROMISE ERROR] " + (e.reason && e.reason.message ? e.reason.message : e.reason);
-      document.body.appendChild(el);
     });
-
-    /* 诊断：3 秒后检查 body 是否有可见内容 */
-    (function() {
-      setTimeout(function() {
-        if (document.body && document.body.children.length <= 1) {
-          var el = document.createElement("div");
-          el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:navy;color:#fff;padding:16px;font:14px monospace;word-break:break-all;";
-          el.textContent = "[DIAG] body children=" + document.body.children.length + " innerHTML=" + document.body.innerHTML.substring(0, 200);
-          document.body.appendChild(el);
-          console.error("[DIAG] body may be empty, children=" + document.body.children.length);
-        }
-      }, 3000);
-    })();
 
     const mainRoutes = new Set(["home", "profile", "camera", "result"]);
     const routableRoutes = new Set([
@@ -5304,14 +5282,14 @@
 
     function buildFoodRecognitionPrompt() {
       return [
-        "你是专业的食物热量识别工具，只输出JSON，不要输出任何其他文字。",
+        "你是专业的食物识别与热量分析工具，只输出JSON，不要输出任何其他文字。",
         "只根据图片中实际可见的食物识别，绝对禁止猜测或编造不存在的食物。",
         "如果图片模糊、无法看清食物、或图片中没有食物，请返回 {\"needs_retake\":true,\"foods\":[]}",
-        "识别图片中所有可见的食物/菜品，每道菜单独一条记录。",
-        "每道菜给出：name（食物名称）、calories（这道菜的总热量大卡，根据份量估算）、description（一句话减脂建议）。",
+        "识别图片中所有可见的食物，明确区分每种食物的类型（如主食、肉类、蔬菜、水果、饮品、甜点等）。",
+        "每种食物单独一条记录，给出：name（食物名称，需体现食物类型）、calories（这道菜的总热量大卡，根据可见份量估算）、description（一句话减脂说明，包括该食物对减脂的影响和食用建议）。",
         "最后给出整体 advice 评级：rating（优/良/注意/差）。",
         "只输出紧凑JSON：",
-        "{\"needs_retake\":false,\"foods\":[{\"name\":\"菜名\",\"calories\":250,\"description\":\"减脂建议\"}],\"advice\":{\"rating\":\"良\"}}"
+        "{\"needs_retake\":false,\"foods\":[{\"name\":\"菜名\",\"calories\":250,\"description\":\"减脂说明\"}],\"advice\":{\"rating\":\"良\"}}"
       ].join("\n");
     }
 
@@ -5550,7 +5528,7 @@
           { role: "system", content: buildFoodRecognitionPrompt() },
           { role: "user", content: [
             imageContent,
-            { type: "text", text: "请识别图片中的所有食物，每道菜返回 name、calories、description（减脂建议）三个字段。" }
+            { type: "text", text: "请识别图片中的所有食物，明确区分食物类型，每种食物返回 name（含类型）、calories、description（减脂说明）三个字段。" }
           ]}
         ];
         var msg = await callAI识别(messages);
@@ -7931,7 +7909,7 @@
       applyRoute(window.location.hash.replace("#", "") || "home");
     } catch(initErr) {
       console.error("[INIT ERROR]", initErr);
-      document.body.innerHTML = '<div style="padding:40px;font:16px sans-serif;text-align:center;background:#fff;"><h2 style="color:red;">应用加载出错</h2><p style="color:#333;margin-top:12px;">' + String(initErr.message || initErr) + '</p><p style="color:#999;margin-top:8px;font-size:12px;">' + String(initErr.stack || "") + '</p></div>';
+      document.body.innerHTML = '<div style="padding:40px;font:16px sans-serif;text-align:center;background:#fff;"><h2 style="color:red;">应用加载出错</h2><p style="color:#999;margin-top:12px;">' + String(initErr.message || initErr) + '</p></div>';
     }
 
     var _editResultHandled = false;

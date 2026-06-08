@@ -7,7 +7,6 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
     private var webView: WKWebView!
     private var progressObservation: NSKeyValueObservation?
     private var imagePickerCompletion: (([URL]?) -> Void)?
-    private var diagLabel: UILabel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,9 +16,6 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
 
         setupWebView()
         setupConstraints()
-        setupDiagLabel()
-
-        diagLabel.text = "[DIAG] viewDidLoad ok, loading HTML..."
         DispatchQueue.main.async { [weak self] in
             self?.loadHTML()
         }
@@ -27,28 +23,6 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
 
     override var prefersStatusBarHidden: Bool { true }
     override var prefersHomeIndicatorAutoHidden: Bool { true }
-
-    // MARK: - Diagnostic Label
-
-    private func setupDiagLabel() {
-        diagLabel = UILabel()
-        diagLabel.translatesAutoresizingMaskIntoConstraints = false
-        diagLabel.text = "[DIAG] starting..."
-        diagLabel.textColor = .white
-        diagLabel.backgroundColor = UIColor(red: 0, green: 0, blue: 0.5, alpha: 0.92)
-        diagLabel.font = UIFont(name: "Menlo", size: 13) ?? UIFont.monospacedSystemFont(ofSize: 13, weight: .regular)
-        diagLabel.numberOfLines = 3
-        diagLabel.textAlignment = .left
-        diagLabel.layer.cornerRadius = 6
-        diagLabel.clipsToBounds = true
-        view.addSubview(diagLabel)
-        NSLayoutConstraint.activate([
-            diagLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
-            diagLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 12),
-            diagLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -12),
-            diagLabel.heightAnchor.constraint(greaterThanOrEqualToConstant: 44)
-        ])
-    }
 
     // MARK: - WebView Setup
 
@@ -120,23 +94,14 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
 
     private func loadHTML() {
         guard let htmlURL = Bundle.main.url(forResource: "index", withExtension: "html") else {
-            diagLabel.text = "[DIAG] ERROR: index.html not found in bundle"
             showError("无法加载应用资源")
             return
         }
         let html = (try? String(contentsOf: htmlURL, encoding: .utf8)) ?? ""
         if html.isEmpty {
-            diagLabel.text = "[DIAG] ERROR: HTML content is empty"
             showError("HTML 内容为空")
             return
         }
-
-        diagLabel.text = "[DIAG] HTML loaded (\(html.count) chars), loading into WebView..."
-
-        /*
-         * 使用 loadHTMLString 加载，以 bundle Resources 目录为 baseURL。
-         * HTML 中的相对路径（如 assets/xxx.png）会自动从 bundle 加载。
-         */
         let baseURL = htmlURL.deletingLastPathComponent()
         webView.loadHTMLString(html, baseURL: baseURL)
     }
@@ -149,28 +114,6 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
     // MARK: - WKNavigationDelegate
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        diagLabel.text = "[DIAG] Page finished loading. Frame: \(Int(webView.frame.width))x\(Int(webView.frame.height))"
-        /* 2 秒后检查 WebView 是否有可见内容 */
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-            guard let self = self else { return }
-            self.webView.evaluateJavaScript("document.body ? document.body.children.length : -1") { result, _ in
-                let count = (result as? Int) ?? -1
-                self.diagLabel.text = "[DIAG] body children: \(count) | \(Int(self.webView.frame.width))x\(Int(self.webView.frame.height))"
-                if count <= 1 {
-                    self.webView.evaluateJavaScript("document.body ? document.body.innerHTML.substring(0, 300) : 'no body'") { html, _ in
-                        self.diagLabel.text = "[DIAG] \(html ?? "nil")"
-                    }
-                }
-            }
-        }
-    }
-
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        diagLabel.text = "[DIAG] Navigation FAILED: \(error.localizedDescription)"
-    }
-
-    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        diagLabel.text = "[DIAG] Provisional nav FAILED: \(error.localizedDescription)"
     }
 
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
