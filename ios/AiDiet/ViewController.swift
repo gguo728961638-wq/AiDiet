@@ -100,9 +100,19 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         /* JS 数据中的 "assets/ 路径（如 image 字段）也转为绝对路径 */
         html = html.replacingOccurrences(of: "\"assets/", with: "\"file://\(bundlePath)/assets/")
         html = html.replacingOccurrences(of: "'assets/", with: "'file://\(bundlePath)/assets/")
-        /* 通过 loadHTMLString + baseURL 加载，确保页面不空白 */
+
+        /*
+         * 写入临时文件后用 loadFileURL 加载，让页面获得 file:// origin，
+         * 这样 JS 中的 fetch(file://) 和 <img src="file://"> 都能正常工作。
+         * loadHTMLString 的 about:blank origin 会阻止 file:// 资源加载。
+         */
+        let tempDir = FileManager.default.temporaryDirectory
+        let tempHTML = tempDir.appendingPathComponent("aiDiet_\(ProcessInfo.processInfo.processIdentifier).html")
+        try? html.write(to: tempHTML, atomically: true, encoding: .utf8)
+
+        /* 保持与原始 bundle 相同的目录层级，确保相对路径解析一致 */
         let baseURL = htmlURL.deletingLastPathComponent()
-        webView.loadHTMLString(html, baseURL: baseURL)
+        webView.loadFileURL(tempHTML, allowingReadAccessTo: baseURL)
     }
 
     // MARK: - Progress

@@ -823,29 +823,33 @@
       background: var(--sage-soft);
       overflow: hidden;
       display: flex;
-      align-items: center;
-      padding: 25px 20px 20px 25px;
-      gap: 12px;
+      flex-direction: row;
+      padding: 0;
     }
 
     .dinner-content {
       position: relative;
       z-index: 2;
+      padding: 22px 22px 18px;
       flex: 1;
-      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
 
     .dinner-title {
       margin: 0;
-      font-size: 21px;
+      font-size: 20px;
       font-weight: 680;
       letter-spacing: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .spark {
       color: var(--sage);
-      font-size: 18px;
-      margin-left: 5px;
+      font-size: 20px;
       display: inline-block;
       animation: rotateSlow 6s linear infinite;
     }
@@ -856,51 +860,64 @@
     }
 
     .dinner-kcal {
-      margin-top: 15px;
       display: flex;
-      align-items: flex-end;
-      gap: 8px;
+      align-items: baseline;
+      gap: 6px;
     }
 
     .dinner-kcal strong {
       font-size: 50px;
-      line-height: 0.86;
-      font-weight: 690;
-      letter-spacing: 0;
+      line-height: 1;
+      font-weight: 700;
+      color: var(--sage);
     }
 
     .dinner-kcal span {
-      margin-bottom: 5px;
-      font-size: 18px;
+      font-size: 16px;
+      color: #697660;
+    }
+
+    .dinner-recommend-dynamic {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
 
     .recommend-pill {
       width: fit-content;
-      margin-top: 13px;
-      padding: 6px 11px;
+      padding: 4px 12px;
       border-radius: 999px;
-      background: rgba(251, 250, 246, 0.48);
+      background: rgba(251, 250, 246, 0.5);
       color: #5f6c57;
-      font-size: 14px;
+      font-size: 13px;
     }
 
-    .dinner-copy {
-      margin-top: 11px;
-      font-size: 17px;
-      font-weight: 650;
+    .dinner-dish-name {
+      font-size: 18px;
+      font-weight: 660;
       line-height: 1.3;
-      white-space: nowrap;
+    }
+
+    .dinner-detail-text {
+      font-size: 14px;
+      color: #5f6c57;
+      line-height: 1.5;
+    }
+
+    .dinner-reason {
+      font-size: 13px;
+      color: #697660;
+      line-height: 1.4;
     }
 
     .goal-pill {
       width: fit-content;
-      margin-top: 16px;
-      padding: 5px 10px;
+      padding: 5px 12px;
       border-radius: 999px;
       display: flex;
       align-items: center;
       gap: 6px;
-      background: rgba(251, 250, 246, 0.36);
+      background: rgba(251, 250, 246, 0.4);
       color: #697660;
       font-size: 13px;
     }
@@ -918,8 +935,7 @@
       object-fit: cover;
       object-position: center;
       filter: saturate(0.92);
-      box-shadow: 0 12px 28px rgba(55, 61, 49, 0.12);
-      flex-shrink: 0;
+      align-self: center;
     }
 
     /* ===== 加载状态通用 ===== */
@@ -3871,25 +3887,8 @@
       stroke-linejoin: round;
     }
 
-    .ai-note {
-      margin-top: 14px;
-      min-height: 54px;
-      border-radius: 29px;
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      padding: 0 22px;
-      background: rgba(251, 250, 246, 0.82);
-      box-shadow: var(--soft-shadow);
-      border: 1px solid rgba(255, 255, 255, 0.74);
-      font-size: 16px;
-      line-height: 1.35;
-    }
-
     .ai-note-mark {
-      color: var(--sage);
-      font-size: 23px;
-      flex: 0 0 auto;
+      display: none;
     }
 
     .result-actions {
@@ -4428,7 +4427,7 @@
           </div>
         </section>
 
-        <section class="ai-note">
+        <section class="ai-note" style="display:none">
           <span class="ai-note-mark">✦</span>
           这是一份轻盈均衡的午餐，适合今天的减脂目标。
         </section>
@@ -4686,34 +4685,39 @@
 
     async function runRecognitionFromImage(imageSrc, sourceLabel, isRealPhoto) {
       showToast("正在识别食物...");
-
-      var aiResult = await recognizeFoodAI(imageSrc, true);
-      if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
-        if (isRealPhoto) {
-          showToast(aiResult.reason || "识别不确定，请重新拍摄或手动选择");
-          return;
+      try {
+        var aiResult = await recognizeFoodAI(imageSrc, true);
+        if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
+          if (isRealPhoto) {
+            showToast(aiResult.reason || "识别不确定，请重新拍摄或手动选择");
+            return;
+          }
+          aiResult = {
+            needs_retake: false,
+            foods: fallbackFoodsFromLocal(imageSrc, "午餐", sourceLabel || "检测食物"),
+            reason: "图像质量不足，已进入本地兜底确认"
+          };
         }
-        aiResult = {
-          needs_retake: false,
-          foods: fallbackFoodsFromLocal(imageSrc, "午餐", sourceLabel || "检测食物"),
-          reason: "图像质量不足，已进入本地兜底确认"
-        };
-      }
-      if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
-        aiResult = {
-          needs_retake: false,
-          foods: fallbackFoodsFromLocal(imageSrc, "午餐", isRealPhoto ? "拍摄照片" : (sourceLabel || "鸡胸沙拉")),
-          reason: "AI 未返回可用结果，已进入本地兜底确认"
-        };
-      }
-      applyRecognitionToPending(aiResult, imageSrc, "午餐", aiResult.meta);
-      showToast(appState.pendingRecognition.uncertain ? "识别不确定，请确认结果" : "识别完成，请确认结果");
+        if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
+          aiResult = {
+            needs_retake: false,
+            foods: fallbackFoodsFromLocal(imageSrc, "午餐", isRealPhoto ? "拍摄照片" : (sourceLabel || "鸡胸沙拉")),
+            reason: "AI 未返回可用结果，已进入本地兜底确认"
+          };
+        }
+        applyRecognitionToPending(aiResult, imageSrc, "午餐", aiResult.meta);
+        showToast(appState.pendingRecognition.uncertain ? "识别不确定，请确认结果" : "识别完成，请确认结果");
 
-      stopCamera();
-      saveState();
-      resultAnimationPlayed = false;
-      window.location.hash = "result";
-      applyRoute("result");
+        stopCamera();
+        saveState();
+        resultAnimationPlayed = false;
+        window.location.hash = "result";
+        applyRoute("result");
+      } catch (error) {
+        console.error("[Recognition] runRecognitionFromImage error:", error);
+        showToast("识别暂时失败，请重新点击或换一张照片");
+        stopCamera();
+      }
     }
 
     function processCapturedPhoto(dataUrl) {
@@ -4763,7 +4767,7 @@
       },
       nutrition: {
         targetCalories: 1800,
-        extraCalories: 446,
+        extraCalories: 0,
         planMode: "低碳轻断食",
         remainingLabel: "今日剩余热量",
         carbRhythm: "低碳",
@@ -4925,7 +4929,7 @@
           ...JSON.parse(JSON.stringify(defaultState)),
           ...raw,
           user: { ...defaultState.user, ...(raw.user || {}) },
-          nutrition: { ...defaultState.nutrition, ...(raw.nutrition || {}) },
+          nutrition: { ...defaultState.nutrition, ...(raw.nutrition || {}), extraCalories: 0 },
           settings: { ...defaultState.settings, ...(raw.settings || {}) },
           pendingRecognition: { ...defaultState.pendingRecognition, ...(raw.pendingRecognition || {}) },
           mealHistory: { ...defaultState.mealHistory, ...(raw.mealHistory || {}) },
@@ -4940,6 +4944,32 @@
 
     const appState = loadState();
 
+    /* 启动时修正旧 localStorage 中 pendingRecognition 的热量不一致 */
+    (function() {
+      var pr = appState.pendingRecognition;
+      if (!pr) return;
+      /* 如果 perFood 不存在但从 foods 可以重建，则重建 */
+      if ((!pr.perFood || pr.perFood.length === 0) && Array.isArray(pr.foods) && pr.foods.length > 0) {
+        pr.perFood = pr.foods.map(function(f) {
+          var cal = Number(f.calories || f.estimated_calories || 0);
+          if (!Number.isFinite(cal) || cal <= 0) cal = 0;
+          return { name: f.name || "未知食物", calories: Math.round(cal), description: f.description || "" };
+        });
+      }
+      /* 从 perFood 实时求和修正 calories/baseCalories */
+      if (pr.perFood && pr.perFood.length > 0) {
+        var hasRealCalories = pr.perFood.some(function(f) { return f.calories > 0; });
+        if (hasRealCalories) {
+          var sum = pr.perFood.reduce(function(s, f) { return s + (f.calories || 0); }, 0);
+          if (sum > 0 && pr.calories !== sum) {
+            pr.calories = sum;
+            pr.baseCalories = sum;
+            pr.goalPercent = Math.round((sum / appState.nutrition.targetCalories) * 100);
+          }
+        }
+      }
+    })();
+
     function sanitizeStoredImage(image) {
       if (typeof image !== "string") return image || "";
       if (image.indexOf("data:image/") === 0 && image.length > 220000) return "";
@@ -4951,23 +4981,19 @@
       if (copy.pendingRecognition) {
         copy.pendingRecognition.image = sanitizeStoredImage(copy.pendingRecognition.image);
       }
-      if (Array.isArray(copy.meals)) {
-        copy.meals = copy.meals.map(function(meal) {
-          meal.image = sanitizeStoredImage(meal.image);
-          return meal;
-        });
-      }
+      /* meals 图片不做 sanitize，永久保留 */
       return copy;
     }
 
     function saveState() {
-      var data = JSON.stringify(sanitizeStateForStorage(appState));
-      /* iOS 原生存储优先 */
+      var rawData = JSON.stringify(appState);
+      var safeData = JSON.stringify(sanitizeStateForStorage(appState));
+      /* iOS 原生存储优先 —— 用原始数据，让 extractAndSaveImages 能处理 base64 图片 */
       if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.storageHandler) {
-        window.webkit.messageHandlers.storageHandler.postMessage({ action: "save", data: data });
+        window.webkit.messageHandlers.storageHandler.postMessage({ action: "save", data: rawData });
       }
-      /* 同时写 localStorage 作为备份 */
-      localStorage.setItem("aiDietAppState", data);
+      /* localStorage 用 sanitize 后的数据（大图已丢弃，防止配额超出） */
+      try { localStorage.setItem("aiDietAppState", safeData); } catch (e) { /* quota exceeded, native storage handles persistence */ }
     }
 
     function consumedCalories() {
@@ -5033,7 +5059,7 @@
             model: AI识别_CONFIG.model,
             messages: messages,
             response_format: { type: "json_object" },
-            max_tokens: 1200,
+            max_tokens: 1500,
             temperature: 0.1
           }),
           signal: controller.signal
@@ -5080,165 +5106,10 @@
       });
     }
 
-    /* AI 食物识别：极简 prompt，只返回名字+热量 */
-    async function recognizeFoodAI(imageSrc) {
-      var dataUrl;
-      if (imageSrc.indexOf("data:") === 0) {
-        dataUrl = imageSrc;
-        console.log("[AI] 输入: data URL, 长度=" + imageSrc.length);
-      } else {
-        /* 先转为 data URL，再压缩 */
-        try {
-          console.log("[AI] 输入: 文件路径=" + imageSrc);
-          var resp = await fetch(imageSrc);
-          var blob = await resp.blob();
-          dataUrl = await new Promise(function(resolve) {
-            var reader = new FileReader();
-            reader.onload = function() { resolve(reader.result); };
-            reader.readAsDataURL(blob);
-          });
-          console.log("[AI] fetch成功, dataUrl长度=" + dataUrl.length);
-        } catch (e) {
-          console.log("[AI] fetch失败: " + e.message);
-          return null;
-        }
-      }
-      var compressed = await compressImage识别(dataUrl);
-      console.log("[AI] 压缩完成, 长度=" + compressed.length);
-      var imageContent = { type: "image_url", image_url: { url: compressed } };
-
-      var messages = [
-        { role: "system", content: "你是一个食物识别助手。请只根据图片中可见内容识别食物。\n\n要求：\n1. 只识别图片中真实可见的食物，不要猜测看不清的内容。\n2. 如果不确定，请返回 uncertain=true。\n3. 如果有多个食物，请分别列出。\n4. 不要直接估算精确克数，只能给出「少量/标准/偏多」等粗略份量。\n5. 输出必须是 JSON，不要输出解释文本。\n6. confidence 必须是 0 到 1 之间的小数。\n7. 如果图片模糊、遮挡严重、食物不可见，请返回 needs_retake=true。\n8. 根据食物特性和烹饪方式给出估算热量大卡。\n\n输出格式：\n{\n  \"needs_retake\": false,\n  \"foods\": [\n    {\n      \"name\": \"食物名称\",\n      \"category\": \"主食/肉类/蔬菜/饮品/甜品/其他\",\n      \"confidence\": 0.0,\n      \"portion_level\": \"多少大卡\",\n      \"uncertain\": false,\n      \"reason\": \"简短说明为什么这样判断\"\n    }\n  ]\n}" },
-        { role: "user", content: [
-          imageContent,
-          { type: "text", text: "请识别这张图片中的食物。" }
-        ]}
-      ];
-
-      console.log("[AI] 发送API请求...");
-      var msg = await callAI识别(messages);
-      if (!msg) return null;
-
-      /* 尝试从 content 和 reasoning_content 分别提取 JSON */
-      var fields = [msg.content, msg.reasoning_content].filter(function(f) { return f && f.length > 10; });
-      for (var fi = 0; fi < fields.length; fi++) {
-        var raw = fields[fi];
-        console.log("[AI] 尝试字段#" + fi + ": 长度=" + raw.length + ", 前100字=" + raw.substring(0, 100));
-        var result = extractValidJson(raw);
-        if (result) return result;
-      }
-      console.log("[AI] 所有字段均未找到有效JSON，返回null");
-      return null;
-
-      /* 辅助：从 portion_level 字符串提取热量数字 */
-      function parseCalories(str) {
-        if (!str) return 0;
-        if (typeof str === "number") return str;
-        var s = String(str);
-        /* 优先匹配"约XXX大卡"格式 */
-        var calMatch = s.match(/约(\d+)[-~](\d+)\s*大卡/);
-        if (calMatch) return Math.round((parseInt(calMatch[1]) + parseInt(calMatch[2])) / 2);
-        var calMatch2 = s.match(/约(\d+)\s*大卡/);
-        if (calMatch2) return parseInt(calMatch2[1]);
-        /* 匹配末尾的大卡数字 */
-        var tailMatch = s.match(/(\d+)\s*大卡/);
-        if (tailMatch) return parseInt(tailMatch[1]);
-        /* fallback：匹配第一个数字 */
-        var numMatch = s.match(/(\d+)/);
-        if (numMatch) return parseInt(numMatch[1]);
-        if (/少量|偏少|小份/.test(s)) return 120;
-        if (/标准|正常|中等|适中/.test(s)) return 250;
-        if (/偏多|较多|大份|过量/.test(s)) return 450;
-        return 0;
-      }
-
-      /* 从文本中提取所有 JSON 块并匹配有效食物识别结果 */
-      function extractValidJson(text) {
-        var cleaned = text.replace(/```json\s*/g, "").replace(/```\s*/g, "").trim();
-        var results = [];
-        var pos = 0;
-        while (pos < cleaned.length) {
-          var braceIdx = cleaned.indexOf("{", pos);
-          if (braceIdx === -1) break;
-          var depth = 0;
-          var endIdx = -1;
-          for (var i = braceIdx; i < cleaned.length; i++) {
-            if (cleaned[i] === "{") depth++;
-            else if (cleaned[i] === "}") depth--;
-            if (depth === 0) { endIdx = i; break; }
-          }
-          if (endIdx === -1) break;
-          results.push(cleaned.substring(braceIdx, endIdx + 1));
-          pos = endIdx + 1;
-        }
-
-        for (var ji = 0; ji < results.length; ji++) {
-          try {
-            var r = JSON.parse(results[ji]);
-            /* 跳过 system prompt 中的 JSON 模板 */
-            if (r.foods && r.foods.length === 1) {
-              var f0 = r.foods[0];
-              if (f0.name === "食物名称" || f0.portion_level === "多少大卡") continue;
-            }
-            if (r.name === "食物名称" || r.name === "具体菜名") continue;
-
-            /* 新格式：{ needs_retake, foods: [...] } */
-            if (r.foods && Array.isArray(r.foods) && r.foods.length > 0) {
-              if (r.needs_retake) { console.log("[AI] needs_retake=true"); return null; }
-              /* 汇总所有食物的热量，取置信度最高的作为主名称 */
-              var totalCal = 0;
-              var mainFood = r.foods[0];
-              var foodNames = [];
-              for (var k = 0; k < r.foods.length; k++) {
-                var f = r.foods[k];
-                var fc = parseCalories(f.portion_level);
-                if (fc > 0) totalCal += fc;
-                if (f.confidence > mainFood.confidence) mainFood = f;
-                if (f.name) foodNames.push(f.name);
-              }
-              var displayName = foodNames.length > 1 ? foodNames.join("、") : mainFood.name;
-              if (displayName && totalCal > 0) {
-                console.log("[AI] 新格式成功! name=" + displayName + ", totalCal=" + totalCal);
-                return { name: displayName, calories: Math.max(1, Math.min(9999, totalCal)) };
-              }
-            }
-            /* 旧格式：{ name, calories } */
-            var n = r.name || r.food_name || "";
-            var c = parseCalories(r.calories || r.estimated_total_calories);
-            if (n && c > 0) {
-              console.log("[AI] 旧格式成功! name=" + n + ", cal=" + c);
-              return { name: n, calories: Math.max(1, Math.min(9999, c)) };
-            }
-          } catch(e) { /* skip invalid JSON */ }
-        }
-        return null;
-      }
-      return null;
-    }
-
-    const RECOGNITION_IMAGE_MAX_EDGE = 1280;
-    const RECOGNITION_JPEG_QUALITY = 0.9;
+    const RECOGNITION_IMAGE_MAX_EDGE = 1600;
+    const RECOGNITION_JPEG_QUALITY = 0.92;
     const RECOGNITION_CACHE_PREFIX = "aiDietRecognitionCache:";
     const RECOGNITION_CACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7;
-    const RECOGNITION_RESPONSE_SCHEMA_FIELDS = [
-      "needs_retake",
-      "best_display_name",
-      "dish_candidates",
-      "visible_ingredients",
-      "foods",
-      "name",
-      "category",
-      "confidence",
-      "portion_level",
-      "uncertain",
-      "reason"
-    ];
-    const FOOD_PORTION_MULTIPLIER = {
-      "少量": 0.72,
-      "标准": 1,
-      "偏多": 1.32,
-      "未知": 1
-    };
 
     function logRecognitionStep(label, payload) {
       try {
@@ -5405,13 +5276,14 @@
 
     function buildFoodRecognitionPrompt() {
       return [
-        "你是一个食物热量识别工具，只输出JSON，不要输出任何其他文字。",
-        "只根据图片识别食物，禁止猜测。看不清则 needs_retake=true。",
+        "你是专业的食物热量识别工具，只输出JSON，不要输出任何其他文字。",
+        "只根据图片中实际可见的食物识别，绝对禁止猜测或编造不存在的食物。",
+        "如果图片模糊、无法看清食物、或图片中没有食物，请返回 {\"needs_retake\":true,\"foods\":[]}",
         "识别图片中所有可见的食物/菜品，每道菜单独一条记录。",
-        "每道菜都要给出名称、分类、置信度、份量、估算热量。",
-        "最后给出整体营养建议：rating 评级（优/良/注意/差）和 tips 建议列表。",
-        "只输出紧凑JSON，格式如下：",
-        "{\"needs_retake\":false,\"best_display_name\":\"主菜品名\",\"foods\":[{\"name\":\"菜名\",\"category\":\"分类\",\"confidence\":0.9,\"portion_level\":\"标准\",\"estimated_calories\":250,\"uncertain\":false,\"reason\":\"识别理由\"}],\"advice\":{\"rating\":\"良\",\"tips\":[\"建议1\",\"建议2\",\"建议3\"]}}"
+        "每道菜给出：name（食物名称）、calories（这道菜的总热量大卡，根据份量估算）、description（一句话减脂建议）。",
+        "最后给出整体 advice 评级：rating（优/良/注意/差）。",
+        "只输出紧凑JSON：",
+        "{\"needs_retake\":false,\"foods\":[{\"name\":\"菜名\",\"calories\":250,\"description\":\"减脂建议\"}],\"advice\":{\"rating\":\"良\"}}"
       ].join("\n");
     }
 
@@ -5428,35 +5300,13 @@
       return null;
     }
 
-    function normalizeFoodConfidence(value) {
-      var numeric = Number(value);
-      if (!Number.isFinite(numeric)) return 0;
-      if (numeric > 1) numeric = numeric / 100;
-      return Math.max(0, Math.min(1, Number(numeric.toFixed(2))));
-    }
-
-    function normalizePortionLevel(value) {
-      var portion = String(value || "未知");
-      if (/少|小|light/i.test(portion)) return "少量";
-      if (/多|大|heavy/i.test(portion)) return "偏多";
-      if (/标准|正常|中|regular|medium/i.test(portion)) return "标准";
-      return "未知";
-    }
-
     function normalizeRecognitionItem(item, fallbackCategory) {
-      var confidence = normalizeFoodConfidence(item.confidence);
-      var estimatedCal = Number(item.estimated_calories);
-      if (!Number.isFinite(estimatedCal) || estimatedCal <= 0) estimatedCal = 0;
+      var cal = Number(item.calories || item.estimated_calories);
+      if (!Number.isFinite(cal) || cal <= 0) cal = 0;
       return {
         name: String(item.name || item.food_name || "").trim(),
-        category: String(item.category || fallbackCategory || "其他").trim() || "其他",
-        confidence: confidence,
-        portion_level: normalizePortionLevel(item.portion_level),
-        estimated_calories: Math.round(estimatedCal),
-        uncertain: Boolean(item.uncertain) || confidence < 0.65,
-        reason: String(item.reason || "基于图片可见内容判断").trim(),
-        includeSide: item.includeSide !== false,
-        includeSauce: Boolean(item.includeSauce)
+        calories: Math.round(cal),
+        description: String(item.description || "").trim()
       };
     }
 
@@ -5472,13 +5322,8 @@
       if (bestName && !candidates.some(function(item) { return item.name === bestName; })) {
         candidates.unshift({
           name: bestName,
-          category: "其他",
-          confidence: candidates[0] && candidates[0].confidence || 0.66,
-          portion_level: candidates[0] && candidates[0].portion_level || "标准",
-          uncertain: candidates[0] && candidates[0].uncertain || false,
-          reason: "AI 给出的最佳展示名称",
-          includeSide: true,
-          includeSauce: false
+          calories: 0,
+          description: "AI 给出的最佳展示名称"
         });
       }
       return candidates;
@@ -5558,69 +5403,48 @@
       if (!local) {
         return [{
           name: preferredName || "未知食物",
-          category: "其他",
-          confidence: 0.42,
-          portion_level: "未知",
-          uncertain: true,
-          reason: "AI 无法稳定识别，使用本地兜底结果",
-          includeSide: true,
-          includeSauce: false
+          calories: 300,
+          description: "AI 无法稳定识别，使用本地兜底结果"
         }];
       }
       return [{
         name: local.name,
-        category: local.category || "其他",
-        confidence: 0.72,
-        portion_level: "标准",
-        uncertain: false,
-        reason: "使用本地食物数据库匹配",
-        includeSide: true,
-        includeSauce: false
+        calories: local.calories || 200,
+        description: local.note || "使用本地食物数据库匹配"
       }];
     }
 
     function calculateConfirmedNutrition(foods) {
       foods = Array.isArray(foods) ? foods : [];
       var names = [];
-      var tags = [];
       var total = 0;
       var perFood = [];
+      var descriptions = [];
 
       for (var i = 0; i < foods.length; i++) {
         var food = foods[i];
-        var foodDb = lookupFood(food.name);
-        /* 优先用 AI 返回的 estimated_calories，其次查本地数据库，最后用置信度估算 */
-        var baseCal = food.estimated_calories || (foodDb ? foodDb.calories : (food.confidence < 0.45 ? 220 : 320));
-        var cal = Math.round(baseCal * (FOOD_PORTION_MULTIPLIER[food.portion_level] || 1));
-        cal = Math.max(1, Math.min(9999, cal || 200));
+        var cal = food.calories || food.estimated_calories || 200;
+        cal = Math.max(1, Math.min(9999, Math.round(cal)));
         total += cal;
-        var displayName = food.confidence < 0.65 ? "可能是" + food.name : food.name;
+        var displayName = food.name || "未知食物";
         names.push(displayName);
-        tags.push(food.category || (foodDb && foodDb.category) || "食物");
         perFood.push({ name: displayName, calories: cal, category: food.category || "其他" });
+        if (food.description) descriptions.push(displayName + "：" + food.description);
       }
 
       if (foods.length === 0) {
         names.push("未知食物");
-        tags.push("手动确认");
         total = 300;
         perFood.push({ name: "未知食物", calories: 300, category: "其他" });
       }
 
-      var hasSide = foods.some(function(food) { return food.includeSide; });
-      var hasSauce = foods.some(function(food) { return food.includeSauce; });
-      if (hasSide) total += 45;
-      if (hasSauce) total += 70;
-
       total = Math.max(1, Math.min(9999, total || 300));
       return {
-        name: names.length > 1 ? names.join(" + ") : (names[0] || "未知食物"),
+        name: names.join(" + "),
         calories: total,
-        summary: foods.map(function(food) { return food.name; }).join("、"),
-        tags: Array.from(new Set(tags)).slice(0, 3),
-        note: foods.some(function(food) { return food.confidence < 0.65 || food.uncertain; })
-          ? "识别结果存在不确定项，请以你的确认结果为准。"
-          : "已根据确认后的食物和份量计算热量。",
+        summary: names.join("、"),
+        tags: [],
+        note: descriptions.length > 0 ? descriptions.join("；") : "已根据识别食物计算热量。",
         perFood: perFood
       };
     }
@@ -5638,7 +5462,7 @@
       result.dish_candidates = Array.isArray(recognition.dish_candidates) ? recognition.dish_candidates : [];
       result.visible_ingredients = Array.isArray(recognition.visible_ingredients) ? recognition.visible_ingredients : [];
       result.best_display_name = recognition.best_display_name || (result.dish_candidates[0] && result.dish_candidates[0].name) || (result.foods[0] && result.foods[0].name) || "";
-      result.uncertain = result.foods.some(function(food) { return food.uncertain || food.confidence < 0.65; });
+      result.uncertain = result.foods.some(function(food) { return !food.calories || food.calories <= 0; });
       result.confirmed = true;
       result.recognitionMeta = meta || {};
       var nutrition = calculateConfirmedNutrition(result.foods.length ? result.foods : fallbackFoodsFromLocal(imageSrc, mealType));
@@ -5646,12 +5470,15 @@
       result.summary = nutrition.summary;
       result.tags = nutrition.tags;
       result.note = nutrition.note;
-      result.calories = nutrition.calories;
-      result.baseCalories = nutrition.calories;
       result.perFood = nutrition.perFood || [];
+      /* 确保总热量 = perFood 热量之和，避免不同步 */
+      var totalFromPerFood = result.perFood.reduce(function(s, f) { return s + (f.calories || 0); }, 0);
+      result.calories = totalFromPerFood > 0 ? totalFromPerFood : nutrition.calories;
+      result.baseCalories = result.calories;
+      console.log("[CALdebug] perFood=" + JSON.stringify(result.perFood.map(function(f){return {n:f.name,c:f.calories}})) + " totalFromPerFood=" + totalFromPerFood + " nutrition.calories=" + nutrition.calories + " result.calories=" + result.calories + " result.foods_count=" + result.foods.length);
       result.aiAdvice = recognition.advice || null;
       result.consumptionRatio = 100;
-      result.goalPercent = Math.round((nutrition.calories / appState.nutrition.targetCalories) * 100);
+      result.goalPercent = Math.round((result.calories / appState.nutrition.targetCalories) * 100);
     }
 
     async function recognizeFoodAI(imageSrc, forceFresh) {
@@ -5695,7 +5522,7 @@
           { role: "system", content: buildFoodRecognitionPrompt() },
           { role: "user", content: [
             imageContent,
-            { type: "text", text: "请识别图片中的所有食物，并严格按 JSON schema 返回。" }
+            { type: "text", text: "请识别图片中的所有食物，每道菜返回 name、calories、description（减脂建议）三个字段。" }
           ]}
         ];
         var msg = await callAI识别(messages);
@@ -6186,6 +6013,16 @@
 
     function renderResult() {
       const result = appState.pendingRecognition;
+      /* 每次渲染前强制从 perFood 重新计算总热量，确保一致 */
+      if (result.perFood && result.perFood.length > 0) {
+        var recalcedTotal = result.perFood.reduce(function(s, f) { return s + (f.calories || 0); }, 0);
+        if (recalcedTotal > 0 && recalcedTotal !== result.calories) {
+          console.log("[CALdebug] renderResult 修正: " + result.calories + " → " + recalcedTotal + " (perFood sum)");
+          result.calories = recalcedTotal;
+          result.baseCalories = recalcedTotal;
+          result.goalPercent = Math.round((recalcedTotal / appState.nutrition.targetCalories) * 100);
+        }
+      }
       const subtitle = document.querySelector(".result-subtitle");
       const thumb = document.querySelector(".result-thumb");
       const note = document.querySelector(".ai-note");
@@ -6225,13 +6062,21 @@
         }
       }
 
-      if (tagsSection && Array.isArray(result.tags) && result.tags.length > 0) {
+      if (tagsSection) {
+        var tags = (Array.isArray(result.tags) && result.tags.length > 0) ? result.tags.slice() : ["轻盈午餐", "蛋白质充足", "符合减脂目标"];
+        /* 根据 AI 评级动态调整第三个标签 */
+        var rating = (result.aiAdvice && result.aiAdvice.rating) || "";
+        if (rating === "注意" || rating === "差") {
+          tags[2] = "偏离减脂目标";
+        } else {
+          tags[2] = "符合减脂目标";
+        }
         var tagIcons = [
           '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4C11 4 5 9 5 17c0 3 2 5 5 5 8 0 10-10 10-18Z" /><path d="M5 20c3-6 7-10 14-15" /></svg>',
           '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c4 4 6 7 6 11a6 6 0 0 1-12 0c0-4 2-7 6-11Z" /></svg>',
           '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v3M12 17v3M4 12h3M17 12h3M7.8 7.8l2.1 2.1M14.1 14.1l2.1 2.1M16.2 7.8l-2.1 2.1M9.9 14.1l-2.1 2.1" /></svg>'
         ];
-        tagsSection.innerHTML = result.tags.map(function(tag, i) {
+        tagsSection.innerHTML = tags.map(function(tag, i) {
           return '<div class="result-tag">' + (tagIcons[i] || tagIcons[0]) + escapeHtml(tag) + '</div>';
         }).join("");
       }
@@ -6260,11 +6105,17 @@
       if (data && data.rating) {
         ratingEl.textContent = data.rating;
         ratingEl.style.display = "";
-        if (Array.isArray(data.tips)) {
-          tipsEl.innerHTML = data.tips.map(function(t) {
-            return '<div class="ai-advice-tip">' + escapeHtml(t) + '</div>';
-          }).join("");
-        }
+      }
+
+      /* 优先使用 aiAdvice.tips，否则从 note（description）生成 */
+      var tips = (data && Array.isArray(data.tips) && data.tips.length > 0) ? data.tips : [];
+      if (tips.length === 0 && mealData.note) {
+        tips = mealData.note.split(/[；;]/).filter(function(t) { return t.trim().length > 0; });
+      }
+      if (tips.length > 0) {
+        tipsEl.innerHTML = tips.slice(0, 3).map(function(t) {
+          return '<div class="ai-advice-tip">' + escapeHtml(t.trim()) + '</div>';
+        }).join("");
       } else {
         tipsEl.innerHTML = '<div class="ai-advice-tip">暂无建议</div>';
       }
@@ -6398,8 +6249,12 @@
       const resultProgress = document.getElementById("resultProgress");
       const goalCopy = document.querySelector(".goal-copy");
 
+      /* 始终从 perFood 实时求和，不依赖 baseCalories */
+      var baseFromPerFood = (result.perFood || []).reduce(function(s, f) { return s + (f.calories || 0); }, 0);
+      if (baseFromPerFood <= 0) baseFromPerFood = result.baseCalories || result.calories || 0;
+      result.baseCalories = baseFromPerFood;
       result.consumptionRatio = ratio;
-      const adjusted = Math.round((result.baseCalories * ratio) / 100);
+      const adjusted = Math.round((baseFromPerFood * ratio) / 100);
       result.calories = adjusted;
       result.goalPercent = Math.round((adjusted / appState.nutrition.targetCalories) * 100);
 
@@ -6847,50 +6702,58 @@
       /* 等待 400ms 让用户看到照片 */
       await new Promise(function(r) { setTimeout(r, 400); });
 
-      /* ── Step 2: API 识别 ── */
-      var startTime = Date.now();
-      var aiResult = await recognizeFoodAI(imageSrc, true);
-      var elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      try {
+        /* ── Step 2: API 识别 ── */
+        var startTime = Date.now();
+        var aiResult = await recognizeFoodAI(imageSrc, true);
+        var elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
-      if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
-        if (isRealPhoto) {
-          if (overlay) overlay.classList.remove("active");
-          if (shutterBtn) shutterBtn.classList.remove('processing');
-          showToast(aiResult.reason || "识别不确定，请重新拍摄或手动选择");
-          return;
+        if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
+          if (isRealPhoto) {
+            if (overlay) overlay.classList.remove("active");
+            if (shutterBtn) shutterBtn.classList.remove('processing');
+            showToast(aiResult.reason || "识别不确定，请重新拍摄或手动选择");
+            return;
+          }
+          aiResult = {
+            needs_retake: false,
+            foods: fallbackFoodsFromLocal(imageSrc, "午餐", "检测食物"),
+            reason: "图像质量不足，已进入本地兜底确认"
+          };
         }
-        aiResult = {
-          needs_retake: false,
-          foods: fallbackFoodsFromLocal(imageSrc, "午餐", "检测食物"),
-          reason: "图像质量不足，已进入本地兜底确认"
-        };
-      }
-      if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
-        aiResult = {
-          needs_retake: false,
-          foods: fallbackFoodsFromLocal(imageSrc, "午餐", isRealPhoto ? "拍摄照片" : "检测食物"),
-          reason: "AI 未返回可用结果，已进入本地兜底确认"
-        };
-      }
-      applyRecognitionToPending(aiResult, imageSrc, "午餐", aiResult.meta);
+        if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
+          aiResult = {
+            needs_retake: false,
+            foods: fallbackFoodsFromLocal(imageSrc, "午餐", isRealPhoto ? "拍摄照片" : "检测食物"),
+            reason: "AI 未返回可用结果，已进入本地兜底确认"
+          };
+        }
+        applyRecognitionToPending(aiResult, imageSrc, "午餐", aiResult.meta);
 
-      /* ── Step 3: 显示识别完成信息 ── */
-      var foodName = appState.pendingRecognition.name || "未知食物";
-      var cal = appState.pendingRecognition.calories || 0;
-      if (costText) {
-        costText.textContent = foodName + " · " + cal + " kcal · " + elapsed + "s";
-        costText.classList.add("show");
-      }
-      await new Promise(function(r) { setTimeout(r, 800); });
+        /* ── Step 3: 显示识别完成信息 ── */
+        var foodName = appState.pendingRecognition.name || "未知食物";
+        var cal = appState.pendingRecognition.calories || 0;
+        if (costText) {
+          costText.textContent = foodName + " · " + cal + " kcal · " + elapsed + "s";
+          costText.classList.add("show");
+        }
+        await new Promise(function(r) { setTimeout(r, 800); });
 
-      /* ── Step 4: 跳转结果页 ── */
-      if (overlay) overlay.classList.remove("active");
-      if (shutterBtn) shutterBtn.classList.remove('processing');
-      stopCamera();
-      saveState();
-      resultAnimationPlayed = false;
-      window.location.hash = "result";
-      applyRoute("result");
+        /* ── Step 4: 跳转结果页 ── */
+        if (overlay) overlay.classList.remove("active");
+        if (shutterBtn) shutterBtn.classList.remove('processing');
+        stopCamera();
+        saveState();
+        resultAnimationPlayed = false;
+        window.location.hash = "result";
+        applyRoute("result");
+      } catch (error) {
+        console.error("[Recognition] captureAndRecognize error:", error);
+        showToast("识别暂时失败，请重新点击或换一张照片");
+        if (overlay) overlay.classList.remove("active");
+        if (shutterBtn) shutterBtn.classList.remove('processing');
+        stopCamera();
+      }
     }
 
     function showDeleteConfirm(mealId) {
@@ -7793,10 +7656,14 @@
       if (route === "result-final") {
         resultAnimationPlayed = true;
         renderResult();
+        var pr = appState.pendingRecognition;
+        var finalSum = (pr.perFood || []).reduce(function(s, f) { return s + (f.calories || 0); }, 0);
+        if (finalSum <= 0) finalSum = pr.calories || 0;
+        pr.calories = finalSum; pr.baseCalories = finalSum; pr.goalPercent = Math.round((finalSum / appState.nutrition.targetCalories) * 100);
         const value = document.getElementById("calorieValue");
         const progress = document.getElementById("resultProgress");
-        if (value) value.textContent = String(appState.pendingRecognition.calories);
-        if (progress) progress.style.width = `${appState.pendingRecognition.goalPercent}%`;
+        if (value) value.textContent = String(pr.calories);
+        if (progress) progress.style.width = `${pr.goalPercent}%`;
         return;
       }
 
@@ -7824,10 +7691,13 @@
       const progress = document.getElementById("resultProgress");
       if (!value || !progress) return;
 
-      const start = appState.pendingRecognition.startCalories;
-      const end = appState.pendingRecognition.calories;
+      /* 从 perFood 实时求和作为目标值 */
+      var pr = appState.pendingRecognition;
+      var perFoodSum = (pr.perFood || []).reduce(function(s, f) { return s + (f.calories || 0); }, 0);
+      var end = perFoodSum > 0 ? perFoodSum : (pr.calories || 0);
+      var targetPercent = Math.round((end / appState.nutrition.targetCalories) * 100);
+      const start = pr.startCalories;
       const duration = 1550;
-      const targetPercent = appState.pendingRecognition.goalPercent;
       const startedAt = performance.now();
 
       const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
