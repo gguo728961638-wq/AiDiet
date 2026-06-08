@@ -16,7 +16,10 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
 
         setupWebView()
         setupConstraints()
-        loadHTML()
+        /* 延迟到下一个布局周期，确保 WebView 帧已确定 */
+        DispatchQueue.main.async { [weak self] in
+            self?.loadHTML()
+        }
     }
 
     override var prefersStatusBarHidden: Bool { true }
@@ -47,7 +50,11 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         var storageJSON = "null"
         if let data = try? Data(contentsOf: storageFileURL),
            let json = String(data: data, encoding: .utf8) {
-            storageJSON = "'" + json.replacingOccurrences(of: "\\", with: "\\\\").replacingOccurrences(of: "'", with: "\\'") + "'"
+            storageJSON = "'" + json
+                .replacingOccurrences(of: "\\", with: "\\\\")
+                .replacingOccurrences(of: "'", with: "\\'")
+                .replacingOccurrences(of: "\n", with: "\\n")
+                .replacingOccurrences(of: "\r", with: "\\r") + "'"
         }
         let storageScript = WKUserScript(
             source: "window.__nativeStorageData = \(storageJSON);",
@@ -92,6 +99,10 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
             return
         }
         var html = (try? String(contentsOf: htmlURL, encoding: .utf8)) ?? ""
+        if html.isEmpty {
+            showError("HTML 内容为空")
+            return
+        }
         /* 将 src / data-photo 的相对路径转为绝对 file:// URL，确保图片在 WKWebView 中可加载 */
         let bundlePath = htmlURL.deletingLastPathComponent().path
         html = html.replacingOccurrences(of: "src=\"assets/", with: "src=\"file://\(bundlePath)/assets/")
@@ -102,17 +113,19 @@ class ViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, WKSc
         html = html.replacingOccurrences(of: "'assets/", with: "'file://\(bundlePath)/assets/")
 
         /*
-         * 写入临时文件后用 loadFileURL 加载，让页面获得 file:// origin，
-         * 这样 JS 中的 fetch(file://) 和 <img src="file://"> 都能正常工作。
-         * loadHTMLString 的 about:blank origin 会阻止 file:// 资源加载。
+         * 优先用 loadFileURL 加载临时文件（file:// origin 可访问 bundle 资源）。
+         * 若写入临时文件失败，回退到 loadHTMLString + baseURL。
          */
         let tempDir = FileManager.default.temporaryDirectory
         let tempHTML = tempDir.appendingPathComponent("aiDiet_\(ProcessInfo.processInfo.processIdentifier).html")
-        try? html.write(to: tempHTML, atomically: true, encoding: .utf8)
-
-        /* 保持与原始 bundle 相同的目录层级，确保相对路径解析一致 */
         let baseURL = htmlURL.deletingLastPathComponent()
-        webView.loadFileURL(tempHTML, allowingReadAccessTo: baseURL)
+
+        if (try? html.write(to: tempHTML, atomically: true, encoding: .utf8)) != nil {
+            webView.loadFileURL(tempHTML, allowingReadAccessTo: baseURL)
+        } else {
+            /* 写入临时文件失败时回退到 loadHTMLString */
+            webView.loadHTMLString(html, baseURL: baseURL)
+        }
     }
 
     // MARK: - Progress

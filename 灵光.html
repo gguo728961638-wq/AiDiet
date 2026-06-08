@@ -21,12 +21,6 @@
       --radius-img: 17px;
     }
 
-    @property --plan-ring-deg {
-      syntax: "<angle>";
-      inherits: false;
-      initial-value: 0deg;
-    }
-
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
@@ -39,8 +33,9 @@
     body {
       margin: 0;
       min-height: 100vh;
-      display: grid;
-      place-items: center;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
       background: #eee9df;
       color: var(--ink);
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Hiragino Sans GB", sans-serif;
@@ -1489,8 +1484,9 @@
       width: 88px;
       height: 88px;
       border-radius: 50%;
-      display: grid;
-      place-items: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       background:
         conic-gradient(var(--sage) 0 var(--plan-ring-deg, 0deg), rgba(251, 250, 246, 0.74) var(--plan-ring-deg, 0deg) 360deg);
       color: var(--ink);
@@ -4523,6 +4519,19 @@
   </div>
 
   <script>
+    /* 全局错误捕获：iOS 空白页调试 */
+    window.onerror = function(msg, url, line, col, err) {
+      var el = document.createElement("div");
+      el.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:99999;background:red;color:#fff;padding:12px;font:14px monospace;word-break:break-all;";
+      el.textContent = "[JS ERROR] " + msg + " (" + line + ":" + col + ")";
+      document.body.appendChild(el);
+      console.error("[JS ERROR]", msg, url, line, col, err);
+      return true;
+    };
+    window.addEventListener("unhandledrejection", function(e) {
+      console.error("[Unhandled Promise]", e.reason);
+    });
+
     const mainRoutes = new Set(["home", "profile", "camera", "result"]);
     const routableRoutes = new Set([
       "home",
@@ -7900,8 +7909,13 @@
       if (!sliderHapticTimer) { haptic("select"); sliderHapticTimer = setTimeout(function() { sliderHapticTimer = null; }, 80); }
     }));
 
-    renderAll();
-    applyRoute(window.location.hash.replace("#", "") || "home");
+    try {
+      renderAll();
+      applyRoute(window.location.hash.replace("#", "") || "home");
+    } catch(initErr) {
+      console.error("[INIT ERROR]", initErr);
+      document.body.innerHTML = '<div style="padding:40px;font:16px sans-serif;text-align:center;"><h2>应用加载出错</h2><p style="color:#999;margin-top:12px;">' + String(initErr.message || initErr) + '</p></div>';
+    }
 
     var _editResultHandled = false;
     document.addEventListener("click", function(e) {
