@@ -4289,7 +4289,7 @@
           <div>
             <div class="done-label">
               <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 12 4 4 8-8" /></svg></span>
-              识别完成
+              识别完成 <span class="ai-star">✦</span>
             </div>
             <div class="result-subtitle">识别于今天 12:40 · 午餐</div>
             <button class="result-edit-btn" type="button" data-action="edit-result" aria-label="编辑识别结果">
@@ -4487,6 +4487,7 @@
     let cameraStream = null;
     var detectionScanning = false;
     var detectionIntervalId = null;
+    var detailParentRoute = "home";
     var foodDetected = false;
     var detectionTimeoutId = null;
 
@@ -5217,33 +5218,53 @@
     }
 
     function analyzeImageQuality(canvas, ctx) {
-      var sampleW = Math.min(160, canvas.width);
-      var sampleH = Math.min(160, canvas.height);
+      /* 采样到 200×200 做分析 */
+      var sampleW = Math.min(200, canvas.width);
+      var sampleH = Math.min(200, canvas.height);
       var scratch = document.createElement("canvas");
       scratch.width = sampleW;
       scratch.height = sampleH;
       var sctx = scratch.getContext("2d");
       sctx.drawImage(canvas, 0, 0, sampleW, sampleH);
       var data = sctx.getImageData(0, 0, sampleW, sampleH).data;
-      var totalBrightness = 0;
-      var edgeSum = 0;
-      var activePixels = 0;
-      var lastLum = 0;
 
-      for (var i = 0; i < data.length; i += 4) {
+      var totalBrightness = 0;
+      var activePixels = 0;
+      var lumArr = new Float32Array(sampleW * sampleH);
+
+      /* 第一遍：计算亮度 + 统计亮度 */
+      for (var i = 0, p = 0; i < data.length; i += 4, p++) {
         var lum = 0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2];
+        lumArr[p] = lum;
         totalBrightness += lum;
-        if (i > 0) edgeSum += Math.abs(lum - lastLum);
         if (lum > 42 && lum < 245) activePixels += 1;
-        lastLum = lum;
       }
 
-      var pixels = data.length / 4;
+      var pixels = sampleW * sampleH;
       var brightness = totalBrightness / pixels;
-      var sharpness = edgeSum / Math.max(1, pixels - 1);
       var subjectRatio = activePixels / pixels;
+
+      /* Laplacian 方差法：业界标准模糊检测 */
+      var lapSum = 0;
+      var lapSumSq = 0;
+      var lapCount = 0;
+      for (var y = 1; y < sampleH - 1; y++) {
+        for (var x = 1; x < sampleW - 1; x++) {
+          var idx = y * sampleW + x;
+          var lap = -4 * lumArr[idx]
+            + lumArr[idx - 1] + lumArr[idx + 1]
+            + lumArr[idx - sampleW] + lumArr[idx + sampleW];
+          lapSum += lap;
+          lapSumSq += lap * lap;
+          lapCount++;
+        }
+      }
+      var lapMean = lapSum / Math.max(1, lapCount);
+      var lapVariance = lapSumSq / Math.max(1, lapCount) - lapMean * lapMean;
+      var sharpness = Math.sqrt(Math.max(0, lapVariance));
+
       var issues = [];
-      if (sharpness < 7.5) issues.push("blur");
+      if (sharpness < 25) issues.push("blur");
       if (brightness < 52) issues.push("dark");
       if (subjectRatio < 0.18) issues.push("small_subject");
 
@@ -7589,6 +7610,10 @@
           ? "detail"
           : document.body.dataset.activeRoute || "home";
       const activeRoute = safeRoute || "home";
+      /* 进入详情页时记录来源 tab，供返回按钮使用 */
+      if (activeRoute === "detail" && mainRoutes.has(document.body.dataset.activeRoute)) {
+        detailParentRoute = document.body.dataset.activeRoute;
+      }
       document.body.dataset.activeRoute = activeRoute;
       document.querySelectorAll(".nav-item").forEach((item) => {
         item.classList.toggle("active", item.dataset.route === activeRoute);
@@ -7824,12 +7849,9 @@
     });
 
     document.getElementById("detailBackBtn").addEventListener("click", function() {
-      if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        window.location.hash = "home";
-        applyRoute("home");
-      }
+      var target = detailParentRoute || "home";
+      window.location.hash = target;
+      applyRoute(target);
     });
 
     window.addEventListener("hashchange", () => {
