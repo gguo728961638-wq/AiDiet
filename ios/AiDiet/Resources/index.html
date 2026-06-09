@@ -4722,18 +4722,18 @@
           }
           aiResult = {
             needs_retake: false,
-            foods: fallbackFoodsFromLocal(imageSrc, "午餐", sourceLabel || "检测食物"),
+            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), sourceLabel || "检测食物"),
             reason: "图像质量不足，已进入本地兜底确认"
           };
         }
         if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
           aiResult = {
             needs_retake: false,
-            foods: fallbackFoodsFromLocal(imageSrc, "午餐", isRealPhoto ? "拍摄照片" : (sourceLabel || "鸡胸沙拉")),
+            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), isRealPhoto ? "拍摄照片" : (sourceLabel || "鸡胸沙拉")),
             reason: "AI 未返回可用结果，已进入本地兜底确认"
           };
         }
-        applyRecognitionToPending(aiResult, imageSrc, "午餐", aiResult.meta);
+        applyRecognitionToPending(aiResult, imageSrc, getAutoMealType(), aiResult.meta);
         showToast(appState.pendingRecognition.uncertain ? "识别不确定，请确认结果" : "识别完成，请确认结果");
 
         stopCamera();
@@ -4945,6 +4945,15 @@
 
     function getToday() {
       return new Date().toISOString().slice(0, 10);
+    }
+
+    function getAutoMealType() {
+      var h = new Date().getHours();
+      if (h >= 5 && h < 10) return "早餐";
+      if (h >= 10 && h < 14) return "午餐";
+      if (h >= 14 && h < 17) return "加餐";
+      if (h >= 17 && h < 21) return "晚餐";
+      return "加餐";
     }
 
     function loadState() {
@@ -5616,7 +5625,7 @@
         parsed.meta = prepared.meta;
         parsed.quality = prepared.quality;
         if (!parsed.foods || parsed.foods.length === 0) {
-          parsed.foods = fallbackFoodsFromLocal(imageSrc, "午餐", "");
+          parsed.foods = fallbackFoodsFromLocal(imageSrc, getAutoMealType(), "");
           parsed.dish_candidates = parsed.foods;
           parsed.best_display_name = (parsed.foods[0] && parsed.foods[0].name) || "";
           parsed.visible_ingredients = [];
@@ -6561,7 +6570,7 @@
       }
 
       const activeType = document.querySelector(".manual-type-btn.active");
-      const mealType = (activeType && activeType.dataset.mealType) || "午餐";
+      const mealType = (activeType && activeType.dataset.mealType) || getAutoMealType();
 
       const now = new Date();
       const date = now.toISOString().slice(0, 10);
@@ -6713,7 +6722,7 @@
 
       var bar = document.getElementById("albumMealTypeBar");
       var activeType = bar ? bar.querySelector(".manual-type-btn.active") : null;
-      var mealType = (activeType && activeType.dataset.mealType) || "午餐";
+      var mealType = (activeType && activeType.dataset.mealType) || getAutoMealType();
 
       var recognizeBtn = document.getElementById("albumRecognizeBtn");
       var didNavigate = false;
@@ -6807,18 +6816,18 @@
           }
           aiResult = {
             needs_retake: false,
-            foods: fallbackFoodsFromLocal(imageSrc, "午餐", "检测食物"),
+            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), "检测食物"),
             reason: "图像质量不足，已进入本地兜底确认"
           };
         }
         if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
           aiResult = {
             needs_retake: false,
-            foods: fallbackFoodsFromLocal(imageSrc, "午餐", isRealPhoto ? "拍摄照片" : "检测食物"),
+            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), isRealPhoto ? "拍摄照片" : "检测食物"),
             reason: "AI 未返回可用结果，已进入本地兜底确认"
           };
         }
-        applyRecognitionToPending(aiResult, imageSrc, "午餐", aiResult.meta);
+        applyRecognitionToPending(aiResult, imageSrc, getAutoMealType(), aiResult.meta);
 
         /* ── Step 3: 显示识别完成信息 ── */
         var foodName = appState.pendingRecognition.name || "未知食物";
@@ -7995,6 +8004,16 @@
 
     try {
       renderAll();
+      /* 根据当前时间设置餐型按钮的默认选中状态 */
+      var autoType = getAutoMealType();
+      document.querySelectorAll(".manual-type-bar").forEach(function(bar) {
+        var active = bar.querySelector(".manual-type-btn.active");
+        if (active && active.dataset.mealType !== autoType) {
+          bar.querySelectorAll(".manual-type-btn").forEach(function(b) { b.classList.remove("active"); });
+          var match = bar.querySelector('[data-meal-type="' + autoType + '"]');
+          if (match) match.classList.add("active");
+        }
+      });
       applyRoute(window.location.hash.replace("#", "") || "home");
     } catch(initErr) {
       console.error("[INIT ERROR]", initErr);
