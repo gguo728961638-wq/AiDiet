@@ -844,9 +844,11 @@
 
     .spark {
       color: var(--sage);
-      font-size: 20px;
+      font-size: 26px;
       display: inline-block;
       animation: rotateSlow 6s linear infinite;
+      transform-origin: center;
+      vertical-align: middle;
     }
 
     @keyframes rotateSlow {
@@ -2451,9 +2453,9 @@
       color: var(--sage);
       display: inline-block;
       animation: aiStarSpin 6s linear infinite;
-      position: relative;
-      top: 2px;
-      font-size: 18px;
+      transform-origin: center;
+      font-size: 24px;
+      vertical-align: middle;
     }
 
     @keyframes aiStarSpin {
@@ -4266,8 +4268,8 @@
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12" /></svg>
           </button>
           <div class="camera-right-controls">
-            <button class="round-control" type="button" data-route="enhance" aria-label="识别增强">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 5 14h7l-1 8 8-12h-7Z" /></svg>
+            <button class="round-control" type="button" data-action="toggle-flash" aria-label="闪光灯">
+              <svg id="flashIcon" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 5 14h7l-1 8 8-12h-7Z" /></svg>
             </button>
           </div>
         </div>
@@ -4552,6 +4554,7 @@
     let homeAnimationFrame = null;
     let resultAnimationPlayed = false;
     let cameraStream = null;
+    var flashOn = false;
     var detectionScanning = false;
     var detectionIntervalId = null;
     var detailParentRoute = "home";
@@ -4666,6 +4669,26 @@
       }
     }
 
+    function toggleFlash() {
+      if (!cameraStream) return;
+      var track = cameraStream.getVideoTracks()[0];
+      if (!track) return;
+      var caps = track.getCapabilities ? track.getCapabilities() : {};
+      if (!caps.torch) {
+        showToast("当前设备不支持闪光灯");
+        return;
+      }
+      flashOn = !flashOn;
+      track.applyConstraints({ advanced: [{ torch: flashOn }] }).catch(function() {});
+      var icon = document.getElementById("flashIcon");
+      if (icon) {
+        icon.style.opacity = flashOn ? "1" : "";
+        icon.parentElement.style.background = flashOn ? "var(--sage)" : "";
+        icon.parentElement.style.color = flashOn ? "var(--surface)" : "";
+      }
+      haptic("light");
+    }
+
     function triggerNativeCamera() {
       var input = document.getElementById("nativeCameraInput");
       if (!input) {
@@ -4735,6 +4758,7 @@
     }
 
     function stopCamera() {
+      flashOn = false;
       stopDetection();
       lastRecognitionFrame = null;
       if (cameraStream) {
@@ -4921,6 +4945,10 @@
       }
     };
 
+    function getToday() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
     function loadState() {
       try {
         /* iOS 原生存储优先 */
@@ -4950,6 +4978,34 @@
     }
 
     const appState = loadState();
+
+    /* ── 跨天重置：将昨天的 meals 归档到 mealHistory，清空今日 meals ── */
+    function checkDayRollover() {
+      var today = getToday();
+      if (appState.currentDay === today) return;
+      if (appState.meals && appState.meals.length > 0) {
+        var oldDate = appState.currentDay || (appState.meals[0] && appState.meals[0].date) || "";
+        if (oldDate && oldDate !== today) {
+          if (!appState.mealHistory) appState.mealHistory = {};
+          appState.mealHistory[oldDate] = appState.meals;
+        }
+      }
+      appState.meals = [];
+      appState.currentDay = today;
+      appState.selectedDate = today;
+      saveState();
+    }
+    checkDayRollover();
+
+    document.addEventListener("visibilitychange", function() {
+      if (document.visibilityState === "visible") {
+        var today = getToday();
+        if (appState.currentDay !== today) {
+          checkDayRollover();
+          renderAll();
+        }
+      }
+    });
 
     /* 启动时修正旧 localStorage 中 pendingRecognition 的热量不一致 */
     (function() {
@@ -6313,7 +6369,7 @@
     }
 
     function mealsForDate(date) {
-      if (date === "2026-06-04") return appState.meals;
+      if (date === getToday()) return appState.meals;
       return (appState.mealHistory && appState.mealHistory[date]) || [];
     }
 
@@ -6322,24 +6378,30 @@
     }
 
     function renderCalendarDetail() {
-      const selectedDate = appState.selectedDate || "2026-06-04";
+      var today = getToday();
+      const selectedDate = appState.selectedDate || today;
       const selectedMeals = mealsForDate(selectedDate);
-      const selectedCalories = caloriesForMeals(selectedMeals, selectedDate === "2026-06-04");
+      const selectedCalories = caloriesForMeals(selectedMeals, selectedDate === today);
       const remaining = Math.max(appState.nutrition.targetCalories - selectedCalories, 0);
-      const firstDayOffset = 0;
-      const daysInMonth = 30;
+      var now = new Date();
+      var year = now.getFullYear();
+      var month = now.getMonth() + 1;
+      var daysInMonth = new Date(year, month, 0).getDate();
+      var firstDayOffset = (new Date(year, month - 1, 1).getDay() + 6) % 7;
       const calendarCells = [
         ...Array.from({ length: firstDayOffset }, () => null),
         ...Array.from({ length: daysInMonth }, (_, index) => index + 1)
       ];
-      const mealDates = new Set(["2026-06-04", ...Object.keys(appState.mealHistory || {})]);
+      var monthPrefix = year + "-" + String(month).padStart(2, "0");
+      var todayStr = today;
+      const mealDates = new Set([todayStr, ...Object.keys(appState.mealHistory || {})]);
       const weekdayLabels = ["一", "二", "三", "四", "五", "六", "日"];
 
       return `
         <section class="calendar-card">
           <div class="calendar-month">
-            <strong>2026 年 6 月</strong>
-            <span>${selectedDate === "2026-06-04" ? "今天" : selectedDate}</span>
+            <strong>${year} 年 ${month} 月</strong>
+            <span>${selectedDate === todayStr ? "今天" : selectedDate}</span>
           </div>
           <div class="calendar-weekdays">
             ${weekdayLabels.map((day) => `<span>${day}</span>`).join("")}
@@ -6347,7 +6409,7 @@
           <div class="calendar-grid">
             ${calendarCells.map((day) => {
               if (!day) return `<span class="calendar-day is-muted"></span>`;
-              const date = `2026-06-${String(day).padStart(2, "0")}`;
+              const date = monthPrefix + "-" + String(day).padStart(2, "0");
               const isSelected = date === selectedDate;
               const hasMeal = mealDates.has(date);
               return `
@@ -7814,6 +7876,10 @@
       if (actionNode && actionNode.dataset.action === "shutter-capture") {
         haptic("camera");
         captureAndRecognize();
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "toggle-flash") {
+        toggleFlash();
         return;
       }
       if (actionNode && actionNode.dataset.action === "album-recognize") {
