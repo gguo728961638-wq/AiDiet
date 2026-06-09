@@ -4982,7 +4982,7 @@
       baseUrl: "https://api.xiaomimimo.com/v1/chat/completions",
       apiKey: "sk-c9ijfnili2azlr4b6depllwmohpg8s5oxsly6vl6vpxdqtb4",
       model: "mimo-v2.5",
-      timeout: 8000
+      timeout: 15000
     };
 
     /* 直接调 API，429 限流自动重试 */
@@ -5001,7 +5001,7 @@
             model: AI识别_CONFIG.model,
             messages: messages,
             response_format: { type: "json_object" },
-            max_tokens: 1200,
+            max_tokens: 2000,
             temperature: 0.1
           }),
           signal: controller.signal
@@ -5013,7 +5013,7 @@
               return callAI识别(messages, _retryCount + 1);
             }).then(resolve);
           }
-          if (!resp.ok) return resolve(null);
+          if (!resp.ok) { console.error("[API] HTTP " + resp.status); return resolve(null); }
           return resp.json();
         }).then(function(data) {
           if (data && data.choices && data.choices[0] && data.choices[0].message) {
@@ -5023,8 +5023,9 @@
           } else {
             resolve(null);
           }
-        }).catch(function() {
+        }).catch(function(e) {
           clearTimeout(timer);
+          console.error("[API] 请求失败:", e.message || e);
           resolve(null);
         });
       });
@@ -5318,9 +5319,9 @@
       var sharpness = Math.sqrt(Math.max(0, lapVariance));
 
       var issues = [];
-      if (sharpness < 25) issues.push("blur");
-      if (brightness < 52) issues.push("dark");
-      if (subjectRatio < 0.18) issues.push("small_subject");
+      if (sharpness < 10) issues.push("blur");
+      if (brightness < 30) issues.push("dark");
+      if (subjectRatio < 0.08) issues.push("small_subject");
 
       return {
         brightness: Number(brightness.toFixed(1)),
