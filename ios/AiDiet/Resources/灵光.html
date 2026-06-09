@@ -4861,7 +4861,8 @@
     };
 
     function getToday() {
-      return new Date().toISOString().slice(0, 10);
+      var d = new Date();
+      return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
     }
 
     function getAutoMealType() {
@@ -5612,7 +5613,7 @@
       var now = new Date();
       result.image = imageSrc;
       result.type = mealType;
-      result.date = now.toISOString().slice(0, 10);
+      result.date = getToday();
       result.time = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
       result.id = "meal-" + Date.now();
       result.needs_retake = Boolean(recognition.needs_retake);
@@ -5862,7 +5863,7 @@
     /* 本地晚餐推荐算法 */
     function getDinnerRecommendationLocal() {
       var meals = appState.meals.filter(function(m) {
-        var today = new Date().toISOString().slice(0, 10);
+        var today = getToday();
         return m.date === today || !m.date;
       });
       var totalCal = meals.reduce(function(s, m) { return s + m.calories; }, 0);
@@ -5907,7 +5908,7 @@
     /* 本地单餐营养建议（规则引擎） */
     function getMealAdviceLocal(mealData) {
       var meals = appState.meals.filter(function(m) {
-        var today = new Date().toISOString().slice(0, 10);
+        var today = getToday();
         return m.date === today || !m.date;
       });
       var totalCal = meals.reduce(function(s, m) { return s + m.calories; }, 0);
@@ -6608,7 +6609,7 @@
       const mealType = (activeType && activeType.dataset.mealType) || getAutoMealType();
 
       const now = new Date();
-      const date = now.toISOString().slice(0, 10);
+      const date = getToday();
       const hours = String(now.getHours()).padStart(2, "0");
       const minutes = String(now.getMinutes()).padStart(2, "0");
       const time = hours + ":" + minutes;
@@ -7407,7 +7408,7 @@
     }
 
     function addWeightRecord(weight) {
-      const today = new Date().toISOString().slice(0, 10);
+      const today = getToday();
       if (!Array.isArray(appState.weightHistory)) {
         appState.weightHistory = [];
       }
