@@ -4041,6 +4041,1372 @@
         opacity: 0.92;
       }
     }
+    .exercise-shell {
+      margin: -10px -4px 0;
+      padding: 0 0 26px;
+      color: #101a13;
+    }
+
+    body[data-detail-kind="exercise"] .detail-nav,
+    body[data-detail-kind="exercise"] .detail-eyebrow,
+    body[data-detail-kind="exercise"] .detail-title,
+    body[data-detail-kind="exercise-set"] .detail-nav,
+    body[data-detail-kind="exercise-set"] .detail-eyebrow,
+    body[data-detail-kind="exercise-set"] .detail-title {
+      display: none;
+    }
+
+    body[data-detail-kind="exercise"] .bottom-nav,
+    body[data-detail-kind="exercise-set"] .bottom-nav {
+      display: none;
+    }
+
+    body[data-detail-kind="exercise"] .detail-content,
+    body[data-detail-kind="exercise-set"] .detail-content {
+      padding-top: 0;
+    }
+
+    html[data-detail-kind="exercise-set"] {
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    body[data-detail-kind="exercise-set"] .home-screen {
+      min-height: 100dvh;
+      height: 100dvh;
+      padding-top: 0;
+      padding-bottom: 0;
+      background: #fbfaf6;
+      overflow: hidden;
+    }
+
+    body[data-detail-kind="exercise-set"] {
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    body[data-detail-kind="exercise-set"] .phone-frame {
+      height: 100dvh;
+      min-height: 100dvh;
+      overflow: hidden;
+    }
+
+    body[data-detail-kind="exercise-set"] .home-indicator {
+      position: fixed;
+      bottom: max(8px, env(safe-area-inset-bottom));
+      z-index: 30;
+    }
+
+    .exercise-shell svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .exercise-hero {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 4px 0 28px;
+    }
+
+    .exercise-title {
+      margin: 0;
+      font-size: 54px;
+      line-height: 0.96;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .exercise-subtitle {
+      display: block;
+      margin-top: 16px;
+      color: #7c8378;
+      font-size: 20px;
+      font-weight: 660;
+      letter-spacing: 0;
+    }
+
+    .exercise-calendar {
+      width: 72px;
+      height: 72px;
+      border-radius: 28px;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 252, 0.8);
+      color: #122017;
+      box-shadow: 0 18px 34px rgba(73, 77, 66, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    }
+
+    .exercise-calendar svg {
+      width: 30px;
+      height: 30px;
+      stroke-width: 2.4;
+    }
+
+    .exercise-card {
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      border-radius: 28px;
+      background: rgba(255, 255, 252, 0.72);
+      box-shadow: 0 18px 42px rgba(82, 86, 75, 0.11), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .exercise-summary-card {
+      min-height: 184px;
+      padding: 24px 24px 22px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 104px;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .exercise-card-title {
+      margin: 0 0 18px;
+      font-size: 23px;
+      line-height: 1;
+      font-weight: 820;
+      letter-spacing: 0;
+    }
+
+    .exercise-total {
+      display: flex;
+      align-items: flex-end;
+      gap: 8px;
+      font-size: 72px;
+      line-height: 0.82;
+      font-weight: 920;
+      letter-spacing: 0;
+    }
+
+    .exercise-total span {
+      margin-bottom: 8px;
+      font-size: 24px;
+      font-weight: 780;
+    }
+
+    .exercise-stats {
+      margin-top: 28px;
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .exercise-stat {
+      display: grid;
+      grid-template-columns: 32px auto;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .exercise-stat-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #dce1d4;
+      color: #738163;
+    }
+
+    .exercise-stat-icon.check {
+      background: #758467;
+      color: #fff;
+    }
+
+    .exercise-stat-icon svg {
+      width: 22px;
+      height: 22px;
+      stroke-width: 2.6;
+    }
+
+    .exercise-stat-divider {
+      width: 1px;
+      height: 58px;
+      background: rgba(24, 32, 24, 0.08);
+    }
+
+    .exercise-stat-label {
+      display: block;
+      color: #7f8479;
+      font-size: 14px;
+      font-weight: 620;
+    }
+
+    .exercise-stat-value {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-top: 3px;
+      font-size: 25px;
+      font-weight: 890;
+      color: #142017;
+    }
+
+    .exercise-stat-value span {
+      font-size: 14px;
+      font-weight: 600;
+      color: #7b8076;
+      white-space: nowrap;
+    }
+
+    .exercise-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      height: 38px;
+      padding: 0 16px;
+      border-radius: 999px;
+      background: rgba(232, 233, 224, 0.78);
+      color: #66735c;
+      font-size: 15px;
+      font-weight: 720;
+      white-space: nowrap;
+    }
+
+    .exercise-ring-wrap {
+      justify-self: end;
+      display: grid;
+      gap: 20px;
+      justify-items: center;
+    }
+
+    .exercise-ring {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at center, rgba(255, 255, 252, 0.95) 0 45%, transparent 47%),
+        conic-gradient(#8a9778 0 31%, rgba(224, 226, 216, 0.68) 31% 100%);
+    }
+
+    .exercise-ring::before {
+      content: "";
+      position: absolute;
+      inset: 16px;
+      border-radius: 50%;
+      background: rgba(255, 255, 252, 0.78);
+      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+    }
+
+    .exercise-ring svg {
+      position: relative;
+      z-index: 1;
+      width: 38px;
+      height: 38px;
+      color: #738163;
+      stroke-width: 2.7;
+    }
+
+    .exercise-section-card {
+      margin-top: 24px;
+      padding: 24px 14px 20px;
+    }
+
+    .exercise-section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 12px 18px;
+    }
+
+    .exercise-section-title {
+      margin: 0;
+      font-size: 23px;
+      line-height: 1;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .exercise-strength-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .exercise-strength-row {
+      min-height: 70px;
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr) 50px;
+      align-items: center;
+      column-gap: 12px;
+      padding: 12px 10px;
+      border-radius: 24px;
+      background: rgba(249, 249, 244, 0.66);
+    }
+
+    .exercise-index {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #eef0e9;
+      color: #6d7b61;
+      font-size: 16px;
+      font-weight: 820;
+    }
+
+    .exercise-line {
+      min-width: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      white-space: nowrap;
+    }
+
+    .exercise-move {
+      min-width: 0;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+      white-space: nowrap;
+    }
+
+    .exercise-move strong {
+      display: inline;
+      font-size: 19px;
+      line-height: 1.05;
+      font-weight: 820;
+    }
+
+    .exercise-move span {
+      display: inline;
+      color: #767c73;
+      font-size: 14px;
+      font-weight: 620;
+    }
+
+    .exercise-reps {
+      color: #70786e;
+      font-size: 15px;
+      font-weight: 720;
+      white-space: nowrap;
+    }
+
+    .exercise-add-small {
+      position: relative;
+      width: 50px;
+      height: 50px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      justify-self: end;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f6edd0, #cfe8cf 32%, #94b8ff 66%, #f1bf9b);
+      background-size: 230% 230%;
+      color: #24352c;
+      box-shadow: 0 14px 28px rgba(87, 111, 83, 0.16), 0 6px 18px rgba(122, 157, 225, 0.18);
+      animation: exerciseActionFlow 3.6s ease-in-out infinite;
+    }
+
+    .exercise-add-small::before {
+      content: "";
+      position: absolute;
+      inset: 3px;
+      border-radius: 15px;
+      background: rgba(255, 255, 250, 0.38);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.64);
+    }
+
+    .exercise-add-small svg {
+      position: relative;
+      z-index: 1;
+      width: 24px;
+      height: 24px;
+      stroke-width: 2.7;
+    }
+
+    @keyframes exerciseActionFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .exercise-history-card {
+      margin-top: 24px;
+      padding: 26px 26px 18px;
+    }
+
+    .exercise-history-list {
+      display: grid;
+    }
+
+    .exercise-history-row {
+      min-height: 72px;
+      display: grid;
+      grid-template-columns: 58px 1fr auto 22px;
+      align-items: center;
+      gap: 14px;
+      border-top: 1px solid rgba(24, 32, 24, 0.08);
+    }
+
+    .exercise-history-row:first-child {
+      border-top: 0;
+    }
+
+    .exercise-history-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #eef0e9;
+      color: #738163;
+    }
+
+    .exercise-history-icon svg {
+      width: 29px;
+      height: 29px;
+      stroke-width: 2.4;
+    }
+
+    .exercise-history-copy strong {
+      display: block;
+      font-size: 20px;
+      font-weight: 840;
+      line-height: 1.08;
+    }
+
+    .exercise-history-copy span {
+      display: block;
+      margin-top: 5px;
+      color: #7c8378;
+      font-size: 16px;
+      font-weight: 620;
+    }
+
+    .exercise-history-time {
+      color: #111a14;
+      font-size: 31px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .exercise-history-time span {
+      margin-left: 4px;
+      color: #7b8076;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .exercise-start-card {
+      margin-top: 20px;
+      min-height: 92px;
+      padding: 22px 24px;
+      display: grid;
+      grid-template-columns: 58px 1fr 24px;
+      align-items: center;
+      gap: 16px;
+      background: rgba(241, 242, 235, 0.78);
+    }
+
+    .exercise-start-plus {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #6f805f;
+      color: #fff;
+      font-size: 36px;
+      font-weight: 360;
+      line-height: 1;
+    }
+
+    .exercise-start-copy strong {
+      display: block;
+      font-size: 21px;
+      font-weight: 850;
+    }
+
+    .exercise-start-copy span {
+      display: block;
+      margin-top: 7px;
+      color: #7c8378;
+      font-size: 16px;
+      font-weight: 620;
+    }
+
+    .exercise-set-page {
+      position: relative;
+      height: 100dvh;
+      min-height: 100dvh;
+      margin: 0 -24px -160px;
+      padding: 0 0 8px;
+      color: #0f1410;
+      overflow: hidden;
+      isolation: isolate;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.96), transparent 22%),
+        radial-gradient(circle at 88% 18%, rgba(226, 237, 216, 0.58), transparent 26%),
+        linear-gradient(180deg, #fbfaf7 0%, #f8f7f2 48%, #fbfaf6 100%);
+    }
+
+    .exercise-set-page::before,
+    .exercise-set-page::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .exercise-set-page::before {
+      background:
+        radial-gradient(circle at 7% 29%, rgba(255, 255, 255, 0.92) 0 7px, transparent 8px),
+        radial-gradient(circle at 26% 18%, rgba(216, 231, 202, 0.42) 0 4px, transparent 5px),
+        radial-gradient(circle at 70% 18%, rgba(255, 255, 255, 0.86) 0 4px, transparent 5px),
+        radial-gradient(circle at 90% 38%, rgba(118, 143, 103, 0.18) 0 5px, transparent 6px),
+        linear-gradient(90deg, rgba(117, 132, 103, 0.03) 1px, transparent 1px),
+        linear-gradient(rgba(117, 132, 103, 0.025) 1px, transparent 1px);
+      background-size: 94px 94px, 148px 148px, 176px 176px, 118px 118px, 26px 26px, 26px 26px;
+      opacity: 0.82;
+    }
+
+    .exercise-set-page::after {
+      background: radial-gradient(circle at 50% 52%, rgba(118, 143, 103, 0.14), transparent 42%);
+      filter: blur(18px);
+    }
+
+    .exercise-set-page > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .exercise-set-page svg {
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .exercise-set-statusbar {
+      height: 38px;
+      padding: 11px 34px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: #090b09;
+      font-size: 18px;
+      line-height: 1;
+      font-weight: 760;
+      letter-spacing: 0;
+    }
+
+    .exercise-set-status-icons {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .exercise-set-signal {
+      width: 25px;
+      height: 16px;
+      display: inline-grid;
+      grid-template-columns: repeat(4, 4px);
+      align-items: end;
+      gap: 2px;
+    }
+
+    .exercise-set-signal span {
+      display: block;
+      border-radius: 4px;
+      background: #0b0d0b;
+    }
+
+    .exercise-set-signal span:nth-child(1) { height: 5px; }
+    .exercise-set-signal span:nth-child(2) { height: 8px; }
+    .exercise-set-signal span:nth-child(3) { height: 12px; }
+    .exercise-set-signal span:nth-child(4) { height: 15px; }
+
+    .exercise-set-wifi {
+      width: 20px;
+      height: 15px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .exercise-set-wifi::before,
+    .exercise-set-wifi::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      border: 3px solid #0b0d0b;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-bottom-color: transparent;
+      border-radius: 50%;
+      transform: translateX(-50%);
+    }
+
+    .exercise-set-wifi::before {
+      top: 0;
+      width: 20px;
+      height: 20px;
+    }
+
+    .exercise-set-wifi::after {
+      top: 7px;
+      width: 10px;
+      height: 10px;
+    }
+
+    .exercise-set-battery {
+      width: 26px;
+      height: 14px;
+      border: 2px solid #0b0d0b;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    .exercise-set-battery::before {
+      content: "";
+      position: absolute;
+      right: -5px;
+      top: 3px;
+      width: 3px;
+      height: 6px;
+      border-radius: 0 2px 2px 0;
+      background: #0b0d0b;
+    }
+
+    .exercise-set-battery::after {
+      content: "";
+      position: absolute;
+      inset: 2px;
+      border-radius: 2px;
+      background: #0b0d0b;
+    }
+
+    .exercise-set-top {
+      height: 60px;
+      padding: 7px 32px 0;
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr) 52px;
+      align-items: start;
+      z-index: 5;
+    }
+
+    .exercise-set-round-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      color: #111511;
+      box-shadow:
+        0 14px 30px rgba(49, 55, 48, 0.12),
+        inset 0 1px 1px rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+
+    .exercise-set-round-btn svg {
+      width: 24px;
+      height: 24px;
+      stroke-width: 2.5;
+    }
+
+    .exercise-set-round-btn:last-child {
+      justify-self: end;
+    }
+
+    .exercise-set-title-wrap {
+      text-align: center;
+      padding-top: 4px;
+    }
+
+    .exercise-set-title {
+      margin: 0;
+      font-size: 23px;
+      line-height: 1.08;
+      font-weight: 850;
+      letter-spacing: 0;
+    }
+
+    .exercise-set-subtitle {
+      margin-top: 5px;
+      color: #5a5d58;
+      font-size: 16px;
+      line-height: 1;
+      font-weight: 650;
+    }
+
+    .exercise-set-glass-progress,
+    .exercise-set-glass-stats {
+      border: 1px solid rgba(255, 255, 255, 0.78);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.76), rgba(248, 248, 244, 0.58));
+      box-shadow:
+        0 22px 54px rgba(70, 75, 66, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.86),
+        inset 0 -1px 0 rgba(106, 121, 94, 0.04);
+      backdrop-filter: blur(22px) saturate(1.15);
+      -webkit-backdrop-filter: blur(22px) saturate(1.15);
+    }
+
+    .exercise-set-glass-progress {
+      width: calc(100% - 72px);
+      min-height: 112px;
+      margin: 0 auto;
+      padding: 13px 15px 12px;
+      border-radius: 24px;
+      position: relative;
+      z-index: 4;
+      overflow: hidden;
+    }
+
+    .exercise-set-progress-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 9px;
+    }
+
+    .exercise-set-progress-head strong {
+      color: #111511;
+      font-size: 17px;
+      line-height: 1;
+      font-weight: 820;
+    }
+
+    .exercise-set-progress-pill {
+      min-width: 88px;
+      height: 29px;
+      padding: 0 13px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.58);
+      border: 1px solid rgba(112, 134, 96, 0.12);
+      color: #6d8460;
+      font-size: 13px;
+      font-weight: 780;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+      white-space: nowrap;
+    }
+
+    .exercise-set-progress-row {
+      display: flex;
+      gap: 16px;
+      align-items: start;
+      width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 2px 2px 8px;
+      margin: -2px -2px -8px;
+    }
+
+    .exercise-set-progress-row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .exercise-set-progress-item {
+      flex: 1 1 0;
+      min-width: 0;
+      display: grid;
+      justify-items: center;
+      gap: 6px;
+      color: #555a55;
+      font-size: 13px;
+      font-weight: 620;
+      white-space: nowrap;
+      scroll-snap-align: center;
+    }
+
+    .exercise-set-progress-row.is-scrollable {
+      gap: 12px;
+    }
+
+    .exercise-set-progress-row.is-scrollable .exercise-set-progress-item {
+      flex: 0 0 64px;
+      font-size: 13px;
+    }
+
+    .exercise-set-progress-dot {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #c7c7c3;
+      font-size: 20px;
+      font-weight: 480;
+      border: 1px solid rgba(35, 39, 34, 0.1);
+      background: rgba(255, 255, 255, 0.44);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.84),
+        0 10px 22px rgba(54, 58, 52, 0.06);
+    }
+
+    .exercise-set-progress-row.is-scrollable .exercise-set-progress-dot {
+      width: 44px;
+      height: 44px;
+      font-size: 19px;
+    }
+
+    .exercise-set-progress-item.done .exercise-set-progress-dot {
+      color: #718965;
+      border-color: rgba(113, 137, 101, 0.58);
+      background: rgba(247, 250, 243, 0.54);
+    }
+
+    .exercise-set-progress-item.done .exercise-set-progress-dot svg {
+      width: 29px;
+      height: 29px;
+      stroke-width: 2.7;
+    }
+
+    .exercise-set-progress-row.is-scrollable .exercise-set-progress-item.done .exercise-set-progress-dot svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .exercise-set-progress-item.current .exercise-set-progress-dot {
+      color: #bfc0bc;
+      background: rgba(255, 255, 255, 0.34);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.86),
+        0 0 0 1px rgba(255, 255, 255, 0.5),
+        0 13px 24px rgba(74, 78, 71, 0.08);
+    }
+
+    .exercise-vortex-stage {
+      width: 100%;
+      height: clamp(292px, 41dvh, 346px);
+      margin: 8px 0 -4px;
+      display: block;
+      position: relative;
+      overflow: visible;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .exercise-vortex-stage::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      width: min(740px, 168vw);
+      height: min(740px, 168vw);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      pointer-events: auto;
+    }
+
+    .exercise-vortex {
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      width: min(740px, 168vw);
+      height: min(740px, 168vw);
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(249, 250, 244, 0.95) 0 17%, rgba(205, 222, 191, 0.36) 18% 23%, transparent 24%),
+        radial-gradient(circle at 50% 50%, rgba(116, 146, 96, 0.11), transparent 58%);
+      filter: drop-shadow(0 26px 54px rgba(106, 127, 94, 0.15));
+    }
+
+    .exercise-vortex::before,
+    .exercise-vortex::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .exercise-vortex::before {
+      inset: 24%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.92) 0 47%, rgba(210, 234, 185, 0.48) 55%, rgba(122, 155, 95, 0.22) 68%, transparent 76%);
+      filter: blur(10px);
+      opacity: 0.72;
+      animation: exerciseVortexBreath 2.6s ease-in-out infinite;
+    }
+
+    .exercise-vortex::after {
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.74) 0 17.5%, rgba(204, 222, 191, 0.18) 18.5%, transparent 42%);
+      mix-blend-mode: screen;
+      opacity: 0.88;
+      animation: exerciseVortexGlow 2.4s ease-in-out infinite;
+    }
+
+    .exercise-vortex-pixels {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .exercise-vortex-pixel {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: var(--s);
+      height: var(--s);
+      border-radius: 0;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(208, 235, 174, 0.84)),
+        rgba(105, 137, 85, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      box-shadow:
+        0 0 18px rgba(176, 224, 112, 0.48),
+        0 0 5px rgba(93, 120, 80, 0.28);
+      transform: translate(calc(-50% + var(--vx)), calc(-50% + var(--vy))) rotate(var(--rot)) scale(0.6);
+      opacity: 0.68;
+      animation: exerciseVortexPixel 2.4s cubic-bezier(0.16, 0.78, 0.26, 1) infinite;
+      animation-delay: var(--delay);
+    }
+
+    .exercise-vortex-pixel:nth-child(3n) {
+      background: linear-gradient(145deg, rgba(221, 238, 197, 0.92), rgba(93, 126, 76, 0.74));
+    }
+
+    .exercise-vortex-pixel:nth-child(7n) {
+      box-shadow: 0 0 22px rgba(255, 255, 255, 0.9), 0 0 18px rgba(180, 230, 116, 0.46);
+      background: rgba(255, 255, 246, 0.92);
+    }
+
+    .exercise-vortex-core {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 156px;
+      height: 156px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background:
+        radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.88), rgba(231, 237, 222, 0.72) 56%, rgba(196, 211, 181, 0.42) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.92);
+      box-shadow:
+        0 0 0 12px rgba(255, 255, 255, 0.36),
+        0 0 34px rgba(170, 215, 118, 0.5),
+        0 0 72px rgba(128, 163, 98, 0.22),
+        inset 0 0 28px rgba(117, 143, 103, 0.08);
+      animation: exerciseCoreBreath 2.6s ease-in-out infinite;
+    }
+
+    .exercise-set-glass-stats {
+      width: calc(100% - 48px);
+      height: 86px;
+      margin: 8px auto 0;
+      border-radius: 24px;
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+      align-items: center;
+      column-gap: 14px;
+      padding: 0 18px;
+      position: relative;
+      z-index: 4;
+    }
+
+    .exercise-set-stat {
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .exercise-set-stat-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: #566252;
+      background: rgba(255, 255, 255, 0.52);
+      border: 1px solid rgba(255, 255, 255, 0.82);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 9px 20px rgba(59, 65, 57, 0.08);
+    }
+
+    .exercise-set-stat-icon svg {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2.1;
+    }
+
+    .exercise-set-stat-copy {
+      min-width: 0;
+    }
+
+    .exercise-set-stat-label {
+      color: #4f544e;
+      font-size: 12px;
+      line-height: 1;
+      font-weight: 690;
+      white-space: nowrap;
+    }
+
+    .exercise-set-stat-value {
+      margin-top: 7px;
+      color: #769167;
+      font-size: 32px;
+      line-height: 0.95;
+      font-weight: 360;
+      letter-spacing: 0;
+      white-space: nowrap;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .exercise-set-stat-value span {
+      color: #353934;
+      font-size: 14px;
+      font-weight: 620;
+      flex: 0 0 auto;
+    }
+
+    .exercise-set-stat-divider {
+      width: 1px;
+      height: 54px;
+      background: rgba(22, 27, 21, 0.08);
+    }
+
+    .exercise-set-swipe-hint {
+      display: none;
+    }
+
+    .exercise-impact-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 320;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.12s ease-out;
+      contain: layout style paint;
+    }
+
+    .exercise-impact-overlay.show {
+      opacity: 1;
+    }
+
+    .exercise-impact-flash {
+      position: absolute;
+      left: var(--impact-x);
+      top: var(--impact-y);
+      width: 148px;
+      height: 148px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      background:
+        radial-gradient(circle, rgba(255, 255, 255, 0.96) 0 18%, rgba(220, 244, 194, 0.34) 42%, transparent 72%);
+      filter: blur(2px);
+      animation: exerciseImpactFlash 0.58s ease-out forwards;
+    }
+
+    .exercise-impact-pixel {
+      position: absolute;
+      left: var(--impact-x);
+      top: var(--impact-y);
+      width: var(--s);
+      height: var(--s);
+      border-radius: 0;
+      transform: translate(calc(-50% + var(--from-x)), calc(-50% + var(--from-y))) rotate(var(--rot)) scale(var(--start-scale));
+      opacity: 0;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(213, 238, 184, 0.82)),
+        rgba(104, 137, 83, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      box-shadow:
+        0 0 10px rgba(190, 235, 132, 0.32),
+        0 0 5px rgba(87, 117, 73, 0.28);
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      animation: exerciseImpactPixel var(--dur) cubic-bezier(0.18, 0.84, 0.24, 1) forwards;
+      animation-delay: var(--delay);
+    }
+
+    .exercise-impact-pixel:nth-child(3n) {
+      background: linear-gradient(145deg, rgba(231, 244, 209, 0.94), rgba(87, 120, 72, 0.76));
+    }
+
+    .exercise-impact-pixel:nth-child(5n) {
+      background: rgba(255, 255, 248, 0.96);
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.62), 0 0 10px rgba(188, 235, 126, 0.28);
+    }
+
+    .exercise-impact-check {
+      position: absolute;
+      left: var(--impact-x);
+      top: var(--impact-y);
+      width: 112px;
+      height: 78px;
+      display: grid;
+      place-items: center;
+      transform: translate(-50%, -50%) scale(0.72);
+      opacity: 0;
+      color: #718f63;
+      filter: drop-shadow(0 8px 18px rgba(93, 122, 78, 0.18));
+      will-change: transform, opacity;
+      animation: exerciseImpactCheck 0.38s cubic-bezier(0.18, 1, 0.24, 1) 0.34s forwards;
+    }
+
+    .exercise-impact-check::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 7px;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(113, 143, 99, 0.24);
+      transform: scaleX(0);
+      transform-origin: center;
+      animation: exerciseImpactCheckBase 0.24s ease-out 0.44s forwards;
+    }
+
+    .exercise-impact-check svg {
+      width: 72px;
+      height: 72px;
+      stroke: currentColor;
+      stroke-width: 5.4;
+      fill: none;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 46;
+      stroke-dashoffset: 46;
+      filter: none;
+      animation: exerciseImpactCheckDraw 0.24s ease-out 0.44s forwards;
+    }
+
+    @keyframes exerciseVortexSpin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes exerciseImpactFlash {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(1.45); }
+      38% { opacity: 0.72; transform: translate(-50%, -50%) scale(0.86); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    }
+
+    @keyframes exerciseImpactPixel {
+      0% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--from-x)), calc(-50% + var(--from-y))) rotate(var(--rot)) scale(var(--start-scale));
+      }
+      12% {
+        opacity: var(--high-alpha);
+      }
+      68% {
+        opacity: calc(var(--high-alpha) * 0.86);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) rotate(calc(var(--rot) + var(--spin))) scale(0.05);
+      }
+    }
+
+    @keyframes exerciseImpactCheck {
+      0% { opacity: 0; transform: translate(-50%, -50%) translateY(8px) scale(0.72); }
+      68% { opacity: 1; transform: translate(-50%, -50%) translateY(0) scale(1.04); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    @keyframes exerciseImpactCheckBase {
+      to { transform: scaleX(1); }
+    }
+
+    @keyframes exerciseImpactCheckDraw {
+      to { stroke-dashoffset: 0; }
+    }
+
+    @keyframes exerciseVortexPulse {
+      0%, 100% { opacity: 0.66; filter: blur(0.2px) drop-shadow(0 0 14px rgba(145, 202, 101, 0.38)); }
+      50% { opacity: 1; filter: blur(0.2px) drop-shadow(0 0 28px rgba(192, 240, 130, 0.58)); }
+    }
+
+    @keyframes exerciseVortexGlow {
+      0%, 100% { opacity: 0.62; transform: scale(0.98); }
+      50% { opacity: 0.94; transform: scale(1.02); }
+    }
+
+    @keyframes exerciseVortexBreath {
+      0%, 100% {
+        opacity: 0.48;
+        transform: scale(0.92);
+        filter: blur(12px) drop-shadow(0 0 18px rgba(151, 190, 117, 0.24));
+      }
+      50% {
+        opacity: 0.95;
+        transform: scale(1.16);
+        filter: blur(18px) drop-shadow(0 0 42px rgba(184, 226, 124, 0.44));
+      }
+    }
+
+    @keyframes exerciseCoreBreath {
+      0%, 100% {
+        box-shadow:
+          0 0 0 10px rgba(255, 255, 255, 0.3),
+          0 0 24px rgba(170, 215, 118, 0.38),
+          0 0 58px rgba(128, 163, 98, 0.14),
+          inset 0 0 28px rgba(117, 143, 103, 0.08);
+      }
+      50% {
+        box-shadow:
+          0 0 0 18px rgba(255, 255, 255, 0.46),
+          0 0 46px rgba(185, 231, 128, 0.58),
+          0 0 104px rgba(128, 163, 98, 0.3),
+          inset 0 0 34px rgba(117, 143, 103, 0.12);
+      }
+    }
+
+    @keyframes exerciseVortexPixel {
+      0% {
+        transform: translate(calc(-50% + var(--vx)), calc(-50% + var(--vy))) rotate(var(--rot)) scale(var(--start-scale, 0.62));
+        opacity: var(--low-alpha, 0.28);
+      }
+      32% { opacity: var(--high-alpha, 0.92); }
+      68% { opacity: var(--mid-alpha, 0.62); }
+      100% {
+        transform: translate(calc(-50% + var(--vx) + var(--dx)), calc(-50% + var(--vy) + var(--dy))) rotate(calc(var(--rot) + var(--spin))) scale(var(--end-scale, 1.12));
+        opacity: var(--low-alpha, 0.32);
+      }
+    }
+
+    @keyframes exerciseHintFloat {
+      0%, 100% { transform: translateY(0); opacity: 0.74; }
+      50% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    .exercise-move-popup-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 240;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(20, 24, 18, 0.22);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .exercise-move-popup-overlay.show {
+      display: flex;
+    }
+
+    .exercise-move-popup {
+      width: min(340px, 100%);
+      border-radius: 26px;
+      padding: 24px;
+      background: rgba(255, 255, 252, 0.96);
+      box-shadow: 0 24px 70px rgba(55, 61, 49, 0.2);
+      animation: popupSlideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .exercise-move-popup-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 880;
+      letter-spacing: 0;
+    }
+
+    .exercise-move-field {
+      display: grid;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .exercise-move-field label {
+      color: #6f766c;
+      font-size: 14px;
+      font-weight: 720;
+    }
+
+    .exercise-move-input {
+      width: 100%;
+      height: 48px;
+      border: 1px solid rgba(24, 32, 24, 0.08);
+      border-radius: 16px;
+      padding: 0 14px;
+      background: #f7f8f1;
+      color: #111a14;
+      font: inherit;
+      font-size: 17px;
+      font-weight: 720;
+      outline: none;
+    }
+
+    .exercise-move-input:focus {
+      border-color: rgba(111, 128, 95, 0.55);
+      box-shadow: 0 0 0 3px rgba(111, 128, 95, 0.12);
+    }
+
+    .exercise-move-popup-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 22px;
+    }
+
+    .exercise-move-popup-btn {
+      height: 48px;
+      border-radius: 17px;
+      background: #eceee6;
+      color: #66735c;
+      font-size: 16px;
+      font-weight: 820;
+    }
+
+    .exercise-move-popup-btn.primary {
+      background: #6f805f;
+      color: #fff;
+    }
+
+    @media (max-width: 390px) {
+      .exercise-title {
+        font-size: 48px;
+      }
+
+      .exercise-summary-card {
+        grid-template-columns: 1fr 112px;
+        padding: 22px 20px;
+      }
+
+      .exercise-total {
+        font-size: 68px;
+      }
+
+      .exercise-ring {
+        width: 108px;
+        height: 108px;
+      }
+
+      .exercise-strength-row {
+        grid-template-columns: 36px minmax(0, 1fr) 48px;
+        column-gap: 8px;
+        padding-inline: 8px;
+      }
+
+      .exercise-line {
+        gap: 8px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -4229,6 +5595,13 @@
             <span><span class="row-title">体重每日记录</span><span class="row-desc">体重趋势图与每日称重</span></span>
             <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
           </button>
+          <button class="profile-row" type="button" data-route="exercise">
+            <span class="row-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M6 20v-5" /><path d="M18 20v-5" /><path d="M4 15h16" /><path d="M8 12l3-5 3 5" /><path d="M12 7V4" /></svg>
+            </span>
+            <span><span class="row-title">体重每日记录</span><span class="row-desc">体重趋势图与每日称重</span></span>
+            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+          </button>
           <button class="profile-row" type="button" data-route="body-data">
             <span class="row-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M7 20V10M12 20V4M17 20v-7" /></svg>
@@ -4247,7 +5620,7 @@
             <span class="row-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 6-3 9h18c0-3-3-2-3-9Z" /><path d="M10 21h4" /></svg>
             </span>
-            <span><span class="row-title">提醒设置</span><span class="row-desc">拍照记录、喝水、称重</span></span>
+            <span><span class="row-title">体重每日记录</span><span class="row-desc">体重趋势图与每日称重</span></span>
             <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
           </button>
           <button class="profile-row" type="button" data-route="sync">
@@ -4486,6 +5859,8 @@
     </div>
   </main>
 
+  <div class="exercise-impact-overlay" id="exerciseImpactOverlay" aria-hidden="true"></div>
+
   <!-- Avatar Change Popup -->
   <div class="avatar-popup-overlay" id="avatarPopup">
     <div class="avatar-popup" onclick="event.stopPropagation()">
@@ -4518,6 +5893,28 @@
     </div>
   </div>
 
+  <div class="exercise-move-popup-overlay" id="exerciseMovePopup" onclick="closeExerciseMovePopup()">
+    <div class="exercise-move-popup" onclick="event.stopPropagation()">
+      <h2 class="exercise-move-popup-title">添加动作</h2>
+      <div class="exercise-move-field">
+        <label for="exerciseMoveName">项目名称</label>
+                  <input class="form-input" type="text" placeholder="例如：番茄炒蛋" data-field="manualName" maxlength="40" />
+      </div>
+      <div class="exercise-move-field">
+        <label for="exerciseMoveSets">运动组数</label>
+        <input class="exercise-move-input" id="exerciseMoveSets" data-field="exerciseMoveSets" type="number" min="1" max="12" inputmode="numeric" value="4" />
+      </div>
+      <div class="exercise-move-field">
+              <div><label for="targetWeightInput">目标体重</label><span>希望达到的健康体重</span></div>
+        <input class="exercise-move-input" id="exerciseMoveWeight" data-field="exerciseMoveWeight" type="number" min="0" max="300" step="0.5" inputmode="decimal" value="20" />
+      </div>
+      <div class="exercise-move-popup-actions">
+        <button class="exercise-move-popup-btn" type="button" data-action="exercise-cancel-move" onclick="closeExerciseMovePopup()">取消</button>
+        <button class="exercise-move-popup-btn primary" type="button" data-action="exercise-save-move" onclick="saveExerciseMoveFromPopup()">添加</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     window.onerror = function(msg, url, line, col, err) {
       console.error("[JS ERROR]", msg, url, line, col, err);
@@ -4539,6 +5936,7 @@
       "settings",
       "body-data",
       "weight-history",
+      "exercise",
       "diet-preference",
       "reminders",
       "sync",
@@ -4586,7 +5984,7 @@
           { role: "system", content: DETECTION_PROMPT },
           { role: "user", content: [
             { type: "image_url", image_url: { url: thumb } },
-            { type: "text", text: "检测图片中是否有食物" }
+        <input class="exercise-move-input" id="exerciseMoveName" data-field="exerciseMoveName" type="text" maxlength="20" placeholder="例如：肩推" />
           ]}
         ]);
         if (!msg) return;
@@ -4830,6 +6228,18 @@
         { date: "2026-06-03", weight: 57.8 },
         { date: "2026-06-04", weight: 57.8 }
       ],
+      exercise: {
+        targetMinutes: 220,
+        moves: [
+          { id: "squat", name: "深蹲", weight: 40, targetSets: 4, reps: 10, completedSets: 4 },
+          { id: "bench", name: "卧推", weight: 25, targetSets: 4, reps: 12, completedSets: 3 },
+          { id: "deadlift", name: "硬拉", weight: 50, targetSets: 4, reps: 8, completedSets: 4 }
+        ],
+        records: [
+      { name:"黑巧克力", calories:160, summary:"黑巧克力30g", tags:["抗氧化","偶尔享用","解馋"], note:"70%以上可可含量的黑巧含丰富抗氧化物，适量食用。", category:"零食", image:"" }
+          { id: "upper", name: "上肢力量", type: "力量训练", minutes: 40, calories: 260, icon: "strength" }
+        ]
+      },
       selectedDate: "2026-06-04",
       meals: [
         {
@@ -4978,7 +6388,13 @@
           mealHistory: { ...defaultState.mealHistory, ...(raw.mealHistory || {}) },
           selectedDate: raw.selectedDate || defaultState.selectedDate,
           meals: Array.isArray(raw.meals) ? raw.meals : defaultState.meals,
-          weightHistory: Array.isArray(raw.weightHistory) ? raw.weightHistory : defaultState.weightHistory
+          weightHistory: Array.isArray(raw.weightHistory) ? raw.weightHistory : defaultState.weightHistory,
+          exercise: {
+            ...defaultState.exercise,
+            ...(raw.exercise || {}),
+            moves: Array.isArray(raw.exercise && raw.exercise.moves) ? raw.exercise.moves : defaultState.exercise.moves,
+            records: Array.isArray(raw.exercise && raw.exercise.records) ? raw.exercise.records : defaultState.exercise.records
+          }
         };
       } catch(e) {
         return JSON.parse(JSON.stringify(defaultState));
@@ -4991,7 +6407,7 @@
     function checkDayRollover() {
       var today = getToday();
       if (appState.currentDay === today) return;
-      /* 归档旧数据：如果有 meals 且日期非今天，存入 mealHistory */
+    /* ── 跨天重置：将昨天的 meals 归档到 mealHistory，清空今日 meals ── */
       if (appState.meals && appState.meals.length > 0) {
         var oldDate = appState.currentDay || (appState.meals[0] && appState.meals[0].date) || "";
         if (oldDate && oldDate !== today) {
@@ -5372,9 +6788,9 @@
       return [
         "你是专业的食物识别与热量分析工具，只输出JSON，不要输出任何其他文字。",
         "只根据图片中实际可见的食物识别，绝对禁止猜测或编造不存在的食物。",
-        "如果图片模糊、无法看清食物、或图片中没有食物，请返回 {\"needs_retake\":true,\"foods\":[]}",
+        if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
         "识别图片中所有可见的食物，明确区分每种食物的类型（如主食、肉类、蔬菜、水果、饮品、甜点等）。",
-        "每种食物单独一条记录，给出：name（食物名称，需体现食物类型）、calories（这道菜的总热量大卡，根据可见份量估算）、description（一句话减脂说明，包括该食物对减脂的影响和食用建议）。",
+          return { name: f.name || "未知食物", calories: Math.round(cal), description: f.description || "" };
         "最后给出整体 advice 评级：rating（优/良/注意/差）。",
         "只输出紧凑JSON：",
         "{\"needs_retake\":false,\"foods\":[{\"name\":\"菜名\",\"calories\":250,\"description\":\"减脂说明\"}],\"advice\":{\"rating\":\"良\"}}"
@@ -5589,7 +7005,7 @@
             });
           } catch (e) {
             logRecognitionStep("图片转换失败", e.message || e);
-            return { needs_retake: true, foods: [], reason: "无法读取图片，请重新选择。" };
+        return { needs_retake: true, foods: [], reason: "AI 未返回可解析 JSON" };
           }
         }
         var prepared = await prepareRecognitionImage(imageSrc);
@@ -5637,7 +7053,7 @@
         return parsed;
       } catch (error) {
         logRecognitionStep("识别异常", error.message || error);
-        return { needs_retake: true, foods: [], reason: "识别过程出现异常，请重新拍摄或手动选择。" };
+        return { needs_retake: true, foods: [], reason: "AI 未返回可解析 JSON" };
       }
     }
 
@@ -5647,7 +7063,7 @@
       { name:"白米饭", calories:230, summary:"精白米饭一碗", tags:["主食","碳水","能量"], note:"白米饭升糖较快，建议搭配蔬菜和蛋白质一起食用。", category:"主食", image:"" },
       { name:"糙米饭", calories:220, summary:"糙米蒸饭一碗", tags:["主食","高纤维","低GI"], note:"糙米保留米糠层，膳食纤维丰富，饱腹感更强。", category:"主食", image:"" },
       { name:"杂粮饭", calories:210, summary:"混合杂粮蒸饭", tags:["主食","高纤维","均衡"], note:"多种谷物搭配，营养更均衡，适合减脂期。", category:"主食", image:"" },
-      { name:"馒头", calories:220, summary:"白面馒头一个", tags:["主食","碳水","快速能量"], note:"精制面食，建议搭配蔬菜和蛋白质平衡血糖。", category:"主食", image:"" },
+      { name:"糙米饭", calories:220, summary:"糙米蒸饭一碗", tags:["主食","高纤维","低GI"], note:"糙米保留米糠层，膳食纤维丰富，饱腹感更强。", category:"主食", image:"" },
       { name:"全麦面包", calories:180, summary:"全麦吐司两片", tags:["主食","高纤维","低GI"], note:"全麦富含B族维生素和膳食纤维，适合早餐。", category:"主食", image:"" },
       { name:"燕麦粥", calories:150, summary:"纯燕麦片煮粥", tags:["主食","高纤维","饱腹"], note:"燕麦富含β-葡聚糖，有助于控制血糖和胆固醇。", category:"主食", image:"" },
       { name:"面条", calories:350, summary:"白面条一碗", tags:["主食","碳水","快速能量"], note:"面条碳水含量高，建议多加蔬菜和少量蛋白质。", category:"主食", image:"" },
@@ -5657,7 +7073,7 @@
 
       /* 肉类 */
       { name:"鸡胸肉", calories:165, summary:"去皮鸡胸肉100g", tags:["高蛋白","低脂","减脂首选"], note:"鸡胸肉是优质蛋白来源，脂肪含量极低，减脂期必备。", category:"肉类", image:"" },
-      { name:"鸡腿肉", calories:210, summary:"去皮鸡腿肉100g", tags:["蛋白质","中脂","口感嫩"], note:"鸡腿肉脂肪比胸肉高，但口感更嫩滑。", category:"肉类", image:"" },
+      { name:"杂粮饭", calories:210, summary:"混合杂粮蒸饭", tags:["主食","高纤维","均衡"], note:"多种谷物搭配，营养更均衡，适合减脂期。", category:"主食", image:"" },
       { name:"猪里脊", calories:155, summary:"猪里脊肉100g", tags:["蛋白质","低脂","瘦肉"], note:"猪里脊是猪肉中最瘦的部位，蛋白质含量高。", category:"肉类", image:"" },
       { name:"五花肉", calories:395, summary:"五花肉100g", tags:["高脂","高热量","偶尔食用"], note:"五花肉脂肪含量高，建议控制食用量，偶尔解馋即可。", category:"肉类", image:"" },
       { name:"牛腩", calories:250, summary:"牛腩100g", tags:["蛋白质","铁质","中脂"], note:"牛腩富含铁和锌，炖煮后更易消化。", category:"肉类", image:"" },
@@ -5683,12 +7099,12 @@
       { name:"胡萝卜", calories:37, summary:"胡萝卜100g", tags:["蔬菜","β-胡萝卜素","护眼"], note:"胡萝卜富含β-胡萝卜素，有助于视力健康。", category:"蔬菜", image:"" },
 
       /* 中式菜品 */
-      { name:"番茄炒蛋", calories:220, summary:"番茄鸡蛋，一份", tags:["家常菜","蛋白质","维生素"], note:"经典家常菜，番茄的维C帮助鸡蛋中铁的吸收。", category:"中式", image:"" },
-      { name:"清炒时蔬", calories:80, summary:"清炒混合蔬菜", tags:["低卡","高纤维","清爽"], note:"清炒蔬菜保留了大部分营养，是最健康的烹饪方式。", category:"中式", image:"" },
+      { name:"糙米饭", calories:220, summary:"糙米蒸饭一碗", tags:["主食","高纤维","低GI"], note:"糙米保留米糠层，膳食纤维丰富，饱腹感更强。", category:"主食", image:"" },
+      { name:"豆腐", calories:80, summary:"北豆腐100g", tags:["植物蛋白","低脂","钙质"], note:"豆腐是优质植物蛋白来源，钙含量也很高。", category:"蛋奶豆", image:"" },
       { name:"红烧牛腩", calories:380, summary:"红烧牛腩一份", tags:["高蛋白","高热量","偶尔食用"], note:"红烧牛腩蛋白质丰富，但酱汁含糖和油较多，注意量。", category:"中式", image:"" },
       { name:"宫保鸡丁", calories:310, summary:"宫保鸡丁一份", tags:["蛋白质","中热量","家常菜"], note:"鸡丁搭配花生米，蛋白质和脂肪均衡，建议少油版。", category:"中式", image:"" },
-      { name:"麻婆豆腐", calories:250, summary:"麻婆豆腐一份", tags:["蛋白质","中热量","下饭"], note:"豆腐提供蛋白质，但麻辣调味热量较高，建议少饭搭配。", category:"中式", image:"" },
-      { name:"清蒸鲈鱼", calories:180, summary:"清蒸鲈鱼一份", tags:["高蛋白","低脂","清淡"], note:"清蒸保留了鱼的营养，高蛋白低脂，减脂期推荐。", category:"中式", image:"" },
+      { name:"牛腩", calories:250, summary:"牛腩100g", tags:["蛋白质","铁质","中脂"], note:"牛腩富含铁和锌，炖煮后更易消化。", category:"肉类", image:"" },
+      { name:"全麦面包", calories:180, summary:"全麦吐司两片", tags:["主食","高纤维","低GI"], note:"全麦富含B族维生素和膳食纤维，适合早餐。", category:"主食", image:"" },
       { name:"白灼虾", calories:120, summary:"白灼大虾10只", tags:["高蛋白","低脂","清淡"], note:"白灼虾是最低卡的虾做法，保留了鲜味和营养。", category:"中式", image:"" },
       { name:"蒜蓉西兰花", calories:90, summary:"蒜蓉炒西兰花", tags:["蔬菜","低卡","高纤维"], note:"蒜蓉提味不增太多热量，是减脂期的优质蔬菜选择。", category:"中式", image:"" },
       { name:"醋溜白菜", calories:70, summary:"醋溜大白菜", tags:["蔬菜","极低卡","开胃"], note:"醋溜白菜热量极低，醋还有助消化的作用。", category:"中式", image:"" },
@@ -5698,25 +7114,25 @@
       { name:"饺子", calories:450, summary:"猪肉白菜饺子12个", tags:["主食","碳水","蛋白质"], note:"饺子营养全面但碳水和热量偏高，建议控制在8-10个。", category:"中式", image:"" },
       { name:"包子", calories:280, summary:"肉包子一个", tags:["主食","碳水","蛋白质"], note:"包子有碳水有蛋白质，是便捷的早餐选择。", category:"中式", image:"" },
       { name:"炒饭", calories:500, summary:"蛋炒饭一份", tags:["主食","高碳水","高热量"], note:"炒饭用油较多热量偏高，建议搭配蔬菜平衡。", category:"中式", image:"" },
-      { name:"酸辣土豆丝", calories:150, summary:"酸辣土豆丝一份", tags:["蔬菜","中卡","开胃"], note:"土豆是蔬菜中碳水较高的，酸辣调味增加食欲。", category:"中式", image:"" },
-      { name:"鱼香肉丝", calories:330, summary:"鱼香肉丝一份", tags:["蛋白质","中热量","下饭"], note:"肉丝搭配木耳笋丝，营养多样，但糖醋汁含糖量不低。", category:"中式", image:"" },
+      { name:"燕麦粥", calories:150, summary:"纯燕麦片煮粥", tags:["主食","高纤维","饱腹"], note:"燕麦富含β-葡聚糖，有助于控制血糖和胆固醇。", category:"主食", image:"" },
+      { name:"意面", calories:330, summary:"意大利面一份", tags:["主食","碳水","中GI"], note:"意面GI值相对较低，搭配番茄酱和蔬菜更健康。", category:"主食", image:"" },
       { name:"回锅肉", calories:420, summary:"回锅肉一份", tags:["高脂","高热量","偶尔食用"], note:"五花肉配豆瓣酱，油脂含量高，建议控制食用量。", category:"中式", image:"" },
-      { name:"糖醋排骨", calories:450, summary:"糖醋排骨一份", tags:["高热量","偶尔食用","解馋"], note:"糖醋排骨糖和油都多，偶尔吃一次解解馋就好。", category:"中式", image:"" },
+      { name:"饺子", calories:450, summary:"猪肉白菜饺子12个", tags:["主食","碳水","蛋白质"], note:"饺子营养全面但碳水和热量偏高，建议控制在8-10个。", category:"中式", image:"" },
 
       /* 沙拉 / 西式 */
       { name:"鸡胸沙拉", calories:320, summary:"鸡胸肉配混合生菜沙拉", tags:["低脂","高蛋白","减脂餐"], note:"鸡胸肉沙拉是减脂期经典搭配，蛋白质充足热量适中。", category:"沙拉", image:"chicken-salad.png" },
-      { name:"凯撒沙拉", calories:380, summary:"凯撒沙拉配面包丁", tags:["沙拉","中热量","口感丰富"], note:"凯撒酱热量偏高，可以选择少酱版本。", category:"沙拉", image:"" },
-      { name:"牛油果沙拉", calories:350, summary:"牛油果配混合蔬菜沙拉", tags:["健康脂肪","纤维","优质脂肪"], note:"牛油果富含单不饱和脂肪酸，对心脏有益。", category:"沙拉", image:"" },
+      { name:"红烧牛腩", calories:380, summary:"红烧牛腩一份", tags:["高蛋白","高热量","偶尔食用"], note:"红烧牛腩蛋白质丰富，但酱汁含糖和油较多，注意量。", category:"中式", image:"" },
+      { name:"面条", calories:350, summary:"白面条一碗", tags:["主食","碳水","快速能量"], note:"面条碳水含量高，建议多加蔬菜和少量蛋白质。", category:"主食", image:"" },
 
       /* 饮品 / 早餐 */
       { name:"燕麦拿铁", calories:180, summary:"燕麦奶拿铁一杯", tags:["饮品","早餐","中热量"], note:"燕麦奶比全脂牛奶热量略低，拿铁咖啡提神醒脑。", category:"饮品", image:"oatmeal-latte.png" },
-      { name:"美式咖啡", calories:10, summary:"黑咖啡一杯", tags:["饮品","极低卡","提神"], note:"黑咖啡几乎零卡，还有助于提高代谢率。", category:"饮品", image:"" },
-      { name:"拿铁咖啡", calories:150, summary:"全脂拿铁一杯", tags:["饮品","钙质","早餐"], note:"拿铁含牛奶，提供钙质和蛋白质，比加糖饮品更健康。", category:"饮品", image:"" },
-      { name:"果汁", calories:120, summary:"鲜榨果汁一杯", tags:["饮品","维生素","注意糖分"], note:"果汁虽然含维C，但缺少纤维且糖分浓缩，不如直接吃水果。", category:"饮品", image:"" },
+      { name:"白灼虾", calories:120, summary:"白灼大虾10只", tags:["高蛋白","低脂","清淡"], note:"白灼虾是最低卡的虾做法，保留了鲜味和营养。", category:"中式", image:"" },
+      { name:"燕麦粥", calories:150, summary:"纯燕麦片煮粥", tags:["主食","高纤维","饱腹"], note:"燕麦富含β-葡聚糖，有助于控制血糖和胆固醇。", category:"主食", image:"" },
+      { name:"白灼虾", calories:120, summary:"白灼大虾10只", tags:["高蛋白","低脂","清淡"], note:"白灼虾是最低卡的虾做法，保留了鲜味和营养。", category:"中式", image:"" },
       { name:"奶茶", calories:400, summary:"珍珠奶茶一杯", tags:["饮品","高糖","偶尔饮用"], note:"奶茶含大量糖分和脂肪，建议选择少糖或无糖。", category:"饮品", image:"" },
 
       /* 水果 */
-      { name:"苹果", calories:95, summary:"中等苹果一个", tags:["水果","高纤维","低GI"], note:"苹果富含果胶和维C，是最佳减脂水果之一。", category:"水果", image:"" },
+      { name:"虾仁", calories:95, summary:"去壳虾仁100g", tags:["高蛋白","低脂","低卡"], note:"虾仁蛋白质丰富、热量极低，是减脂期理想蛋白源。", category:"肉类", image:"" },
       { name:"香蕉", calories:105, summary:"香蕉一根", tags:["水果","钾","快速能量"], note:"香蕉富含钾和快速碳水，适合运动前后食用。", category:"水果", image:"" },
       { name:"蓝莓", calories:57, summary:"蓝莓100g", tags:["水果","抗氧化","低卡"], note:"蓝莓富含花青素，抗氧化能力强，热量很低。", category:"水果", image:"" },
       { name:"橙子", calories:62, summary:"中等橙子一个", tags:["水果","维生素C","低卡"], note:"橙子富含维生素C和水分，是冬季补充维C的好选择。", category:"水果", image:"" },
@@ -5724,7 +7140,7 @@
 
       /* 零食 / 加餐 */
       { name:"坚果混合", calories:170, summary:"混合坚果一小把30g", tags:["健康脂肪","蛋白质","加餐"], note:"坚果富含不饱和脂肪酸和维生素E，但热量高要控量。", category:"零食", image:"" },
-      { name:"蛋白棒", calories:200, summary:"蛋白棒一根", tags:["蛋白质","方便","加餐"], note:"蛋白棒方便携带，蛋白质含量高，适合运动后加餐。", category:"零食", image:"" },
+      { name:"酸奶", calories:145, summary:"原味酸奶200g", tags:["钙质","益生菌","蛋白质"], note:"选择无糖酸奶，富含益生菌有助于肠道健康。", category:"蛋奶豆", image:"" },
       { name:"黑巧克力", calories:160, summary:"黑巧克力30g", tags:["抗氧化","偶尔享用","解馋"], note:"70%以上可可含量的黑巧含丰富抗氧化物，适量食用。", category:"零食", image:"" }
     ];
 
@@ -5740,7 +7156,7 @@
       for (var i = 0; i < FOOD_DB.length; i++) {
         if (FOOD_DB[i].name.indexOf(lower) !== -1 || lower.indexOf(FOOD_DB[i].name) !== -1) return FOOD_DB[i];
       }
-      /* 3. 子串重叠匹配：DB名称的2-3字片段在AI名称中出现几次 */
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       var bestMatch = null, bestScore = 0;
       for (var i = 0; i < FOOD_DB.length; i++) {
         var dbName = FOOD_DB[i].name;
@@ -5861,30 +7277,30 @@
         tips.push("热量控制得很好，份量合适");
       } else if (ratio <= 0.45) {
         rating = "良";
-        tips.push("热量适中，是不错的一餐");
+        tips.push("热量控制得很好，份量合适");
       } else if (ratio <= 0.65) {
         rating = "注意";
         tips.push("这餐热量偏高，注意控制总量");
       } else {
         rating = "注意";
-        tips.push("热量较高，建议搭配清淡食物");
+        tips.push("热量控制得很好，份量合适");
       }
 
       /* 根据食物标签给建议 */
       var tags = mealData.tags || [];
-      if (tags.some(function(t) { return t.indexOf("高蛋白") !== -1 || t.indexOf("蛋白质") !== -1; })) {
-        tips.push("优质蛋白质，有助于肌肉修复");
+        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
+        tips.push("热量控制得很好，份量合适");
       }
-      if (tags.some(function(t) { return t.indexOf("高纤维") !== -1 || t.indexOf("纤维") !== -1; })) {
-        tips.push("膳食纤维丰富，促进消化");
+        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
+        tips.push("热量控制得很好，份量合适");
       }
-      if (tags.some(function(t) { return t.indexOf("低脂") !== -1 || t.indexOf("极低卡") !== -1; })) {
+        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
         tips.push("低脂低卡，减脂期好选择");
       }
-      if (tags.some(function(t) { return t.indexOf("高热量") !== -1 || t.indexOf("高脂") !== -1; })) {
+        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
         tips.push("热量偏高，建议今天其余餐清淡");
       }
-      if (tags.some(function(t) { return t.indexOf("维生素") !== -1 || t.indexOf("维生素C") !== -1; })) {
+        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
         tips.push("维生素含量高，提升免疫力");
       }
 
@@ -6160,7 +7576,7 @@
         var tags = (Array.isArray(result.tags) && result.tags.length > 0) ? result.tags.slice() : ["轻盈午餐", "蛋白质充足", "符合减脂目标"];
         /* 根据 AI 评级动态调整第三个标签 */
         var rating = (result.aiAdvice && result.aiAdvice.rating) || "";
-        if (rating === "注意" || rating === "差") {
+        var rating = (result.aiAdvice && result.aiAdvice.rating) || "";
           tags[2] = "偏离减脂目标";
         } else {
           tags[2] = "符合减脂目标";
@@ -6701,7 +8117,7 @@
             uploadZone.classList.add("has-photo");
             uploadZone.innerHTML = `
               <img class="album-preview-img" src="${ev.target.result}" alt="已上传照片" />
-              <span class="album-preview-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>已上传</span>
+          <span class="album-preview-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>已选择</span>
             `;
           }
 
@@ -6817,14 +8233,14 @@
           }
           aiResult = {
             needs_retake: false,
-            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), "检测食物"),
+            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), sourceLabel || "检测食物"),
             reason: "图像质量不足，已进入本地兜底确认"
           };
         }
         if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
           aiResult = {
             needs_retake: false,
-            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), isRealPhoto ? "拍摄照片" : "检测食物"),
+            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), isRealPhoto ? "拍摄照片" : (sourceLabel || "鸡胸沙拉")),
             reason: "AI 未返回可用结果，已进入本地兜底确认"
           };
         }
@@ -7031,6 +8447,449 @@
       });
     }
 
+    function renderExerciseDetail() {
+      const strengthRows = [
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      ];
+
+      const strengthHtml = strengthRows.map((item) => `
+        <div class="exercise-strength-row">
+          <span class="exercise-index">${item.index}</span>
+          <span class="exercise-line">
+            <span class="exercise-move"><strong>${item.name}</strong><span> · ${item.weight}</span></span>
+            <span class="exercise-reps">${item.reps}</span>
+          </span>
+          <button class="exercise-add-small" type="button" aria-label="记录${item.name}组数">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+          </button>
+        </div>
+      `).join("");
+
+      return `
+        <div class="exercise-shell">
+          <div class="exercise-hero">
+            <div>
+              <h1 class="exercise-title">运动</h1>
+              <span class="exercise-subtitle">记录运动 · 力量训练</span>
+            </div>
+            <button class="exercise-calendar" type="button" aria-label="查看运动日历">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4M16 2v4" /><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M3 10h18" /><path d="m9 15 2 2 4-5" /></svg>
+            </button>
+          </div>
+
+          <section class="exercise-card exercise-summary-card">
+            <div>
+              <h2 class="exercise-card-title">今日运动</h2>
+              <div class="exercise-total">68 <span>min</span></div>
+              <div class="exercise-stats">
+                <div class="exercise-stat">
+                  <span class="exercise-stat-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4-3 5-3 9a5 5 0 0 0 10 0c0-3-2-5-4-7 .5 4-3 5-3 8" /></svg>
+                  </span>
+                  <span><span class="exercise-stat-label">消耗</span><span class="exercise-stat-value">420 <span>kcal</span></span></span>
+                </div>
+                <span class="exercise-stat-divider"></span>
+                <div class="exercise-stat">
+                  <span class="exercise-stat-icon check">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6" /></svg>
+                  </span>
+                  <span><span class="exercise-stat-label">完成</span><span class="exercise-stat-value">2 <span>项训练</span></span></span>
+                </div>
+              </div>
+            </div>
+            <div class="exercise-ring-wrap">
+              <span class="exercise-pill">查看详情 <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></span>
+              <div class="exercise-ring" aria-label="今日运动进度 31%">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /><path d="m12 8 3 3 3-1" /><path d="m10 10-2 4-3 2" /><path d="m13 13-2 3 3 4" /></svg>
+              </div>
+            </div>
+          </section>
+
+          <section class="exercise-card exercise-section-card">
+            <div class="exercise-section-head">
+              <h2 class="exercise-section-title">力量训练</h2>
+              <span class="exercise-pill">记录组数</span>
+            </div>
+            <div class="exercise-strength-list">${strengthHtml}</div>
+          </section>
+
+          <section class="exercise-card exercise-history-card">
+            <div class="exercise-section-head" style="margin:0 0 14px;">
+              <h2 class="exercise-section-title">今日训练记录</h2>
+              <span class="exercise-pill">查看全部 <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></span>
+            </div>
+            <div class="exercise-history-list">
+              <button class="exercise-history-row" type="button">
+                <span class="exercise-history-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /><path d="m12 8 3 3 3-1" /><path d="m10 10-2 4-3 2" /><path d="M6 21h12" /></svg></span>
+                <span class="exercise-history-copy"><strong>跑步机快走</strong><span>有氧</span></span>
+                <span class="exercise-history-time">28<span>min</span></span>
+                <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+              </button>
+              <button class="exercise-history-row" type="button">
+                <span class="exercise-history-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12" /></svg></span>
+                <span class="exercise-history-copy"><strong>上肢力量</strong><span>力量训练</span></span>
+                <span class="exercise-history-time">40<span>min</span></span>
+                <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+              </button>
+            </div>
+          </section>
+
+          <button class="exercise-card exercise-start-card" type="button">
+            <span class="exercise-start-plus">+</span>
+            <span class="exercise-start-copy"><strong>开始记录训练</strong><span>记录有氧或力量训练</span></span>
+            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+          </button>
+        </div>
+      `;
+    }
+
+    function exerciseTotals() {
+      const records = (appState.exercise && appState.exercise.records) || [];
+      const moves = (appState.exercise && appState.exercise.moves) || [];
+      const minutes = records.reduce((sum, item) => sum + (Number(item.minutes) || 0), 0);
+      const calories = records.reduce((sum, item) => sum + (Number(item.calories) || 0), 0);
+      return {
+        minutes,
+        calories,
+        completed: records.length,
+        progress: Math.min(Math.round((minutes / ((appState.exercise && appState.exercise.targetMinutes) || 220)) * 100), 100),
+        moves
+      };
+    }
+
+    function exerciseIcon(type) {
+      if (type === "strength") {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12" /></svg>';
+      }
+      return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /><path d="m12 8 3 3 3-1" /><path d="m10 10-2 4-3 2" /><path d="M6 21h12" /></svg>';
+    }
+
+    const EXERCISE_IMPACT_DURATION = 1350;
+
+    function triggerExercisePixelImpact(sourceNode) {
+      const overlay = document.getElementById("exerciseImpactOverlay");
+      if (!overlay) return;
+      const vortexNode = sourceNode && sourceNode.querySelector ? sourceNode.querySelector(".exercise-vortex") : null;
+      const rect = vortexNode && vortexNode.getBoundingClientRect
+        ? vortexNode.getBoundingClientRect()
+        : (sourceNode && sourceNode.getBoundingClientRect ? sourceNode.getBoundingClientRect() : null);
+      const originX = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
+      const originY = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
+      const pixels = Array.from({ length: 120 }, (_, index) => {
+        const angle = (index * 137.508 + (index % 19) * 9) % 360;
+        const edge = index % 4;
+        const startX = edge === 0 ? -24 : edge === 1 ? window.innerWidth + 24 : ((index * 71) % Math.max(window.innerWidth, 1));
+        const startY = edge === 2 ? -24 : edge === 3 ? window.innerHeight + 24 : ((index * 97) % Math.max(window.innerHeight, 1));
+        const fromX = Math.round(startX - originX);
+        const fromY = Math.round(startY - originY);
+        const size = 3 + (index % 8);
+        const delay = ((index % 18) * 0.006).toFixed(3);
+        const duration = (0.38 + (index % 8) * 0.018).toFixed(3);
+        const spin = 80 + (index % 10) * 22;
+        const startScale = (0.72 + (index % 8) * 0.12).toFixed(2);
+        const alpha = (0.58 + (index % 6) * 0.04).toFixed(2);
+        return `<span class="exercise-impact-pixel" style="--impact-x:${originX}px;--impact-y:${originY}px;--from-x:${fromX}px;--from-y:${fromY}px;--s:${size}px;--delay:${delay}s;--dur:${duration}s;--rot:${Math.round(angle)}deg;--spin:${spin}deg;--start-scale:${startScale};--high-alpha:${alpha};"></span>`;
+      }).join("");
+      overlay.style.setProperty("--impact-x", originX + "px");
+      overlay.style.setProperty("--impact-y", originY + "px");
+      overlay.innerHTML = `<span class="exercise-impact-flash"></span>${pixels}<span class="exercise-impact-check"><svg viewBox="0 0 52 52" aria-hidden="true"><path d="M14 27l7.8 7.8L38 17" /></svg></span>`;
+      overlay.classList.remove("show");
+      void overlay.offsetWidth;
+      overlay.classList.add("show");
+      window.clearTimeout(overlay._exerciseImpactTimer);
+      overlay._exerciseImpactTimer = window.setTimeout(() => {
+        overlay.classList.remove("show");
+        overlay.innerHTML = "";
+      }, EXERCISE_IMPACT_DURATION);
+    }
+
+    function addExerciseSet(moveId, options = {}) {
+      const move = appState.exercise.moves.find((item) => item.id === moveId);
+      if (!move) return;
+      move.completedSets = Math.min((move.completedSets || 0) + 1, move.targetSets || 4);
+      if (move.completedSets >= (move.targetSets || 4)) {
+        const existing = appState.exercise.records.find((record) => record.id === "strength-" + move.id);
+        if (!existing) {
+          appState.exercise.records.unshift({
+            id: "strength-" + move.id,
+            name: move.name,
+            type: "力量训练",
+            minutes: 10,
+            calories: 65,
+            icon: "strength"
+          });
+        }
+      }
+      saveState();
+      if (!options.skipRender) {
+        renderDetailPage("exercise-set-" + move.id);
+      }
+      showToast(move.name + " 已完成本组");
+    }
+
+    function resetExerciseSet(moveId) {
+      const move = appState.exercise.moves.find((item) => item.id === moveId);
+      if (!move) return;
+      move.completedSets = 0;
+      appState.exercise.records = appState.exercise.records.filter((record) => record.id !== "strength-" + move.id);
+      saveState();
+      renderDetailPage("exercise-set-" + move.id);
+      showToast(move.name + " 已完成本组");
+    }
+
+    function openExerciseMovePopup() {
+      const popup = document.getElementById("exerciseMovePopup");
+      const name = document.querySelector('[data-field="exerciseMoveName"]');
+      const sets = document.querySelector('[data-field="exerciseMoveSets"]');
+      const weight = document.querySelector('[data-field="exerciseMoveWeight"]');
+      if (name) name.value = "";
+      if (sets) sets.value = "4";
+      if (weight) weight.value = "20";
+      if (popup) popup.classList.add("show");
+      setTimeout(() => { if (name) name.focus(); }, 50);
+    }
+
+    function closeExerciseMovePopup() {
+      const popup = document.getElementById("exerciseMovePopup");
+      if (popup) popup.classList.remove("show");
+    }
+
+    function addExerciseMove(moveData) {
+      const nextIndex = appState.exercise.moves.length + 1;
+      const data = moveData || {};
+      appState.exercise.moves.push({
+        id: "custom-" + Date.now(),
+      if (data && data.name) {
+        weight: Number(data.weight) || 20,
+        targetSets: Number(data.sets) || 4,
+        reps: 10,
+        completedSets: 0
+      });
+      saveState();
+      renderDetailPage("exercise");
+      showToast("已添加动作");
+    }
+
+    function saveExerciseMoveFromPopup() {
+      const name = ((document.querySelector('[data-field="exerciseMoveName"]') && document.querySelector('[data-field="exerciseMoveName"]').value) || "").trim();
+      const sets = Math.max(1, Math.min(12, parseInt((document.querySelector('[data-field="exerciseMoveSets"]') && document.querySelector('[data-field="exerciseMoveSets"]').value) || "4", 10) || 4));
+      const weight = Math.max(0, Math.min(300, Number((document.querySelector('[data-field="exerciseMoveWeight"]') && document.querySelector('[data-field="exerciseMoveWeight"]').value) || 20) || 20));
+      if (!name) {
+        haptic("error");
+        showToast("请填写项目名称");
+        return;
+      }
+      addExerciseMove({ name, sets, weight });
+      closeExerciseMovePopup();
+    }
+
+    function startExerciseRecord() {
+      const id = "record-" + Date.now();
+      appState.exercise.records.unshift({
+        id,
+        name: "自由训练",
+        type: "有氧",
+        minutes: 15,
+        calories: 90,
+        icon: "run"
+      });
+      saveState();
+      renderDetailPage("exercise");
+      showToast("已开始记录训练");
+    }
+
+    function renderExerciseDetail() {
+      if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
+      const totals = exerciseTotals();
+      const strengthHtml = totals.moves.map((item, index) => {
+        const targetSets = Number(item.targetSets) || 4;
+        return `
+          <div class="exercise-strength-row">
+            <span class="exercise-index">${index + 1}</span>
+            <span class="exercise-line">
+              <span class="exercise-move"><strong>${escapeHtml(item.name)}</strong><span> · ${Number(item.weight) || 0} kg</span></span>
+              <span class="exercise-reps">${targetSets} 组 × ${Number(item.reps) || 10} 次</span>
+            </span>
+            <button class="exercise-add-small" type="button" data-route="exercise-set-${escapeHtml(item.id)}" aria-label="记录${escapeHtml(item.name)}组数">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
+            </button>
+          </div>
+        `;
+      }).join("");
+
+      const recordsHtml = appState.exercise.records.map((item) => `
+        <button class="exercise-history-row" type="button" data-action="exercise-record-detail" data-record-id="${escapeHtml(item.id)}">
+          <span class="exercise-history-icon">${exerciseIcon(item.icon)}</span>
+          <span class="exercise-history-copy"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.type)}</span></span>
+          <span class="exercise-history-time">${Number(item.minutes) || 0}<span>min</span></span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+        </button>
+      `).join("");
+
+      return `
+        <div class="exercise-shell">
+          <div class="exercise-hero">
+            <div>
+              <h1 class="exercise-title">运动</h1>
+              <span class="exercise-subtitle">记录运动 · 力量训练</span>
+            </div>
+            <button class="exercise-calendar" type="button" data-action="exercise-calendar" aria-label="查看运动日历">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4M16 2v4" /><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M3 10h18" /><path d="m9 15 2 2 4-5" /></svg>
+            </button>
+          </div>
+
+          <section class="exercise-card exercise-summary-card">
+            <div>
+              <h2 class="exercise-card-title">今日运动</h2>
+              <div class="exercise-total">${totals.minutes} <span>min</span></div>
+              <div class="exercise-stats">
+                <div class="exercise-stat">
+                  <span class="exercise-stat-icon">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4-3 5-3 9a5 5 0 0 0 10 0c0-3-2-5-4-7 .5 4-3 5-3 8" /></svg>
+                  </span>
+                  <span><span class="exercise-stat-label">消耗</span><span class="exercise-stat-value">${totals.calories} <span>kcal</span></span></span>
+                </div>
+                <span class="exercise-stat-divider"></span>
+                <div class="exercise-stat">
+                  <span class="exercise-stat-icon check">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6" /></svg>
+                  </span>
+                  <span><span class="exercise-stat-label">完成</span><span class="exercise-stat-value">${totals.completed} <span>项训练</span></span></span>
+                </div>
+              </div>
+            </div>
+            <div class="exercise-ring-wrap">
+              <button class="exercise-pill" type="button" data-action="exercise-show-summary">查看详情 <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>
+              <div class="exercise-ring" style="background: radial-gradient(circle at center, rgba(255, 255, 252, 0.95) 0 45%, transparent 47%), conic-gradient(#8a9778 0 ${totals.progress}%, rgba(224, 226, 216, 0.68) ${totals.progress}% 100%);" aria-label="今日运动进度 ${totals.progress}%">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /><path d="m12 8 3 3 3-1" /><path d="m10 10-2 4-3 2" /><path d="m13 13-2 3 3 4" /></svg>
+              </div>
+            </div>
+          </section>
+
+          <section class="exercise-card exercise-section-card">
+            <div class="exercise-section-head">
+              <h2 class="exercise-section-title">力量训练</h2>
+              <button class="exercise-pill" type="button" data-action="exercise-add-move">添加动作</button>
+            </div>
+            <div class="exercise-strength-list">${strengthHtml}</div>
+          </section>
+
+          <section class="exercise-card exercise-history-card">
+            <div class="exercise-section-head" style="margin:0 0 14px;">
+              <h2 class="exercise-section-title">今日训练记录</h2>
+              <button class="exercise-pill" type="button" data-action="exercise-show-all">查看全部 <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>
+            </div>
+            <div class="exercise-history-list">${recordsHtml}</div>
+          </section>
+
+          <button class="exercise-card exercise-start-card" type="button" data-action="exercise-start-record">
+            <span class="exercise-start-plus">+</span>
+            <span class="exercise-start-copy"><strong>开始记录训练</strong><span>记录有氧或力量训练</span></span>
+            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+          </button>
+        </div>
+      `;
+    }
+    function renderExerciseSetDetail(moveId) {
+      if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
+      const move = appState.exercise.moves.find((item) => item.id === moveId);
+      if (!move) {
+        return `
+          <section class="detail-card">
+            <p class="detail-summary">\u672a\u627e\u5230\u8fd9\u4e2a\u8bad\u7ec3\u52a8\u4f5c\uff0c\u8bf7\u8fd4\u56de\u8fd0\u52a8\u9875\u91cd\u65b0\u9009\u62e9\u3002</p>
+            <button class="detail-empty-action" type="button" data-route="exercise">\u8fd4\u56de\u8fd0\u52a8</button>
+          </section>
+        `;
+      }
+      const targetSets = Number(move.targetSets) || 4;
+      const completedSets = Math.max(0, Math.min(Number(move.completedSets) || 0, targetSets));
+      const reps = Number(move.reps) || 10;
+      const weight = Number(move.weight) || 0;
+      const referenceCompletedSets = Math.min(3, Math.max(0, targetSets - 1));
+      const currentSet = Math.min(referenceCompletedSets + 1, targetSets);
+      const progressRowClass = targetSets > 4 ? " is-scrollable" : "";
+      const progressItems = Array.from({ length: targetSets }, (_, index) => {
+        const setNumber = index + 1;
+        const done = setNumber <= referenceCompletedSets;
+        const current = !done && setNumber === currentSet;
+        return `
+          <span class="exercise-set-progress-item${done ? " done" : ""}${current ? " current" : ""}">
+            <span class="exercise-set-progress-dot">${done ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.2 4.2L19 6.8" /></svg>` : setNumber}</span>
+            <span>${current ? `\u7b2c ${setNumber} \u7ec4` : `${setNumber} \u7ec4`}</span>
+          </span>
+        `;
+      }).join("");
+      const pixels = Array.from({ length: 900 }, (_, index) => {
+        const angle = (index * 137.508 + (index % 17) * 11 + (index % 23) * 3) % 360;
+        const radius = 88 + (index % 67) * 5 + (index % 13) * 11 + (index % 5) * 17;
+        const radians = angle * Math.PI / 180;
+        const jitterX = ((index * 29) % 41) - 20;
+        const jitterY = ((index * 31) % 47) - 23;
+        const x = Math.round(Math.cos(radians) * radius + jitterX);
+        const y = Math.round(Math.sin(radians) * radius + jitterY);
+        const dx = Math.round(Math.cos(radians) * (18 + (index % 9) * 5) + (((index * 7) % 19) - 9));
+        const dy = Math.round(Math.sin(radians) * (18 + (index % 11) * 4) + (((index * 11) % 23) - 11));
+        const size = 2 + (index % 12);
+        const delay = ((index % 64) * -0.037).toFixed(3);
+        const spin = 24 + (index % 9) * 18;
+        const lowAlpha = (0.2 + (index % 5) * 0.035).toFixed(2);
+        const midAlpha = (0.5 + (index % 7) * 0.045).toFixed(2);
+        const highAlpha = (0.74 + (index % 6) * 0.04).toFixed(2);
+        const startScale = (0.54 + (index % 4) * 0.08).toFixed(2);
+        const endScale = (0.92 + (index % 5) * 0.08).toFixed(2);
+        return `<span class="exercise-vortex-pixel" style="--vx:${x}px;--vy:${y}px;--dx:${dx}px;--dy:${dy}px;--s:${size}px;--delay:${delay}s;--rot:${Math.round(angle)}deg;--spin:${spin}deg;--low-alpha:${lowAlpha};--mid-alpha:${midAlpha};--high-alpha:${highAlpha};--start-scale:${startScale};--end-scale:${endScale};"></span>`;
+      }).join("");
+      return `
+        <div class="exercise-set-page">
+          <div class="exercise-set-statusbar">
+            <span>9:41</span>
+            <span class="exercise-set-status-icons" aria-hidden="true">
+              <span class="exercise-set-signal"><span></span><span></span><span></span><span></span></span>
+              <span class="exercise-set-wifi"></span>
+              <span class="exercise-set-battery"></span>
+            </span>
+          </div>
+          <div class="exercise-set-top">
+            <button class="exercise-set-round-btn" type="button" data-route="exercise" aria-label="\u8fd4\u56de\u8fd0\u52a8">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+            </button>
+            <div class="exercise-set-title-wrap">
+              <h2 class="exercise-set-title">${escapeHtml(move.name)}</h2>
+              <div class="exercise-set-subtitle">\u76ee\u6807 ${targetSets} \u7ec4</div>
+            </div>
+            <span class="exercise-set-top-spacer" aria-hidden="true"></span>
+          </div>
+          <section class="exercise-set-glass-progress" aria-label="\u8bad\u7ec3\u8fdb\u5ea6">
+            <div class="exercise-set-progress-head">
+              <strong>\u8bad\u7ec3\u8fdb\u5ea6</strong>
+              <span class="exercise-set-progress-pill">\u5b8c\u6210 ${referenceCompletedSets}/${targetSets} \u7ec4</span>
+            </div>
+            <div class="exercise-set-progress-row${progressRowClass}">${progressItems}</div>
+          </section>
+          <button class="exercise-vortex-stage" type="button" data-action="exercise-record-set" data-move-id="${escapeHtml(move.id)}" aria-label="\u5b8c\u6210\u672c\u7ec4">
+            <span class="exercise-vortex">
+              <span class="exercise-vortex-pixels">${pixels}</span>
+              <span class="exercise-vortex-core"></span>
+            </span>
+          </button>
+          <section class="exercise-set-glass-stats" aria-label="\u672c\u7ec4\u6570\u636e">
+            <div class="exercise-set-stat">
+              <span class="exercise-set-stat-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2-6 4 13 3-9 2 5h4" /></svg></span>
+              <span class="exercise-set-stat-copy"><span class="exercise-set-stat-label">\u672c\u7ec4\u91cd\u91cf</span><span class="exercise-set-stat-value">${weight}<span>kg</span></span></span>
+            </div>
+            <span class="exercise-set-stat-divider"></span>
+            <div class="exercise-set-stat">
+              <span class="exercise-set-stat-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8" /><path d="M4 4v4h4" /><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16" /><path d="M20 20v-4h-4" /></svg></span>
+              <span class="exercise-set-stat-copy"><span class="exercise-set-stat-label">\u672c\u7ec4\u6b21\u6570</span><span class="exercise-set-stat-value">${reps}<span>\u6b21</span></span></span>
+            </div>
+          </section>
+          <div class="exercise-set-swipe-hint">\u2191 \u5411\u4e0a\u6ed1\u52a8\u5b8c\u6210\u672c\u7ec4 \u2191</div>
+        </div>
+      `;
+    }
+
     function renderDetailPage(route) {
       const eyebrow = document.querySelector("[data-detail-eyebrow]");
       const title = document.querySelector("[data-detail-title]");
@@ -7039,7 +8898,11 @@
 
       const mealId = route.startsWith("meal-") ? route.replace("meal-", "") : "";
       const selectedMeal = appState.meals.find((meal) => meal.id === mealId);
-      document.body.dataset.detailKind = selectedMeal ? "meal" : route;
+      const exerciseSetId = route.startsWith("exercise-set-") ? route.replace("exercise-set-", "") : "";
+      const selectedExerciseMove = exerciseSetId && appState.exercise && appState.exercise.moves.find((move) => move.id === exerciseSetId);
+      const detailKind = selectedMeal ? "meal" : (exerciseSetId ? "exercise-set" : route);
+      document.body.dataset.detailKind = detailKind;
+      document.documentElement.dataset.detailKind = detailKind;
 
       const detailConfig = {
         "plan-settings": {
@@ -7116,12 +8979,17 @@
           title: "每日记录",
           body: renderWeightHistoryPage()
         },
+        exercise: {
+          eyebrow: "运动",
+          title: "运动",
+          body: renderExerciseDetail()
+        },
         "diet-preference": {
           eyebrow: "饮食偏好",
           title: "低碳轻食",
           body: `
             <section class="detail-card">
-              <p class="detail-summary"><span class="ai-star">✦</span> 偏好会用于智能推荐和热量估算，让晚餐建议更贴合你的减脂节奏。</p>
+              <p class="detail-summary"><span class="ai-star">✦</span> 系统会根据你的身体数据，智能分析减脂进度并调整每日热量目标，提供个性化建议。</p>
               <div class="detail-form">
                 <div class="data-row">
                   <div class="data-info">
@@ -7369,6 +9237,12 @@
               </div>
             `
           }
+        : selectedExerciseMove
+          ? {
+              eyebrow: "力量训练",
+              title: selectedExerciseMove.name,
+              body: renderExerciseSetDetail(exerciseSetId)
+            }
         : detailConfig[route] || {
             eyebrow: route.startsWith("meal-") ? "餐食记录" : "功能",
             title: route.startsWith("meal-") ? "未找到记录" : (routeMap[route] || "详情"),
@@ -7699,6 +9573,7 @@
       settings: "设置",
       "body-data": "身体数据",
       "weight-history": "体重每日记录",
+      exercise: "运动",
       "diet-preference": "饮食偏好",
       reminders: "提醒设置",
       sync: "数据同步",
@@ -7721,7 +9596,7 @@
       const normalizedRoute = routeAlias[route] || route;
       const safeRoute = mainRoutes.has(normalizedRoute)
         ? normalizedRoute
-        : routableRoutes.has(normalizedRoute) || normalizedRoute.startsWith("meal-")
+        : routableRoutes.has(normalizedRoute) || normalizedRoute.startsWith("meal-") || normalizedRoute.startsWith("exercise-set-")
           ? "detail"
           : document.body.dataset.activeRoute || "home";
       const activeRoute = safeRoute || "home";
@@ -7743,6 +9618,7 @@
         renderDetailPage(normalizedRoute);
       } else {
         delete document.body.dataset.detailKind;
+        delete document.documentElement.dataset.detailKind;
       }
 
       if (activeRoute === "profile") {
@@ -7944,6 +9820,65 @@
       if (actionNode && actionNode.dataset.action === "add-weight-from-history") {
         haptic("light");
         openWeightPopup();
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-add-set") {
+        haptic("select");
+        addExerciseSet(actionNode.dataset.moveId);
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-record-set") {
+        haptic("select");
+        triggerExercisePixelImpact(actionNode);
+        window.clearTimeout(actionNode._exerciseRecordTimer);
+        actionNode._exerciseRecordTimer = window.setTimeout(() => addExerciseSet(actionNode.dataset.moveId, { skipRender: true }), EXERCISE_IMPACT_DURATION + 80);
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-reset-set") {
+        haptic("medium");
+        resetExerciseSet(actionNode.dataset.moveId);
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-add-move") {
+        haptic("medium");
+        openExerciseMovePopup();
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-save-move") {
+        haptic("medium");
+        saveExerciseMoveFromPopup();
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-cancel-move") {
+        haptic("light");
+        closeExerciseMovePopup();
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-start-record") {
+        haptic("success");
+        startExerciseRecord();
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-show-summary") {
+        const totals = exerciseTotals();
+        haptic("light");
+        showToast(`今日 ${totals.minutes} min · ${totals.calories} kcal`);
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-show-all") {
+        haptic("light");
+        showToast(`共 ${appState.exercise.records.length} 条训练记录`);
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-calendar") {
+        haptic("light");
+        showToast("运动日历已连接");
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-record-detail") {
+        const record = appState.exercise.records.find((item) => item.id === actionNode.dataset.recordId);
+        haptic("light");
+        if (record) showToast(`${record.name} · ${record.minutes} min`);
         return;
       }
 

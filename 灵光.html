@@ -52,7 +52,7 @@
     .phone-frame {
       width: min(430px, 100vw);
       min-height: 100vh;
-      background: #f8f7f2;
+      background: var(--page);
     }
 
     .home-screen {
@@ -933,8 +933,6 @@
       object-position: center;
       filter: saturate(0.92);
       align-self: center;
-      box-shadow: 0 12px 28px rgba(55, 61, 49, 0.12);
-      flex-shrink: 0;
     }
 
     /* ===== 加载状态通用 ===== */
@@ -4068,8 +4066,35 @@
       padding-top: 0;
     }
 
+    html[data-detail-kind="exercise-set"] {
+      height: 100dvh;
+      overflow: hidden;
+    }
+
     body[data-detail-kind="exercise-set"] .home-screen {
-      background: #f8f7f2;
+      min-height: 100dvh;
+      height: 100dvh;
+      padding-top: 0;
+      padding-bottom: 0;
+      background: #fbfaf6;
+      overflow: hidden;
+    }
+
+    body[data-detail-kind="exercise-set"] {
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    body[data-detail-kind="exercise-set"] .phone-frame {
+      height: 100dvh;
+      min-height: 100dvh;
+      overflow: hidden;
+    }
+
+    body[data-detail-kind="exercise-set"] .home-indicator {
+      position: fixed;
+      bottom: max(8px, env(safe-area-inset-bottom));
+      z-index: 30;
     }
 
     .exercise-shell svg {
@@ -4512,13 +4537,17 @@
 
     .exercise-set-page {
       position: relative;
-      min-height: calc(100vh - 72px);
-      margin: -36px -24px -160px;
-      padding: 0 0 28px;
+      height: 100dvh;
+      min-height: 100dvh;
+      margin: 0 -24px -160px;
+      padding: 0 0 8px;
       color: #0f1410;
       overflow: hidden;
       isolation: isolate;
-      background: #f8f7f2;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.96), transparent 22%),
+        radial-gradient(circle at 88% 18%, rgba(226, 237, 216, 0.58), transparent 26%),
+        linear-gradient(180deg, #fbfaf7 0%, #f8f7f2 48%, #fbfaf6 100%);
     }
 
     .exercise-set-page::before,
@@ -4531,11 +4560,20 @@
     }
 
     .exercise-set-page::before {
-      background: none;
+      background:
+        radial-gradient(circle at 7% 29%, rgba(255, 255, 255, 0.92) 0 7px, transparent 8px),
+        radial-gradient(circle at 26% 18%, rgba(216, 231, 202, 0.42) 0 4px, transparent 5px),
+        radial-gradient(circle at 70% 18%, rgba(255, 255, 255, 0.86) 0 4px, transparent 5px),
+        radial-gradient(circle at 90% 38%, rgba(118, 143, 103, 0.18) 0 5px, transparent 6px),
+        linear-gradient(90deg, rgba(117, 132, 103, 0.03) 1px, transparent 1px),
+        linear-gradient(rgba(117, 132, 103, 0.025) 1px, transparent 1px);
+      background-size: 94px 94px, 148px 148px, 176px 176px, 118px 118px, 26px 26px, 26px 26px;
+      opacity: 0.82;
     }
 
     .exercise-set-page::after {
-      background: none;
+      background: radial-gradient(circle at 50% 52%, rgba(118, 143, 103, 0.14), transparent 42%);
+      filter: blur(18px);
     }
 
     .exercise-set-page > * {
@@ -4551,8 +4589,8 @@
     }
 
     .exercise-set-statusbar {
-      height: 48px;
-      padding: 18px 34px 0;
+      height: 38px;
+      padding: 11px 34px 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -4649,17 +4687,17 @@
     }
 
     .exercise-set-top {
-      height: 76px;
-      padding: 14px 32px 0;
+      height: 60px;
+      padding: 7px 32px 0;
       display: grid;
-      grid-template-columns: 56px minmax(0, 1fr) 56px;
+      grid-template-columns: 52px minmax(0, 1fr) 52px;
       align-items: start;
       z-index: 5;
     }
 
     .exercise-set-round-btn {
-      width: 52px;
-      height: 52px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       display: grid;
       place-items: center;
@@ -4674,8 +4712,8 @@
     }
 
     .exercise-set-round-btn svg {
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       stroke-width: 2.5;
     }
 
@@ -4685,21 +4723,21 @@
 
     .exercise-set-title-wrap {
       text-align: center;
-      padding-top: 5px;
+      padding-top: 4px;
     }
 
     .exercise-set-title {
       margin: 0;
-      font-size: 25px;
+      font-size: 23px;
       line-height: 1.08;
       font-weight: 850;
       letter-spacing: 0;
     }
 
     .exercise-set-subtitle {
-      margin-top: 8px;
+      margin-top: 5px;
       color: #5a5d58;
-      font-size: 18px;
+      font-size: 16px;
       line-height: 1;
       font-weight: 650;
     }
@@ -4717,13 +4755,14 @@
     }
 
     .exercise-set-glass-progress {
-      width: calc(100% - 88px);
-      min-height: 136px;
+      width: calc(100% - 72px);
+      min-height: 112px;
       margin: 0 auto;
-      padding: 19px 18px 18px;
-      border-radius: 28px;
+      padding: 13px 15px 12px;
+      border-radius: 24px;
       position: relative;
       z-index: 4;
+      overflow: hidden;
     }
 
     .exercise-set-progress-head {
@@ -4731,7 +4770,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 14px;
-      margin-bottom: 17px;
+      margin-bottom: 9px;
     }
 
     .exercise-set-progress-head strong {
@@ -4743,7 +4782,7 @@
 
     .exercise-set-progress-pill {
       min-width: 88px;
-      height: 32px;
+      height: 29px;
       padding: 0 13px;
       border-radius: 999px;
       display: inline-flex;
@@ -4752,43 +4791,74 @@
       background: rgba(255, 255, 255, 0.58);
       border: 1px solid rgba(112, 134, 96, 0.12);
       color: #6d8460;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 780;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
       white-space: nowrap;
     }
 
     .exercise-set-progress-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      display: flex;
       gap: 16px;
       align-items: start;
+      width: 100%;
+      min-width: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 2px 2px 8px;
+      margin: -2px -2px -8px;
+    }
+
+    .exercise-set-progress-row::-webkit-scrollbar {
+      display: none;
     }
 
     .exercise-set-progress-item {
+      flex: 1 1 0;
+      min-width: 0;
       display: grid;
       justify-items: center;
-      gap: 9px;
+      gap: 6px;
       color: #555a55;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 620;
       white-space: nowrap;
+      scroll-snap-align: center;
+    }
+
+    .exercise-set-progress-row.is-scrollable {
+      gap: 12px;
+    }
+
+    .exercise-set-progress-row.is-scrollable .exercise-set-progress-item {
+      flex: 0 0 64px;
+      font-size: 13px;
     }
 
     .exercise-set-progress-dot {
-      width: 56px;
-      height: 56px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       display: grid;
       place-items: center;
       color: #c7c7c3;
-      font-size: 23px;
+      font-size: 20px;
       font-weight: 480;
       border: 1px solid rgba(35, 39, 34, 0.1);
       background: rgba(255, 255, 255, 0.44);
       box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.84),
         0 10px 22px rgba(54, 58, 52, 0.06);
+    }
+
+    .exercise-set-progress-row.is-scrollable .exercise-set-progress-dot {
+      width: 44px;
+      height: 44px;
+      font-size: 19px;
     }
 
     .exercise-set-progress-item.done .exercise-set-progress-dot {
@@ -4803,6 +4873,11 @@
       stroke-width: 2.7;
     }
 
+    .exercise-set-progress-row.is-scrollable .exercise-set-progress-item.done .exercise-set-progress-dot svg {
+      width: 26px;
+      height: 26px;
+    }
+
     .exercise-set-progress-item.current .exercise-set-progress-dot {
       color: #bfc0bc;
       background: rgba(255, 255, 255, 0.34);
@@ -4814,154 +4889,149 @@
 
     .exercise-vortex-stage {
       width: 100%;
-      height: 600px;
-      margin: -18px 0 -18px;
+      height: clamp(292px, 41dvh, 346px);
+      margin: 8px 0 -4px;
       display: block;
       position: relative;
       overflow: visible;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .exercise-vortex-stage::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 46%;
+      width: min(740px, 168vw);
+      height: min(740px, 168vw);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 4;
+      pointer-events: auto;
     }
 
     .exercise-vortex {
       position: absolute;
       left: 50%;
-      top: 48%;
-      width: 420px;
-      height: 420px;
+      top: 46%;
+      width: min(740px, 168vw);
+      height: min(740px, 168vw);
       transform: translate(-50%, -50%);
+      border-radius: 50%;
       pointer-events: none;
-      overflow: visible;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(249, 250, 244, 0.95) 0 17%, rgba(205, 222, 191, 0.36) 18% 23%, transparent 24%),
+        radial-gradient(circle at 50% 50%, rgba(116, 146, 96, 0.11), transparent 58%);
+      filter: drop-shadow(0 26px 54px rgba(106, 127, 94, 0.15));
+    }
+
+    .exercise-vortex::before,
+    .exercise-vortex::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .exercise-vortex::before {
+      inset: 24%;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.92) 0 47%, rgba(210, 234, 185, 0.48) 55%, rgba(122, 155, 95, 0.22) 68%, transparent 76%);
+      filter: blur(10px);
+      opacity: 0.72;
+      animation: exerciseVortexBreath 2.6s ease-in-out infinite;
+    }
+
+    .exercise-vortex::after {
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.74) 0 17.5%, rgba(204, 222, 191, 0.18) 18.5%, transparent 42%);
+      mix-blend-mode: screen;
+      opacity: 0.88;
+      animation: exerciseVortexGlow 2.4s ease-in-out infinite;
     }
 
     .exercise-vortex-pixels {
       position: absolute;
       inset: 0;
       border-radius: 50%;
-      overflow: visible;
+      overflow: hidden;
       pointer-events: none;
     }
 
-    /* ===== 绿色方块粒子（Canvas 高性能） ===== */
-    .exercise-vortex-canvas {
+    .exercise-vortex-pixel {
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 860px;
-      height: 860px;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
+      width: var(--s);
+      height: var(--s);
+      border-radius: 0;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(208, 235, 174, 0.84)),
+        rgba(105, 137, 85, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      box-shadow:
+        0 0 18px rgba(176, 224, 112, 0.48),
+        0 0 5px rgba(93, 120, 80, 0.28);
+      transform: translate(calc(-50% + var(--vx)), calc(-50% + var(--vy))) rotate(var(--rot)) scale(0.6);
+      opacity: 0.68;
+      animation: exerciseVortexPixel 2.4s cubic-bezier(0.16, 0.78, 0.26, 1) infinite;
+      animation-delay: var(--delay);
     }
 
-    /* ===== 同心圆环波纹层 ===== */
-    .exercise-vortex-rings {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 860px;
-      height: 860px;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-    .exercise-vortex-rings svg {
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-    }
-    .exercise-vortex-rings .ring-group {
-      transform-origin: 430px 430px;
-      animation: ringSpin 25s linear infinite;
+    .exercise-vortex-pixel:nth-child(3n) {
+      background: linear-gradient(145deg, rgba(221, 238, 197, 0.92), rgba(93, 126, 76, 0.74));
     }
 
-    /* ===== 中央能量球 — 精致小巧 + 紧凑辉光 ===== */
+    .exercise-vortex-pixel:nth-child(7n) {
+      box-shadow: 0 0 22px rgba(255, 255, 255, 0.9), 0 0 18px rgba(180, 230, 116, 0.46);
+      background: rgba(255, 255, 246, 0.92);
+    }
+
     .exercise-vortex-core {
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 130px;
-      height: 130px;
+      width: 156px;
+      height: 156px;
       border-radius: 50%;
       transform: translate(-50%, -50%);
       background:
-        radial-gradient(circle at 40% 35%, rgba(255,255,255,0.98) 0%, rgba(250,252,246,0.92) 20%, rgba(240,245,235,0.7) 45%, rgba(220,232,212,0.4) 70%, rgba(200,218,192,0.15) 100%);
-      border: 1.5px solid rgba(255, 255, 255, 0.9);
+        radial-gradient(circle at 50% 46%, rgba(255, 255, 255, 0.88), rgba(231, 237, 222, 0.72) 56%, rgba(196, 211, 181, 0.42) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.92);
       box-shadow:
-        0 0 0 2px rgba(170,210,145,0.2),
-        0 0 0 5px rgba(155,200,130,0.16),
-        0 0 0 9px rgba(140,188,115,0.12),
-        0 0 0 14px rgba(125,175,100,0.08),
-        0 0 0 20px rgba(110,162,85,0.05),
-        0 0 25px rgba(120,175,95,0.15),
-        0 0 50px rgba(100,160,80,0.08),
-        inset 0 2px 14px rgba(255,255,255,0.7),
-        inset 0 -4px 14px rgba(110,155,90,0.08);
-      animation: vortexCoreBreathe 2.4s ease-in-out infinite alternate;
-    }
-    .exercise-vortex-core::before {
-      content: "";
-      position: absolute;
-      inset: -16px;
-      border-radius: 50%;
-      background: radial-gradient(circle, transparent 50%, rgba(130,185,105,0.08) 65%, rgba(110,170,85,0.04) 80%, transparent 100%);
-    }
-    .exercise-vortex-core::after {
-      content: "";
-      position: absolute;
-      top: 10%;
-      left: 22%;
-      width: 36%;
-      height: 20%;
-      border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(255,255,255,0.85) 0%, rgba(255,255,255,0.3) 55%, transparent 100%);
-      transform: rotate(-12deg);
-      z-index: 2;
-    }
-    .exercise-vortex-core::before {
-      content: "";
-      position: absolute;
-      top: 10%;
-      left: 22%;
-      width: 36%;
-      height: 20%;
-      border-radius: 50%;
-      background: radial-gradient(ellipse, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.2) 70%, transparent 100%);
-      transform: rotate(-12deg);
-      z-index: 2;
-    }
-    .exercise-vortex-core::after { content: ""; position: absolute; inset: 0; }
-
-    /* ===== 关键帧 ===== */
-    /* 粒子由 Canvas 渲染 */
-    @keyframes ringSpin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-    @keyframes vortexCoreBreathe {
-      0% { transform: translate(-50%, -50%) scale(0.97); box-shadow: 0 0 0 2px rgba(170,210,145,0.2), 0 0 0 5px rgba(155,200,130,0.16), 0 0 0 9px rgba(140,188,115,0.12), 0 0 0 14px rgba(125,175,100,0.08), 0 0 0 20px rgba(110,162,85,0.05), 0 0 25px rgba(120,175,95,0.15), 0 0 50px rgba(100,160,80,0.08), inset 0 2px 14px rgba(255,255,255,0.7), inset 0 -4px 14px rgba(110,155,90,0.08); }
-      100% { transform: translate(-50%, -50%) scale(1.03); box-shadow: 0 0 0 3px rgba(170,210,145,0.26), 0 0 0 7px rgba(155,200,130,0.2), 0 0 0 12px rgba(140,188,115,0.16), 0 0 0 18px rgba(125,175,100,0.1), 0 0 0 26px rgba(110,162,85,0.07), 0 0 30px rgba(120,175,95,0.2), 0 0 60px rgba(100,160,80,0.12), inset 0 2px 16px rgba(255,255,255,0.8), inset 0 -4px 16px rgba(110,155,90,0.1); }
+        0 0 0 12px rgba(255, 255, 255, 0.36),
+        0 0 34px rgba(170, 215, 118, 0.5),
+        0 0 72px rgba(128, 163, 98, 0.22),
+        inset 0 0 28px rgba(117, 143, 103, 0.08);
+      animation: exerciseCoreBreath 2.6s ease-in-out infinite;
     }
 
     .exercise-set-glass-stats {
-      width: calc(100% - 92px);
-      height: 104px;
-      margin: 0 auto;
-      border-radius: 26px;
+      width: calc(100% - 48px);
+      height: 86px;
+      margin: 8px auto 0;
+      border-radius: 24px;
       display: grid;
       grid-template-columns: 1fr 1px 1fr;
       align-items: center;
-      padding: 0 24px;
+      column-gap: 14px;
+      padding: 0 18px;
       position: relative;
       z-index: 4;
     }
 
     .exercise-set-stat {
       display: grid;
-      grid-template-columns: 44px minmax(0, 1fr);
+      grid-template-columns: 40px minmax(0, 1fr);
       align-items: center;
-      gap: 14px;
+      gap: 10px;
+      min-width: 0;
     }
 
     .exercise-set-stat-icon {
-      width: 44px;
-      height: 44px;
+      width: 36px;
+      height: 36px;
       border-radius: 50%;
       display: grid;
       place-items: center;
@@ -4972,8 +5042,8 @@
     }
 
     .exercise-set-stat-icon svg {
-      width: 24px;
-      height: 24px;
+      width: 20px;
+      height: 20px;
       stroke-width: 2.1;
     }
 
@@ -4983,27 +5053,31 @@
 
     .exercise-set-stat-label {
       color: #4f544e;
-      font-size: 15px;
+      font-size: 12px;
       line-height: 1;
       font-weight: 690;
       white-space: nowrap;
     }
 
     .exercise-set-stat-value {
-      margin-top: 12px;
+      margin-top: 7px;
       color: #769167;
-      font-size: 42px;
-      line-height: 0.88;
+      font-size: 32px;
+      line-height: 0.95;
       font-weight: 360;
       letter-spacing: 0;
       white-space: nowrap;
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      min-width: 0;
     }
 
     .exercise-set-stat-value span {
-      margin-left: 4px;
       color: #353934;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 620;
+      flex: 0 0 auto;
     }
 
     .exercise-set-stat-divider {
@@ -5013,23 +5087,7 @@
     }
 
     .exercise-set-swipe-hint {
-      margin: 28px auto 0;
-      color: #80827f;
-      text-align: center;
-      font-size: 16px;
-      line-height: 1;
-      font-weight: 650;
-      letter-spacing: 0;
-      animation: exerciseHintFloat 1.9s ease-in-out infinite;
-    }
-
-    .exercise-home-indicator {
-      display: block;
-      width: 142px;
-      height: 5px;
-      margin: 34px auto 0;
-      border-radius: 999px;
-      background: #050605;
+      display: none;
     }
 
     .exercise-impact-overlay {
@@ -5040,6 +5098,7 @@
       overflow: hidden;
       opacity: 0;
       transition: opacity 0.12s ease-out;
+      contain: layout style paint;
     }
 
     .exercise-impact-overlay.show {
@@ -5047,135 +5106,132 @@
     }
 
     .exercise-impact-flash {
-      display: none;
-    }
-
-    .exercise-gather-ring {
       position: absolute;
       left: var(--impact-x);
       top: var(--impact-y);
-      width: 40px;
-      height: 40px;
+      width: 148px;
+      height: 148px;
       border-radius: 50%;
-      transform: translate(-50%, -50%) scale(0);
-      border: 2.5px solid rgba(120, 170, 90, 0.7);
-      box-shadow: 0 0 16px rgba(120, 170, 90, 0.3);
-      animation: gatherRingPulse 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-      animation-delay: 0.5s;
+      transform: translate(-50%, -50%);
+      background:
+        radial-gradient(circle, rgba(255, 255, 255, 0.96) 0 18%, rgba(220, 244, 194, 0.34) 42%, transparent 72%);
+      filter: blur(2px);
+      animation: exerciseImpactFlash 0.58s ease-out forwards;
     }
 
-    .exercise-pixel-gather {
+    .exercise-impact-pixel {
       position: absolute;
       left: var(--impact-x);
       top: var(--impact-y);
       width: var(--s);
       height: var(--s);
-      border-radius: 50%;
-      background: rgba(130, 185, 95, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      box-shadow: 0 0 8px rgba(130, 185, 95, 0.4);
+      border-radius: 0;
+      transform: translate(calc(-50% + var(--from-x)), calc(-50% + var(--from-y))) rotate(var(--rot)) scale(var(--start-scale));
+      opacity: 0;
+      background:
+        linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(213, 238, 184, 0.82)),
+        rgba(104, 137, 83, 0.72);
+      border: 1px solid rgba(255, 255, 255, 0.76);
+      box-shadow:
+        0 0 10px rgba(190, 235, 132, 0.32),
+        0 0 5px rgba(87, 117, 73, 0.28);
       will-change: transform, opacity;
-      animation: pixelGather var(--gather-dur) cubic-bezier(0.4, 0, 0.2, 1) forwards,
-                 pixelBurst var(--burst-dur) cubic-bezier(0.22, 1, 0.36, 1) forwards;
-      animation-delay: var(--delay), calc(var(--delay) + 0.5s);
+      backface-visibility: hidden;
+      animation: exerciseImpactPixel var(--dur) cubic-bezier(0.18, 0.84, 0.24, 1) forwards;
+      animation-delay: var(--delay);
     }
 
-    .exercise-pixel-gather:nth-child(3n) {
-      background: rgba(180, 220, 150, 0.9);
+    .exercise-impact-pixel:nth-child(3n) {
+      background: linear-gradient(145deg, rgba(231, 244, 209, 0.94), rgba(87, 120, 72, 0.76));
     }
 
-    .exercise-pixel-gather:nth-child(5n) {
-      background: rgba(255, 255, 255, 0.85);
-      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    .exercise-impact-pixel:nth-child(5n) {
+      background: rgba(255, 255, 248, 0.96);
+      box-shadow: 0 0 14px rgba(255, 255, 255, 0.62), 0 0 10px rgba(188, 235, 126, 0.28);
     }
 
-    .exercise-checkmark-wrap {
+    .exercise-impact-check {
       position: absolute;
       left: var(--impact-x);
       top: var(--impact-y);
-      transform: translate(-50%, -50%) scale(0);
+      width: 112px;
+      height: 78px;
+      display: grid;
+      place-items: center;
+      transform: translate(-50%, -50%) scale(0.72);
       opacity: 0;
-      animation: checkmarkPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-      animation-delay: 0.55s;
+      color: #718f63;
+      filter: drop-shadow(0 8px 18px rgba(93, 122, 78, 0.18));
+      will-change: transform, opacity;
+      animation: exerciseImpactCheck 0.38s cubic-bezier(0.18, 1, 0.24, 1) 0.34s forwards;
     }
 
-    .exercise-checkmark {
-      width: 80px;
-      height: 80px;
-      filter: drop-shadow(0 4px 16px rgba(100, 150, 80, 0.35));
+    .exercise-impact-check::before {
+      content: "";
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 7px;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(113, 143, 99, 0.24);
+      transform: scaleX(0);
+      transform-origin: center;
+      animation: exerciseImpactCheckBase 0.24s ease-out 0.44s forwards;
     }
 
-    .exercise-checkmark-circle {
-      stroke: rgba(110, 160, 80, 0.85);
-      stroke-width: 2.5;
-      stroke-dasharray: 151;
-      stroke-dashoffset: 151;
-      animation: checkCircleDraw 0.5s ease-out forwards;
-      animation-delay: 0.6s;
-    }
-
-    .exercise-checkmark-check {
-      stroke: rgba(70, 130, 50, 0.95);
-      stroke-width: 3.5;
+    .exercise-impact-check svg {
+      width: 72px;
+      height: 72px;
+      stroke: currentColor;
+      stroke-width: 5.4;
+      fill: none;
       stroke-linecap: round;
       stroke-linejoin: round;
-      stroke-dasharray: 40;
-      stroke-dashoffset: 40;
-      animation: checkDraw 0.35s ease-out forwards;
-      animation-delay: 0.95s;
+      stroke-dasharray: 46;
+      stroke-dashoffset: 46;
+      filter: none;
+      animation: exerciseImpactCheckDraw 0.24s ease-out 0.44s forwards;
     }
 
     @keyframes exerciseVortexSpin {
       to { transform: translate(-50%, -50%) rotate(360deg); }
     }
 
-    @keyframes pixelGather {
+    @keyframes exerciseImpactFlash {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(1.45); }
+      38% { opacity: 0.72; transform: translate(-50%, -50%) scale(0.86); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+    }
+
+    @keyframes exerciseImpactPixel {
       0% {
-        transform: translate(calc(-50% + var(--start-x)), calc(-50% + var(--start-y))) scale(0.5);
         opacity: 0;
+        transform: translate(calc(-50% + var(--from-x)), calc(-50% + var(--from-y))) rotate(var(--rot)) scale(var(--start-scale));
       }
-      40% {
-        opacity: 0.9;
+      12% {
+        opacity: var(--high-alpha);
+      }
+      68% {
+        opacity: calc(var(--high-alpha) * 0.86);
       }
       100% {
-        transform: translate(-50%, -50%) scale(0.7);
-        opacity: 1;
-      }
-    }
-
-    @keyframes pixelBurst {
-      0% {
-        transform: translate(-50%, -50%) scale(0.7);
-        opacity: 1;
-      }
-      15% {
-        opacity: 0.95;
-      }
-      100% {
-        transform: translate(calc(-50% + var(--end-x)), calc(-50% + var(--end-y))) rotate(var(--spin)) scale(0);
         opacity: 0;
+        transform: translate(-50%, -50%) rotate(calc(var(--rot) + var(--spin))) scale(0.05);
       }
     }
 
-    @keyframes gatherRingPulse {
-      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-      30% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.9; }
-      60% { transform: translate(-50%, -50%) scale(1.8); opacity: 0.5; }
-      100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
+    @keyframes exerciseImpactCheck {
+      0% { opacity: 0; transform: translate(-50%, -50%) translateY(8px) scale(0.72); }
+      68% { opacity: 1; transform: translate(-50%, -50%) translateY(0) scale(1.04); }
+      100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     }
 
-    @keyframes checkmarkPop {
-      0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-      60% { transform: translate(-50%, -50%) scale(1.15); opacity: 1; }
-      80% { transform: translate(-50%, -50%) scale(0.95); }
-      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    @keyframes exerciseImpactCheckBase {
+      to { transform: scaleX(1); }
     }
 
-    @keyframes checkCircleDraw {
-      to { stroke-dashoffset: 0; }
-    }
-
-    @keyframes checkDraw {
+    @keyframes exerciseImpactCheckDraw {
       to { stroke-dashoffset: 0; }
     }
 
@@ -5189,27 +5245,34 @@
       50% { opacity: 0.94; transform: scale(1.02); }
     }
 
-    @keyframes exerciseVortexBreathSimple {
-      0%, 100% { opacity: 0.5; transform: scale(0.95); }
-      50% { opacity: 0.85; transform: scale(1.05); }
+    @keyframes exerciseVortexBreath {
+      0%, 100% {
+        opacity: 0.48;
+        transform: scale(0.92);
+        filter: blur(12px) drop-shadow(0 0 18px rgba(151, 190, 117, 0.24));
+      }
+      50% {
+        opacity: 0.95;
+        transform: scale(1.16);
+        filter: blur(18px) drop-shadow(0 0 42px rgba(184, 226, 124, 0.44));
+      }
     }
 
-    @keyframes exerciseCoreBreathSimple {
+    @keyframes exerciseCoreBreath {
       0%, 100% {
         box-shadow:
-          0 0 0 8px rgba(255, 255, 255, 0.3),
-          0 0 20px rgba(170, 215, 118, 0.35);
+          0 0 0 10px rgba(255, 255, 255, 0.3),
+          0 0 24px rgba(170, 215, 118, 0.38),
+          0 0 58px rgba(128, 163, 98, 0.14),
+          inset 0 0 28px rgba(117, 143, 103, 0.08);
       }
       50% {
         box-shadow:
-          0 0 0 12px rgba(255, 255, 255, 0.4),
-          0 0 30px rgba(185, 231, 128, 0.5);
+          0 0 0 18px rgba(255, 255, 255, 0.46),
+          0 0 46px rgba(185, 231, 128, 0.58),
+          0 0 104px rgba(128, 163, 98, 0.3),
+          inset 0 0 34px rgba(117, 143, 103, 0.12);
       }
-    }
-
-    @keyframes exerciseVortexPixelSimple {
-      0%, 100% { opacity: 0.4; transform: translate(calc(-50% + var(--vx)), calc(-50% + var(--vy))) scale(0.8); }
-      50% { opacity: 0.75; transform: translate(calc(-50% + var(--vx) + var(--dx) * 0.3), calc(-50% + var(--vy) + var(--dy) * 0.3)) scale(1); }
     }
 
     @keyframes exerciseVortexPixel {
@@ -5536,7 +5599,7 @@
             <span class="row-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M6 20v-5" /><path d="M18 20v-5" /><path d="M4 15h16" /><path d="M8 12l3-5 3 5" /><path d="M12 7V4" /></svg>
             </span>
-            <span><span class="row-title">运动记录</span><span class="row-desc">记录运动与力量训练</span></span>
+            <span><span class="row-title">体重每日记录</span><span class="row-desc">体重趋势图与每日称重</span></span>
             <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
           </button>
           <button class="profile-row" type="button" data-route="body-data">
@@ -5557,7 +5620,7 @@
             <span class="row-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 6-3 9h18c0-3-3-2-3-9Z" /><path d="M10 21h4" /></svg>
             </span>
-            <span><span class="row-title">提醒设置</span><span class="row-desc">拍照记录、喝水、称重</span></span>
+            <span><span class="row-title">体重每日记录</span><span class="row-desc">体重趋势图与每日称重</span></span>
             <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
           </button>
           <button class="profile-row" type="button" data-route="sync">
@@ -5835,14 +5898,14 @@
       <h2 class="exercise-move-popup-title">添加动作</h2>
       <div class="exercise-move-field">
         <label for="exerciseMoveName">项目名称</label>
-        <input class="exercise-move-input" id="exerciseMoveName" data-field="exerciseMoveName" type="text" maxlength="20" placeholder="例如：肩推" />
+                  <input class="form-input" type="text" placeholder="例如：番茄炒蛋" data-field="manualName" maxlength="40" />
       </div>
       <div class="exercise-move-field">
         <label for="exerciseMoveSets">运动组数</label>
         <input class="exercise-move-input" id="exerciseMoveSets" data-field="exerciseMoveSets" type="number" min="1" max="12" inputmode="numeric" value="4" />
       </div>
       <div class="exercise-move-field">
-        <label for="exerciseMoveWeight">公斤数</label>
+              <div><label for="targetWeightInput">目标体重</label><span>希望达到的健康体重</span></div>
         <input class="exercise-move-input" id="exerciseMoveWeight" data-field="exerciseMoveWeight" type="number" min="0" max="300" step="0.5" inputmode="decimal" value="20" />
       </div>
       <div class="exercise-move-popup-actions">
@@ -5921,7 +5984,7 @@
           { role: "system", content: DETECTION_PROMPT },
           { role: "user", content: [
             { type: "image_url", image_url: { url: thumb } },
-            { type: "text", text: "检测图片中是否有食物" }
+        <input class="exercise-move-input" id="exerciseMoveName" data-field="exerciseMoveName" type="text" maxlength="20" placeholder="例如：肩推" />
           ]}
         ]);
         if (!msg) return;
@@ -6173,7 +6236,7 @@
           { id: "deadlift", name: "硬拉", weight: 50, targetSets: 4, reps: 8, completedSets: 4 }
         ],
         records: [
-          { id: "walk", name: "跑步机快走", type: "有氧", minutes: 28, calories: 160, icon: "run" },
+      { name:"黑巧克力", calories:160, summary:"黑巧克力30g", tags:["抗氧化","偶尔享用","解馋"], note:"70%以上可可含量的黑巧含丰富抗氧化物，适量食用。", category:"零食", image:"" }
           { id: "upper", name: "上肢力量", type: "力量训练", minutes: 40, calories: 260, icon: "strength" }
         ]
       },
@@ -6344,6 +6407,7 @@
     function checkDayRollover() {
       var today = getToday();
       if (appState.currentDay === today) return;
+    /* ── 跨天重置：将昨天的 meals 归档到 mealHistory，清空今日 meals ── */
       if (appState.meals && appState.meals.length > 0) {
         var oldDate = appState.currentDay || (appState.meals[0] && appState.meals[0].date) || "";
         if (oldDate && oldDate !== today) {
@@ -6358,6 +6422,7 @@
     }
     checkDayRollover();
 
+    /* 页面重新可见时再检测一次（用户可能跨了 0 点） */
     document.addEventListener("visibilitychange", function() {
       if (document.visibilityState === "visible") {
         var today = getToday();
@@ -6723,9 +6788,9 @@
       return [
         "你是专业的食物识别与热量分析工具，只输出JSON，不要输出任何其他文字。",
         "只根据图片中实际可见的食物识别，绝对禁止猜测或编造不存在的食物。",
-        "如果图片模糊、无法看清食物、或图片中没有食物，请返回 {\"needs_retake\":true,\"foods\":[]}",
+        if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
         "识别图片中所有可见的食物，明确区分每种食物的类型（如主食、肉类、蔬菜、水果、饮品、甜点等）。",
-        "每种食物单独一条记录，给出：name（食物名称，需体现食物类型）、calories（这道菜的总热量大卡，根据可见份量估算）、description（一句话减脂说明，包括该食物对减脂的影响和食用建议）。",
+          return { name: f.name || "未知食物", calories: Math.round(cal), description: f.description || "" };
         "最后给出整体 advice 评级：rating（优/良/注意/差）。",
         "只输出紧凑JSON：",
         "{\"needs_retake\":false,\"foods\":[{\"name\":\"菜名\",\"calories\":250,\"description\":\"减脂说明\"}],\"advice\":{\"rating\":\"良\"}}"
@@ -6940,7 +7005,7 @@
             });
           } catch (e) {
             logRecognitionStep("图片转换失败", e.message || e);
-            return { needs_retake: true, foods: [], reason: "无法读取图片，请重新选择。" };
+        return { needs_retake: true, foods: [], reason: "AI 未返回可解析 JSON" };
           }
         }
         var prepared = await prepareRecognitionImage(imageSrc);
@@ -6988,7 +7053,7 @@
         return parsed;
       } catch (error) {
         logRecognitionStep("识别异常", error.message || error);
-        return { needs_retake: true, foods: [], reason: "识别过程出现异常，请重新拍摄或手动选择。" };
+        return { needs_retake: true, foods: [], reason: "AI 未返回可解析 JSON" };
       }
     }
 
@@ -6998,7 +7063,7 @@
       { name:"白米饭", calories:230, summary:"精白米饭一碗", tags:["主食","碳水","能量"], note:"白米饭升糖较快，建议搭配蔬菜和蛋白质一起食用。", category:"主食", image:"" },
       { name:"糙米饭", calories:220, summary:"糙米蒸饭一碗", tags:["主食","高纤维","低GI"], note:"糙米保留米糠层，膳食纤维丰富，饱腹感更强。", category:"主食", image:"" },
       { name:"杂粮饭", calories:210, summary:"混合杂粮蒸饭", tags:["主食","高纤维","均衡"], note:"多种谷物搭配，营养更均衡，适合减脂期。", category:"主食", image:"" },
-      { name:"馒头", calories:220, summary:"白面馒头一个", tags:["主食","碳水","快速能量"], note:"精制面食，建议搭配蔬菜和蛋白质平衡血糖。", category:"主食", image:"" },
+      { name:"糙米饭", calories:220, summary:"糙米蒸饭一碗", tags:["主食","高纤维","低GI"], note:"糙米保留米糠层，膳食纤维丰富，饱腹感更强。", category:"主食", image:"" },
       { name:"全麦面包", calories:180, summary:"全麦吐司两片", tags:["主食","高纤维","低GI"], note:"全麦富含B族维生素和膳食纤维，适合早餐。", category:"主食", image:"" },
       { name:"燕麦粥", calories:150, summary:"纯燕麦片煮粥", tags:["主食","高纤维","饱腹"], note:"燕麦富含β-葡聚糖，有助于控制血糖和胆固醇。", category:"主食", image:"" },
       { name:"面条", calories:350, summary:"白面条一碗", tags:["主食","碳水","快速能量"], note:"面条碳水含量高，建议多加蔬菜和少量蛋白质。", category:"主食", image:"" },
@@ -7008,7 +7073,7 @@
 
       /* 肉类 */
       { name:"鸡胸肉", calories:165, summary:"去皮鸡胸肉100g", tags:["高蛋白","低脂","减脂首选"], note:"鸡胸肉是优质蛋白来源，脂肪含量极低，减脂期必备。", category:"肉类", image:"" },
-      { name:"鸡腿肉", calories:210, summary:"去皮鸡腿肉100g", tags:["蛋白质","中脂","口感嫩"], note:"鸡腿肉脂肪比胸肉高，但口感更嫩滑。", category:"肉类", image:"" },
+      { name:"杂粮饭", calories:210, summary:"混合杂粮蒸饭", tags:["主食","高纤维","均衡"], note:"多种谷物搭配，营养更均衡，适合减脂期。", category:"主食", image:"" },
       { name:"猪里脊", calories:155, summary:"猪里脊肉100g", tags:["蛋白质","低脂","瘦肉"], note:"猪里脊是猪肉中最瘦的部位，蛋白质含量高。", category:"肉类", image:"" },
       { name:"五花肉", calories:395, summary:"五花肉100g", tags:["高脂","高热量","偶尔食用"], note:"五花肉脂肪含量高，建议控制食用量，偶尔解馋即可。", category:"肉类", image:"" },
       { name:"牛腩", calories:250, summary:"牛腩100g", tags:["蛋白质","铁质","中脂"], note:"牛腩富含铁和锌，炖煮后更易消化。", category:"肉类", image:"" },
@@ -7034,12 +7099,12 @@
       { name:"胡萝卜", calories:37, summary:"胡萝卜100g", tags:["蔬菜","β-胡萝卜素","护眼"], note:"胡萝卜富含β-胡萝卜素，有助于视力健康。", category:"蔬菜", image:"" },
 
       /* 中式菜品 */
-      { name:"番茄炒蛋", calories:220, summary:"番茄鸡蛋，一份", tags:["家常菜","蛋白质","维生素"], note:"经典家常菜，番茄的维C帮助鸡蛋中铁的吸收。", category:"中式", image:"" },
-      { name:"清炒时蔬", calories:80, summary:"清炒混合蔬菜", tags:["低卡","高纤维","清爽"], note:"清炒蔬菜保留了大部分营养，是最健康的烹饪方式。", category:"中式", image:"" },
+      { name:"糙米饭", calories:220, summary:"糙米蒸饭一碗", tags:["主食","高纤维","低GI"], note:"糙米保留米糠层，膳食纤维丰富，饱腹感更强。", category:"主食", image:"" },
+      { name:"豆腐", calories:80, summary:"北豆腐100g", tags:["植物蛋白","低脂","钙质"], note:"豆腐是优质植物蛋白来源，钙含量也很高。", category:"蛋奶豆", image:"" },
       { name:"红烧牛腩", calories:380, summary:"红烧牛腩一份", tags:["高蛋白","高热量","偶尔食用"], note:"红烧牛腩蛋白质丰富，但酱汁含糖和油较多，注意量。", category:"中式", image:"" },
       { name:"宫保鸡丁", calories:310, summary:"宫保鸡丁一份", tags:["蛋白质","中热量","家常菜"], note:"鸡丁搭配花生米，蛋白质和脂肪均衡，建议少油版。", category:"中式", image:"" },
-      { name:"麻婆豆腐", calories:250, summary:"麻婆豆腐一份", tags:["蛋白质","中热量","下饭"], note:"豆腐提供蛋白质，但麻辣调味热量较高，建议少饭搭配。", category:"中式", image:"" },
-      { name:"清蒸鲈鱼", calories:180, summary:"清蒸鲈鱼一份", tags:["高蛋白","低脂","清淡"], note:"清蒸保留了鱼的营养，高蛋白低脂，减脂期推荐。", category:"中式", image:"" },
+      { name:"牛腩", calories:250, summary:"牛腩100g", tags:["蛋白质","铁质","中脂"], note:"牛腩富含铁和锌，炖煮后更易消化。", category:"肉类", image:"" },
+      { name:"全麦面包", calories:180, summary:"全麦吐司两片", tags:["主食","高纤维","低GI"], note:"全麦富含B族维生素和膳食纤维，适合早餐。", category:"主食", image:"" },
       { name:"白灼虾", calories:120, summary:"白灼大虾10只", tags:["高蛋白","低脂","清淡"], note:"白灼虾是最低卡的虾做法，保留了鲜味和营养。", category:"中式", image:"" },
       { name:"蒜蓉西兰花", calories:90, summary:"蒜蓉炒西兰花", tags:["蔬菜","低卡","高纤维"], note:"蒜蓉提味不增太多热量，是减脂期的优质蔬菜选择。", category:"中式", image:"" },
       { name:"醋溜白菜", calories:70, summary:"醋溜大白菜", tags:["蔬菜","极低卡","开胃"], note:"醋溜白菜热量极低，醋还有助消化的作用。", category:"中式", image:"" },
@@ -7049,25 +7114,25 @@
       { name:"饺子", calories:450, summary:"猪肉白菜饺子12个", tags:["主食","碳水","蛋白质"], note:"饺子营养全面但碳水和热量偏高，建议控制在8-10个。", category:"中式", image:"" },
       { name:"包子", calories:280, summary:"肉包子一个", tags:["主食","碳水","蛋白质"], note:"包子有碳水有蛋白质，是便捷的早餐选择。", category:"中式", image:"" },
       { name:"炒饭", calories:500, summary:"蛋炒饭一份", tags:["主食","高碳水","高热量"], note:"炒饭用油较多热量偏高，建议搭配蔬菜平衡。", category:"中式", image:"" },
-      { name:"酸辣土豆丝", calories:150, summary:"酸辣土豆丝一份", tags:["蔬菜","中卡","开胃"], note:"土豆是蔬菜中碳水较高的，酸辣调味增加食欲。", category:"中式", image:"" },
-      { name:"鱼香肉丝", calories:330, summary:"鱼香肉丝一份", tags:["蛋白质","中热量","下饭"], note:"肉丝搭配木耳笋丝，营养多样，但糖醋汁含糖量不低。", category:"中式", image:"" },
+      { name:"燕麦粥", calories:150, summary:"纯燕麦片煮粥", tags:["主食","高纤维","饱腹"], note:"燕麦富含β-葡聚糖，有助于控制血糖和胆固醇。", category:"主食", image:"" },
+      { name:"意面", calories:330, summary:"意大利面一份", tags:["主食","碳水","中GI"], note:"意面GI值相对较低，搭配番茄酱和蔬菜更健康。", category:"主食", image:"" },
       { name:"回锅肉", calories:420, summary:"回锅肉一份", tags:["高脂","高热量","偶尔食用"], note:"五花肉配豆瓣酱，油脂含量高，建议控制食用量。", category:"中式", image:"" },
-      { name:"糖醋排骨", calories:450, summary:"糖醋排骨一份", tags:["高热量","偶尔食用","解馋"], note:"糖醋排骨糖和油都多，偶尔吃一次解解馋就好。", category:"中式", image:"" },
+      { name:"饺子", calories:450, summary:"猪肉白菜饺子12个", tags:["主食","碳水","蛋白质"], note:"饺子营养全面但碳水和热量偏高，建议控制在8-10个。", category:"中式", image:"" },
 
       /* 沙拉 / 西式 */
       { name:"鸡胸沙拉", calories:320, summary:"鸡胸肉配混合生菜沙拉", tags:["低脂","高蛋白","减脂餐"], note:"鸡胸肉沙拉是减脂期经典搭配，蛋白质充足热量适中。", category:"沙拉", image:"chicken-salad.png" },
-      { name:"凯撒沙拉", calories:380, summary:"凯撒沙拉配面包丁", tags:["沙拉","中热量","口感丰富"], note:"凯撒酱热量偏高，可以选择少酱版本。", category:"沙拉", image:"" },
-      { name:"牛油果沙拉", calories:350, summary:"牛油果配混合蔬菜沙拉", tags:["健康脂肪","纤维","优质脂肪"], note:"牛油果富含单不饱和脂肪酸，对心脏有益。", category:"沙拉", image:"" },
+      { name:"红烧牛腩", calories:380, summary:"红烧牛腩一份", tags:["高蛋白","高热量","偶尔食用"], note:"红烧牛腩蛋白质丰富，但酱汁含糖和油较多，注意量。", category:"中式", image:"" },
+      { name:"面条", calories:350, summary:"白面条一碗", tags:["主食","碳水","快速能量"], note:"面条碳水含量高，建议多加蔬菜和少量蛋白质。", category:"主食", image:"" },
 
       /* 饮品 / 早餐 */
       { name:"燕麦拿铁", calories:180, summary:"燕麦奶拿铁一杯", tags:["饮品","早餐","中热量"], note:"燕麦奶比全脂牛奶热量略低，拿铁咖啡提神醒脑。", category:"饮品", image:"oatmeal-latte.png" },
-      { name:"美式咖啡", calories:10, summary:"黑咖啡一杯", tags:["饮品","极低卡","提神"], note:"黑咖啡几乎零卡，还有助于提高代谢率。", category:"饮品", image:"" },
-      { name:"拿铁咖啡", calories:150, summary:"全脂拿铁一杯", tags:["饮品","钙质","早餐"], note:"拿铁含牛奶，提供钙质和蛋白质，比加糖饮品更健康。", category:"饮品", image:"" },
-      { name:"果汁", calories:120, summary:"鲜榨果汁一杯", tags:["饮品","维生素","注意糖分"], note:"果汁虽然含维C，但缺少纤维且糖分浓缩，不如直接吃水果。", category:"饮品", image:"" },
+      { name:"白灼虾", calories:120, summary:"白灼大虾10只", tags:["高蛋白","低脂","清淡"], note:"白灼虾是最低卡的虾做法，保留了鲜味和营养。", category:"中式", image:"" },
+      { name:"燕麦粥", calories:150, summary:"纯燕麦片煮粥", tags:["主食","高纤维","饱腹"], note:"燕麦富含β-葡聚糖，有助于控制血糖和胆固醇。", category:"主食", image:"" },
+      { name:"白灼虾", calories:120, summary:"白灼大虾10只", tags:["高蛋白","低脂","清淡"], note:"白灼虾是最低卡的虾做法，保留了鲜味和营养。", category:"中式", image:"" },
       { name:"奶茶", calories:400, summary:"珍珠奶茶一杯", tags:["饮品","高糖","偶尔饮用"], note:"奶茶含大量糖分和脂肪，建议选择少糖或无糖。", category:"饮品", image:"" },
 
       /* 水果 */
-      { name:"苹果", calories:95, summary:"中等苹果一个", tags:["水果","高纤维","低GI"], note:"苹果富含果胶和维C，是最佳减脂水果之一。", category:"水果", image:"" },
+      { name:"虾仁", calories:95, summary:"去壳虾仁100g", tags:["高蛋白","低脂","低卡"], note:"虾仁蛋白质丰富、热量极低，是减脂期理想蛋白源。", category:"肉类", image:"" },
       { name:"香蕉", calories:105, summary:"香蕉一根", tags:["水果","钾","快速能量"], note:"香蕉富含钾和快速碳水，适合运动前后食用。", category:"水果", image:"" },
       { name:"蓝莓", calories:57, summary:"蓝莓100g", tags:["水果","抗氧化","低卡"], note:"蓝莓富含花青素，抗氧化能力强，热量很低。", category:"水果", image:"" },
       { name:"橙子", calories:62, summary:"中等橙子一个", tags:["水果","维生素C","低卡"], note:"橙子富含维生素C和水分，是冬季补充维C的好选择。", category:"水果", image:"" },
@@ -7075,7 +7140,7 @@
 
       /* 零食 / 加餐 */
       { name:"坚果混合", calories:170, summary:"混合坚果一小把30g", tags:["健康脂肪","蛋白质","加餐"], note:"坚果富含不饱和脂肪酸和维生素E，但热量高要控量。", category:"零食", image:"" },
-      { name:"蛋白棒", calories:200, summary:"蛋白棒一根", tags:["蛋白质","方便","加餐"], note:"蛋白棒方便携带，蛋白质含量高，适合运动后加餐。", category:"零食", image:"" },
+      { name:"酸奶", calories:145, summary:"原味酸奶200g", tags:["钙质","益生菌","蛋白质"], note:"选择无糖酸奶，富含益生菌有助于肠道健康。", category:"蛋奶豆", image:"" },
       { name:"黑巧克力", calories:160, summary:"黑巧克力30g", tags:["抗氧化","偶尔享用","解馋"], note:"70%以上可可含量的黑巧含丰富抗氧化物，适量食用。", category:"零食", image:"" }
     ];
 
@@ -7091,7 +7156,7 @@
       for (var i = 0; i < FOOD_DB.length; i++) {
         if (FOOD_DB[i].name.indexOf(lower) !== -1 || lower.indexOf(FOOD_DB[i].name) !== -1) return FOOD_DB[i];
       }
-      /* 3. 子串重叠匹配：DB名称的2-3字片段在AI名称中出现几次 */
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       var bestMatch = null, bestScore = 0;
       for (var i = 0; i < FOOD_DB.length; i++) {
         var dbName = FOOD_DB[i].name;
@@ -7212,30 +7277,30 @@
         tips.push("热量控制得很好，份量合适");
       } else if (ratio <= 0.45) {
         rating = "良";
-        tips.push("热量适中，是不错的一餐");
+        tips.push("热量控制得很好，份量合适");
       } else if (ratio <= 0.65) {
         rating = "注意";
         tips.push("这餐热量偏高，注意控制总量");
       } else {
         rating = "注意";
-        tips.push("热量较高，建议搭配清淡食物");
+        tips.push("热量控制得很好，份量合适");
       }
 
       /* 根据食物标签给建议 */
       var tags = mealData.tags || [];
-      if (tags.some(function(t) { return t.indexOf("高蛋白") !== -1 || t.indexOf("蛋白质") !== -1; })) {
-        tips.push("优质蛋白质，有助于肌肉修复");
+        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
+        tips.push("热量控制得很好，份量合适");
       }
-      if (tags.some(function(t) { return t.indexOf("高纤维") !== -1 || t.indexOf("纤维") !== -1; })) {
-        tips.push("膳食纤维丰富，促进消化");
+        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
+        tips.push("热量控制得很好，份量合适");
       }
-      if (tags.some(function(t) { return t.indexOf("低脂") !== -1 || t.indexOf("极低卡") !== -1; })) {
+        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
         tips.push("低脂低卡，减脂期好选择");
       }
-      if (tags.some(function(t) { return t.indexOf("高热量") !== -1 || t.indexOf("高脂") !== -1; })) {
+        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
         tips.push("热量偏高，建议今天其余餐清淡");
       }
-      if (tags.some(function(t) { return t.indexOf("维生素") !== -1 || t.indexOf("维生素C") !== -1; })) {
+        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
         tips.push("维生素含量高，提升免疫力");
       }
 
@@ -7511,7 +7576,7 @@
         var tags = (Array.isArray(result.tags) && result.tags.length > 0) ? result.tags.slice() : ["轻盈午餐", "蛋白质充足", "符合减脂目标"];
         /* 根据 AI 评级动态调整第三个标签 */
         var rating = (result.aiAdvice && result.aiAdvice.rating) || "";
-        if (rating === "注意" || rating === "差") {
+        var rating = (result.aiAdvice && result.aiAdvice.rating) || "";
           tags[2] = "偏离减脂目标";
         } else {
           tags[2] = "符合减脂目标";
@@ -8052,7 +8117,7 @@
             uploadZone.classList.add("has-photo");
             uploadZone.innerHTML = `
               <img class="album-preview-img" src="${ev.target.result}" alt="已上传照片" />
-              <span class="album-preview-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>已上传</span>
+          <span class="album-preview-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>已选择</span>
             `;
           }
 
@@ -8168,14 +8233,14 @@
           }
           aiResult = {
             needs_retake: false,
-            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), "检测食物"),
+            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), sourceLabel || "检测食物"),
             reason: "图像质量不足，已进入本地兜底确认"
           };
         }
         if (!aiResult || !Array.isArray(aiResult.foods) || aiResult.foods.length === 0) {
           aiResult = {
             needs_retake: false,
-            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), isRealPhoto ? "拍摄照片" : "检测食物"),
+            foods: fallbackFoodsFromLocal(imageSrc, getAutoMealType(), isRealPhoto ? "拍摄照片" : (sourceLabel || "鸡胸沙拉")),
             reason: "AI 未返回可用结果，已进入本地兜底确认"
           };
         }
@@ -8384,9 +8449,9 @@
 
     function renderExerciseDetail() {
       const strengthRows = [
-        { index: 1, name: "深蹲", weight: "40 kg", reps: "4 组 × 10 次", sets: [1, 2, 3, 4] },
-        { index: 2, name: "卧推", weight: "25 kg", reps: "3 组 × 12 次", sets: [1, 2, 3], pending: 4 },
-        { index: 3, name: "硬拉", weight: "50 kg", reps: "4 组 × 8 次", sets: [1, 2, 3, 4] }
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
       ];
 
       const strengthHtml = strengthRows.map((item) => `
@@ -8501,40 +8566,35 @@
       return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /><path d="m12 8 3 3 3-1" /><path d="m10 10-2 4-3 2" /><path d="M6 21h12" /></svg>';
     }
 
+    const EXERCISE_IMPACT_DURATION = 1350;
+
     function triggerExercisePixelImpact(sourceNode) {
       const overlay = document.getElementById("exerciseImpactOverlay");
       if (!overlay) return;
-      const rect = sourceNode && sourceNode.getBoundingClientRect ? sourceNode.getBoundingClientRect() : null;
+      const vortexNode = sourceNode && sourceNode.querySelector ? sourceNode.querySelector(".exercise-vortex") : null;
+      const rect = vortexNode && vortexNode.getBoundingClientRect
+        ? vortexNode.getBoundingClientRect()
+        : (sourceNode && sourceNode.getBoundingClientRect ? sourceNode.getBoundingClientRect() : null);
       const originX = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
       const originY = rect ? rect.top + rect.height / 2 : window.innerHeight / 2;
-      const maxDistance = Math.hypot(Math.max(originX, window.innerWidth - originX), Math.max(originY, window.innerHeight - originY)) + 80;
-      const pixels = Array.from({ length: 50 }, (_, index) => {
+      const pixels = Array.from({ length: 120 }, (_, index) => {
         const angle = (index * 137.508 + (index % 19) * 9) % 360;
-        const radians = angle * Math.PI / 180;
-        const startDistance = maxDistance * (0.6 + (index % 20) / 35);
-        const startX = Math.round(Math.cos(radians) * startDistance);
-        const startY = Math.round(Math.sin(radians) * startDistance);
-        const endX = Math.round(Math.cos(radians) * (80 + (index % 15) * 12));
-        const endY = Math.round(Math.sin(radians) * (80 + (index % 15) * 12));
-        const size = 3 + (index % 5);
-        const delay = (index % 12) * 0.015;
-        const gatherDur = 0.45 + (index % 6) * 0.02;
-        const burstDur = 0.6 + (index % 5) * 0.06;
-        const spin = 40 + (index % 6) * 20;
-        return `<span class="exercise-pixel-gather" style="--impact-x:${originX}px;--impact-y:${originY}px;--start-x:${startX}px;--start-y:${startY}px;--end-x:${endX}px;--end-y:${endY}px;--s:${size}px;--delay:${delay}s;--gather-dur:${gatherDur}s;--burst-dur:${burstDur}s;--spin:${spin}deg;"></span>`;
+        const edge = index % 4;
+        const startX = edge === 0 ? -24 : edge === 1 ? window.innerWidth + 24 : ((index * 71) % Math.max(window.innerWidth, 1));
+        const startY = edge === 2 ? -24 : edge === 3 ? window.innerHeight + 24 : ((index * 97) % Math.max(window.innerHeight, 1));
+        const fromX = Math.round(startX - originX);
+        const fromY = Math.round(startY - originY);
+        const size = 3 + (index % 8);
+        const delay = ((index % 18) * 0.006).toFixed(3);
+        const duration = (0.38 + (index % 8) * 0.018).toFixed(3);
+        const spin = 80 + (index % 10) * 22;
+        const startScale = (0.72 + (index % 8) * 0.12).toFixed(2);
+        const alpha = (0.58 + (index % 6) * 0.04).toFixed(2);
+        return `<span class="exercise-impact-pixel" style="--impact-x:${originX}px;--impact-y:${originY}px;--from-x:${fromX}px;--from-y:${fromY}px;--s:${size}px;--delay:${delay}s;--dur:${duration}s;--rot:${Math.round(angle)}deg;--spin:${spin}deg;--start-scale:${startScale};--high-alpha:${alpha};"></span>`;
       }).join("");
       overlay.style.setProperty("--impact-x", originX + "px");
       overlay.style.setProperty("--impact-y", originY + "px");
-      overlay.innerHTML = `
-        <span class="exercise-gather-ring"></span>
-        ${pixels}
-        <span class="exercise-checkmark-wrap">
-          <svg class="exercise-checkmark" viewBox="0 0 52 52">
-            <circle class="exercise-checkmark-circle" cx="26" cy="26" r="24" fill="none"/>
-            <path class="exercise-checkmark-check" fill="none" d="M14 27l7.8 7.8L38 17"/>
-          </svg>
-        </span>
-      `;
+      overlay.innerHTML = `<span class="exercise-impact-flash"></span>${pixels}<span class="exercise-impact-check"><svg viewBox="0 0 52 52" aria-hidden="true"><path d="M14 27l7.8 7.8L38 17" /></svg></span>`;
       overlay.classList.remove("show");
       void overlay.offsetWidth;
       overlay.classList.add("show");
@@ -8542,10 +8602,10 @@
       overlay._exerciseImpactTimer = window.setTimeout(() => {
         overlay.classList.remove("show");
         overlay.innerHTML = "";
-      }, 1800);
+      }, EXERCISE_IMPACT_DURATION);
     }
 
-    function addExerciseSet(moveId) {
+    function addExerciseSet(moveId, options = {}) {
       const move = appState.exercise.moves.find((item) => item.id === moveId);
       if (!move) return;
       move.completedSets = Math.min((move.completedSets || 0) + 1, move.targetSets || 4);
@@ -8563,7 +8623,9 @@
         }
       }
       saveState();
-      renderDetailPage("exercise-set-" + move.id);
+      if (!options.skipRender) {
+        renderDetailPage("exercise-set-" + move.id);
+      }
       showToast(move.name + " 已完成本组");
     }
 
@@ -8574,7 +8636,7 @@
       appState.exercise.records = appState.exercise.records.filter((record) => record.id !== "strength-" + move.id);
       saveState();
       renderDetailPage("exercise-set-" + move.id);
-      showToast(move.name + " 组数已重置");
+      showToast(move.name + " 已完成本组");
     }
 
     function openExerciseMovePopup() {
@@ -8599,7 +8661,7 @@
       const data = moveData || {};
       appState.exercise.moves.push({
         id: "custom-" + Date.now(),
-        name: data.name || ("自定义动作 " + nextIndex),
+      if (data && data.name) {
         weight: Number(data.weight) || 20,
         targetSets: Number(data.sets) || 4,
         reps: 10,
@@ -8747,6 +8809,7 @@
       const weight = Number(move.weight) || 0;
       const referenceCompletedSets = Math.min(3, Math.max(0, targetSets - 1));
       const currentSet = Math.min(referenceCompletedSets + 1, targetSets);
+      const progressRowClass = targetSets > 4 ? " is-scrollable" : "";
       const progressItems = Array.from({ length: targetSets }, (_, index) => {
         const setNumber = index + 1;
         const done = setNumber <= referenceCompletedSets;
@@ -8758,45 +8821,26 @@
           </span>
         `;
       }).join("");
-      /* 粒子数据 — Canvas 渲染 */
-      const particleCount = 400;
-      const ballRadius = 68;
-      const particlePalette = [
-        [130,175,110],[110,155,90],[155,200,135],[90,140,72],
-        [255,255,255],[245,250,240],[175,215,155],[230,242,222],
-        [100,148,82],[255,255,255],[210,230,200],[75,125,58],
-        [255,255,255],[140,185,120],[255,255,255]
-      ];
-      const particleData = [];
-      for (let i = 0; i < particleCount; i++) {
-        const angle = (i / particleCount) * Math.PI * 2 + (Math.sin(i * 1.3) * 0.15);
-        const t = i / particleCount;
-        const dist = 65 + Math.pow(t, 1.2) * 400;
-        const size = t < 0.15 ? (6 + (i % 9)) :
-                     t < 0.4 ? (4 + (i % 7)) :
-                     t < 0.7 ? (2 + (i % 5)) :
-                     (2 + (i % 3));
-        const pc = particlePalette[i % particlePalette.length];
-        const alpha = 0.5 + (1 - t) * 0.45;
-        const delay = i * 0.018;
-        const dur = 0.8 + (i % 12) * 0.15;
-        particleData.push([Math.cos(angle)*dist, Math.sin(angle)*dist, size, pc[0],pc[1],pc[2], alpha, delay, dur]);
-      }
-
-      /* 同心圆环 SVG — 绿色调细线圆环，从球体向外扩散 */
-      const rcx = 430, rcy = 430;
-      const ringCount = 28;
-      const ringCircles = [];
-      for (let i = 0; i < ringCount; i++) {
-        const r = 82 + i * 14;
-        const op = Math.max(0.03, 0.16 - i * 0.005);
-        const sw = i < 3 ? 1.0 : (i < 8 ? 0.7 : (i < 16 ? 0.5 : 0.35));
-        ringCircles.push(`<circle cx="${rcx}" cy="${rcy}" r="${r}" fill="none" stroke="rgba(115,160,90,${op.toFixed(3)})" stroke-width="${sw}"/>`);
-      }
-      const ringsHtml = `<svg viewBox="0 0 860 860" xmlns="http://www.w3.org/2000/svg">
-        <g class="ring-group">${ringCircles.join("\n        ")}</g>
-      </svg>`;
-
+      const pixels = Array.from({ length: 900 }, (_, index) => {
+        const angle = (index * 137.508 + (index % 17) * 11 + (index % 23) * 3) % 360;
+        const radius = 88 + (index % 67) * 5 + (index % 13) * 11 + (index % 5) * 17;
+        const radians = angle * Math.PI / 180;
+        const jitterX = ((index * 29) % 41) - 20;
+        const jitterY = ((index * 31) % 47) - 23;
+        const x = Math.round(Math.cos(radians) * radius + jitterX);
+        const y = Math.round(Math.sin(radians) * radius + jitterY);
+        const dx = Math.round(Math.cos(radians) * (18 + (index % 9) * 5) + (((index * 7) % 19) - 9));
+        const dy = Math.round(Math.sin(radians) * (18 + (index % 11) * 4) + (((index * 11) % 23) - 11));
+        const size = 2 + (index % 12);
+        const delay = ((index % 64) * -0.037).toFixed(3);
+        const spin = 24 + (index % 9) * 18;
+        const lowAlpha = (0.2 + (index % 5) * 0.035).toFixed(2);
+        const midAlpha = (0.5 + (index % 7) * 0.045).toFixed(2);
+        const highAlpha = (0.74 + (index % 6) * 0.04).toFixed(2);
+        const startScale = (0.54 + (index % 4) * 0.08).toFixed(2);
+        const endScale = (0.92 + (index % 5) * 0.08).toFixed(2);
+        return `<span class="exercise-vortex-pixel" style="--vx:${x}px;--vy:${y}px;--dx:${dx}px;--dy:${dy}px;--s:${size}px;--delay:${delay}s;--rot:${Math.round(angle)}deg;--spin:${spin}deg;--low-alpha:${lowAlpha};--mid-alpha:${midAlpha};--high-alpha:${highAlpha};--start-scale:${startScale};--end-scale:${endScale};"></span>`;
+      }).join("");
       return `
         <div class="exercise-set-page">
           <div class="exercise-set-statusbar">
@@ -8815,21 +8859,18 @@
               <h2 class="exercise-set-title">${escapeHtml(move.name)}</h2>
               <div class="exercise-set-subtitle">\u76ee\u6807 ${targetSets} \u7ec4</div>
             </div>
-            <button class="exercise-set-round-btn" type="button" aria-label="\u8bbe\u7f6e">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" /><path d="M19.4 15a1.8 1.8 0 0 0 .36 1.98l.04.04a2.1 2.1 0 0 1-2.98 2.98l-.04-.04a1.8 1.8 0 0 0-1.98-.36 1.8 1.8 0 0 0-1.1 1.66V21a2.1 2.1 0 0 1-4.2 0v-.06a1.8 1.8 0 0 0-1.1-1.66 1.8 1.8 0 0 0-1.98.36l-.04.04a2.1 2.1 0 0 1-2.98-2.98l.04-.04A1.8 1.8 0 0 0 4.6 15a1.8 1.8 0 0 0-1.66-1.1H3a2.1 2.1 0 0 1 0-4.2h.06A1.8 1.8 0 0 0 4.72 8.6a1.8 1.8 0 0 0-.36-1.98l-.04-.04A2.1 2.1 0 0 1 7.3 3.6l.04.04a1.8 1.8 0 0 0 1.98.36h.02A1.8 1.8 0 0 0 10.44 2.34V2a2.1 2.1 0 0 1 4.2 0v.06A1.8 1.8 0 0 0 15.74 3.72a1.8 1.8 0 0 0 1.98-.36l.04-.04a2.1 2.1 0 0 1 2.98 2.98l-.04.04a1.8 1.8 0 0 0-.36 1.98v.02a1.8 1.8 0 0 0 1.66 1.1H22a2.1 2.1 0 0 1 0 4.2h-.06A1.8 1.8 0 0 0 19.4 15Z" /></svg>
-            </button>
+            <span class="exercise-set-top-spacer" aria-hidden="true"></span>
           </div>
           <section class="exercise-set-glass-progress" aria-label="\u8bad\u7ec3\u8fdb\u5ea6">
             <div class="exercise-set-progress-head">
               <strong>\u8bad\u7ec3\u8fdb\u5ea6</strong>
               <span class="exercise-set-progress-pill">\u5b8c\u6210 ${referenceCompletedSets}/${targetSets} \u7ec4</span>
             </div>
-            <div class="exercise-set-progress-row">${progressItems}</div>
+            <div class="exercise-set-progress-row${progressRowClass}">${progressItems}</div>
           </section>
           <button class="exercise-vortex-stage" type="button" data-action="exercise-record-set" data-move-id="${escapeHtml(move.id)}" aria-label="\u5b8c\u6210\u672c\u7ec4">
             <span class="exercise-vortex">
-              <span class="exercise-vortex-rings">${ringsHtml}</span>
-              <canvas class="exercise-vortex-canvas" width="860" height="860" id="vortexCanvas"></canvas>
+              <span class="exercise-vortex-pixels">${pixels}</span>
               <span class="exercise-vortex-core"></span>
             </span>
           </button>
@@ -8845,7 +8886,6 @@
             </div>
           </section>
           <div class="exercise-set-swipe-hint">\u2191 \u5411\u4e0a\u6ed1\u52a8\u5b8c\u6210\u672c\u7ec4 \u2191</div>
-          <span class="exercise-home-indicator" aria-hidden="true"></span>
         </div>
       `;
     }
@@ -8860,7 +8900,9 @@
       const selectedMeal = appState.meals.find((meal) => meal.id === mealId);
       const exerciseSetId = route.startsWith("exercise-set-") ? route.replace("exercise-set-", "") : "";
       const selectedExerciseMove = exerciseSetId && appState.exercise && appState.exercise.moves.find((move) => move.id === exerciseSetId);
-      document.body.dataset.detailKind = selectedMeal ? "meal" : (exerciseSetId ? "exercise-set" : route);
+      const detailKind = selectedMeal ? "meal" : (exerciseSetId ? "exercise-set" : route);
+      document.body.dataset.detailKind = detailKind;
+      document.documentElement.dataset.detailKind = detailKind;
 
       const detailConfig = {
         "plan-settings": {
@@ -8947,7 +8989,7 @@
           title: "低碳轻食",
           body: `
             <section class="detail-card">
-              <p class="detail-summary"><span class="ai-star">✦</span> 偏好会用于智能推荐和热量估算，让晚餐建议更贴合你的减脂节奏。</p>
+              <p class="detail-summary"><span class="ai-star">✦</span> 系统会根据你的身体数据，智能分析减脂进度并调整每日热量目标，提供个性化建议。</p>
               <div class="detail-form">
                 <div class="data-row">
                   <div class="data-info">
@@ -9215,38 +9257,6 @@
       eyebrow.textContent = config.eyebrow;
       title.textContent = config.title;
       body.innerHTML = config.body;
-
-      /* Canvas 粒子渲染 — 运动组页面 */
-      if (route.startsWith("exercise-set-")) {
-        const canvas = document.getElementById("vortexCanvas");
-        if (canvas && typeof particleData !== "undefined") {
-          const ctx = canvas.getContext("2d");
-          const W = 860, H = 860, cx = W/2, cy = H/2;
-          const ballR = 68;
-          let startTime = performance.now();
-          function drawParticles(now) {
-            const t = (now - startTime) / 1000;
-            ctx.clearRect(0, 0, W, H);
-            for (let i = 0; i < particleData.length; i++) {
-              const p = particleData[i];
-              const ex = p[0], ey = p[1], size = p[2];
-              const r = p[3], g = p[4], b = p[5], baseAlpha = p[6];
-              const delay = p[7], dur = p[8];
-              const phase = ((t - delay) % dur) / dur;
-              if (phase < 0) continue;
-              const ease = phase < 0.1 ? phase/0.1 : phase > 0.8 ? (1-phase)/0.2 : 1;
-              const alpha = baseAlpha * Math.max(0, ease);
-              const x = cx + ex * Math.min(1, phase * 1.2);
-              const y = cy + ey * Math.min(1, phase * 1.2);
-              const s = size * (phase < 0.1 ? phase/0.1 : 1);
-              ctx.fillStyle = `rgba(${r},${g},${b},${alpha.toFixed(3)})`;
-              ctx.fillRect(x - s/2, y - s/2, s, s);
-            }
-            requestAnimationFrame(drawParticles);
-          }
-          requestAnimationFrame(drawParticles);
-        }
-      }
 
       if (route === "album") {
         albumSelectedPhoto = null;
@@ -9608,6 +9618,7 @@
         renderDetailPage(normalizedRoute);
       } else {
         delete document.body.dataset.detailKind;
+        delete document.documentElement.dataset.detailKind;
       }
 
       if (activeRoute === "profile") {
@@ -9819,7 +9830,8 @@
       if (actionNode && actionNode.dataset.action === "exercise-record-set") {
         haptic("select");
         triggerExercisePixelImpact(actionNode);
-        window.setTimeout(() => addExerciseSet(actionNode.dataset.moveId), 360);
+        window.clearTimeout(actionNode._exerciseRecordTimer);
+        actionNode._exerciseRecordTimer = window.setTimeout(() => addExerciseSet(actionNode.dataset.moveId, { skipRender: true }), EXERCISE_IMPACT_DURATION + 80);
         return;
       }
       if (actionNode && actionNode.dataset.action === "exercise-reset-set") {
@@ -9928,6 +9940,7 @@
 
     try {
       renderAll();
+      /* 根据当前时间设置餐型按钮的默认选中状态 */
       var autoType = getAutoMealType();
       document.querySelectorAll(".manual-type-bar").forEach(function(bar) {
         var active = bar.querySelector(".manual-type-btn.active");
