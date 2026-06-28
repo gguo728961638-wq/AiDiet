@@ -48,6 +48,8 @@
       color: inherit;
       background: transparent;
       cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
     .phone-frame {
@@ -1059,6 +1061,7 @@
       backdrop-filter: blur(16px);
       z-index: 100;
       padding: 0 20px;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .bottom-nav .nav-item {
@@ -1084,6 +1087,9 @@
       color: var(--muted);
       font-size: 14px;
       font-weight: 600;
+      -webkit-tap-highlight-color: transparent;
+      will-change: transform;
+      transform: translateZ(0);
     }
 
     .nav-item.active {
@@ -1621,6 +1627,9 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: relative;
+      z-index: 10;
+      min-height: 54px;
     }
 
     .detail-eyebrow {
@@ -7883,15 +7892,21 @@
       return copy;
     }
 
+    var _saveStateTimer = null;
     function saveState() {
-      var rawData = JSON.stringify(appState);
-      var safeData = JSON.stringify(sanitizeStateForStorage(appState));
-      /* iOS 原生存储优先 —— 用原始数据，让 extractAndSaveImages 能处理 base64 图片 */
-      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.storageHandler) {
-        window.webkit.messageHandlers.storageHandler.postMessage({ action: "save", data: rawData });
-      }
-      /* localStorage 用 sanitize 后的数据（大图已丢弃，防止配额超出） */
-      try { localStorage.setItem("aiDietAppState", safeData); } catch (e) { /* quota exceeded, native storage handles persistence */ }
+      // 防抖：合并 16ms 内的多次 saveState 调用，减少 JSON.stringify 开销
+      if (_saveStateTimer) return;
+      _saveStateTimer = requestAnimationFrame(function() {
+        _saveStateTimer = null;
+        var rawData = JSON.stringify(appState);
+        var safeData = JSON.stringify(sanitizeStateForStorage(appState));
+        /* iOS 原生存储优先 —— 用原始数据，让 extractAndSaveImages 能处理 base64 图片 */
+        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.storageHandler) {
+          window.webkit.messageHandlers.storageHandler.postMessage({ action: "save", data: rawData });
+        }
+        /* localStorage 用 sanitize 后的数据（大图已丢弃，防止配额超出） */
+        try { localStorage.setItem("aiDietAppState", safeData); } catch (e) { /* quota exceeded, native storage handles persistence */ }
+      });
     }
 
     function consumedCalories() {
@@ -10304,12 +10319,13 @@
       const todayPlan = getTodayPlan();
       const beijingDay = getBeijingDayOfWeek();
       const planHtml = todayPlan.length > 0
-        ? todayPlan.map(function(name, i) {
-            const move = appState.exercise.moves.find(function(m) { return m.name === name; });
+        ? todayPlan.map(function(item, i) {
+            const planName = typeof item === 'string' ? item : (item.name || '');
+            const move = appState.exercise.moves.find(function(m) { return m.name === planName; });
             const done = move && move.completedSets >= (move.targetSets || 4);
-            return '<div class="exercise-plan-item' + (done ? ' done' : '') + '" data-action="exercise-toggle-plan" data-move-name="' + escapeHtml(name) + '">' +
+            return '<div class="exercise-plan-item' + (done ? ' done' : '') + '" data-action="exercise-toggle-plan" data-move-name="' + escapeHtml(planName) + '">' +
               '<span class="exercise-plan-idx">' + (i + 1) + '</span>' +
-              '<span class="exercise-plan-name">' + escapeHtml(name) + '</span>' +
+              '<span class="exercise-plan-name">' + escapeHtml(planName) + '</span>' +
               '<span class="exercise-plan-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>' +
             '</div>';
           }).join("")
@@ -10347,7 +10363,7 @@
       return `
         <div class="exercise-shell">
           <div class="exercise-hero">
-            <button class="exercise-back" type="button" onclick="location.hash=detailRootRoute||'home'" aria-label="返回">
+            <button class="exercise-back" type="button" data-action="exercise-back" aria-label="返回">
               <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
             </button>
             <div>
@@ -10663,6 +10679,11 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
         : '<div class="weekly-plan-empty"><div class="weekly-plan-empty-text">还没有训练计划，添加动作开始规划</div></div>';
 
       return '<div class="weekly-plan-editor">' +
+        '<div style="position:relative;margin-bottom:8px;">' +
+          '<button class="exercise-back" type="button" onclick="location.hash=\'exercise\'; applyRoute(\'exercise\')" aria-label="返回" style="position:absolute;top:0;left:0;z-index:10;">' +
+            '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
+          '</button>' +
+        '</div>' +
         '<div class="weekly-plan-tabs">' + tabsHtml + '</div>' +
         '<div class="weekly-plan-card">' +
           '<div class="weekly-plan-card-blob"></div>' +
@@ -10675,8 +10696,9 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
             '<div class="weekly-plan-items">' + itemsHtml + '</div>' +
             '<div class="weekly-plan-card-footer">' +
               '<span>' + plan.length + ' 项计划</span>' +
-              '<span>' + plan.filter(function(n) {
-                var m = appState.exercise.moves.find(function(x) { return x.name === n; });
+              '<span>' + plan.filter(function(item) {
+                var planName = typeof item === 'string' ? item : (item.name || '');
+                var m = appState.exercise.moves.find(function(x) { return x.name === planName; });
                 return m && m.completedSets >= (m.targetSets || 4);
               }).length + '/' + plan.length + ' 已完成</span>' +
             '</div>' +
@@ -10735,7 +10757,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
 
       return '<div class="exercise-set-page">' +
         '<div class="exercise-set-header">' +
-          '<button class="exercise-back" type="button" onclick="location.hash=detailRootRoute||\'home\'" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
+          '<button class="exercise-back" type="button" onclick="location.hash=\'exercise\'; applyRoute(\'exercise\')" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
             '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
           '</button>' +
           '<h1 class="exercise-set-title">' + escapeHtml(move.name) + '</h1>' +
@@ -10776,32 +10798,30 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       '</div>';
     }
 
-    /* GSAP 按钮点击动效 */
+    /* GSAP 按钮点击动效 — 仅对 button 元素生效，减少无效匹配 */
     function initButtonAnimations() {
       if (typeof gsap === 'undefined') return;
 
-      // 所有可点击按钮的通用动效
+      // 使用事件委托，仅对 button 元素触发
       document.addEventListener('click', function(e) {
-        var btn = e.target.closest('button, [data-action], [data-route]');
+        var btn = e.target.closest('button');
         if (!btn) return;
 
-        // 跳过特殊按钮
+        // 跳过特殊按钮和页面切换按钮（避免和路由冲突）
         if (btn.closest('.exercise-set-ring')) return;
 
-        // 弹性缩放动效
-        gsap.fromTo(btn,
-          { scale: 1 },
-          {
-            scale: 0.92,
-            duration: 0.1,
-            ease: 'power2.in',
-            yoyo: true,
-            repeat: 1,
-            onComplete: function() {
-              gsap.set(btn, { scale: 1 });
-            }
-          }
-        );
+        // 弹性缩放动效 — 使用 CSS 代替 GSAP 减少主线程开销
+        btn.style.transition = 'transform 0.1s ease-in';
+        btn.style.transform = 'scale(0.95)';
+        requestAnimationFrame(function() {
+          setTimeout(function() {
+            btn.style.transform = 'scale(1)';
+            setTimeout(function() {
+              btn.style.transition = '';
+              btn.style.transform = '';
+            }, 100);
+          }, 60);
+        });
       }, true);
     }
 
@@ -10870,6 +10890,11 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
         : '<div class="calendar-empty">这一天还没有运动记录<br />可以从运动页面添加训练</div>';
 
       return `
+        <div style="position:relative;">
+          <button class="exercise-back" type="button" onclick="location.hash='exercise'; applyRoute('exercise')" aria-label="返回" style="position:absolute;top:0;left:0;z-index:10;">
+            <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+        </div>
         <section class="calendar-card">
           <div class="calendar-month">
             <strong>${year} 年 ${month} 月</strong>
@@ -10944,7 +10969,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
 
       return '<div class="exercise-set-page">' +
         '<div class="exercise-set-header">' +
-          '<button class="exercise-back" type="button" onclick="location.hash=detailRootRoute||\'home\'" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
+          '<button class="exercise-back" type="button" onclick="location.hash=\'exercise\'; applyRoute(\'exercise\')" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
             '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
           '</button>' +
           '<h1 class="exercise-set-title">' + escapeHtml(move.name) + '</h1>' +
@@ -11013,7 +11038,12 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
         meals: {
           eyebrow: "饮食记录",
           title: `今天 ${appState.meals.length} 餐`,
-          body: `<div class="detail-list">${appState.meals.map(detailMealTemplate).join("")}</div>`
+          body: `<div style="margin-bottom:12px;">
+            <button class="exercise-back" type="button" onclick="location.hash='home'; applyRoute('home')" aria-label="返回">
+              <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+            </button>
+          </div>
+          <div class="detail-list">${appState.meals.map(detailMealTemplate).join("")}</div>`
         },
         settings: {
           eyebrow: "个人中心",
@@ -11299,6 +11329,11 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
             eyebrow: `${selectedMeal.time} · ${selectedMeal.type}`,
             title: selectedMeal.name,
             body: `
+              <div style="margin-bottom:12px;">
+                <button class="exercise-back" type="button" onclick="location.hash='meals'; applyRoute('meals')" aria-label="返回">
+                  <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+                </button>
+              </div>
               <div class="meal-detail-shell">
                 <div class="meal-visual-card">
                   <img class="meal-hero-img" src="${escapeHtml(selectedMeal.image)}" alt="${escapeHtml(selectedMeal.name)}" />
@@ -11377,7 +11412,12 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
         setupExerciseSwipeRows();
       }
       if (route === "ai-chat") {
-        initAIGradientCanvas();
+        // 延迟初始化 WebGL canvas，不阻塞页面渲染
+        requestAnimationFrame(function() {
+          requestAnimationFrame(function() {
+            initAIGradientCanvas();
+          });
+        });
         requestHealthData(); // 进入聊天页时预拉取健康数据
         // 键盘弹出时输入框跟随
         const chatInput = document.getElementById('aiChatInput');
