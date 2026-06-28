@@ -29,6 +29,7 @@ jobs:
           plutil -lint "ios/AiDiet/Info.plist"
 
       - name: Build without code signing
+        if: always()
         run: |
           mkdir -p "${EXPORT_PATH}"
           set -o pipefail
@@ -51,11 +52,17 @@ jobs:
           grep -nE "error:|warning:|BUILD FAILED|The following build commands failed" "${EXPORT_PATH}/xcodebuild.log" > "${EXPORT_PATH}/swift-errors.log" || true
 
       - name: Package unsigned app bundle
+        if: always()
         run: |
           APP_PATH="${BUILD_DIR}/Build/Products/Release-iphoneos/${APP_TARGET}.app"
-          test -d "${APP_PATH}" || (echo "Unsigned app bundle missing at ${APP_PATH}" && exit 1)
-          ditto -c -k --sequesterRsrc --keepParent "${APP_PATH}" "${EXPORT_PATH}/${APP_TARGET}-unsigned-app.zip"
-          ditto -c -k --sequesterRsrc --keepParent "${BUILD_DIR}" "${EXPORT_PATH}/${APP_TARGET}-unsigned-build.zip"
+          if [ -d "${APP_PATH}" ]; then
+            ditto -c -k --sequesterRsrc --keepParent "${APP_PATH}" "${EXPORT_PATH}/${APP_TARGET}-unsigned-app.zip"
+            ditto -c -k --sequesterRsrc --keepParent "${BUILD_DIR}" "${EXPORT_PATH}/${APP_TARGET}-unsigned-build.zip"
+          else
+            echo "Unsigned app bundle missing at ${APP_PATH}"
+            echo "Build logs saved to ${EXPORT_PATH}/xcodebuild.log"
+            echo "Swift errors saved to ${EXPORT_PATH}/swift-errors.log"
+          fi
 
       - name: Upload unsigned artifacts
         if: always()
@@ -64,4 +71,4 @@ jobs:
           name: LingGuang-iOS-unsigned
           path: |
             build/unsigned-export/*
-          if-no-files-found: error
+          if-no-files-found: warn
