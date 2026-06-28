@@ -10793,30 +10793,15 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       '</div>';
     }
 
-    /* GSAP 按钮点击动效 — 仅对 button 元素生效，减少无效匹配 */
+    /* 按钮点击动效 — 仅视觉反馈，不改变布局 */
     function initButtonAnimations() {
-      if (typeof gsap === 'undefined') return;
-
-      // 使用事件委托，仅对 button 元素触发
       document.addEventListener('click', function(e) {
         var btn = e.target.closest('button');
         if (!btn) return;
-
-        // 跳过特殊按钮和页面切换按钮（避免和路由冲突）
         if (btn.closest('.exercise-set-ring')) return;
-
-        // 弹性缩放动效 — 使用 CSS 代替 GSAP 减少主线程开销
-        btn.style.transition = 'transform 0.1s ease-in';
-        btn.style.transform = 'scale(0.95)';
-        requestAnimationFrame(function() {
-          setTimeout(function() {
-            btn.style.transform = 'scale(1)';
-            setTimeout(function() {
-              btn.style.transition = '';
-              btn.style.transform = '';
-            }, 100);
-          }, 60);
-        });
+        // 使用 box-shadow 代替 transform，不影响触控坐标
+        btn.style.boxShadow = 'inset 0 0 0 2px rgba(0,0,0,0.08)';
+        setTimeout(function() { btn.style.boxShadow = ''; }, 150);
       }, true);
     }
 
