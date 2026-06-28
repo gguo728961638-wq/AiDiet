@@ -7204,7 +7204,7 @@
 
       <section class="page-content detail-content" aria-label="功能详情页">
         <div class="detail-nav">
-          <button class="round-control" type="button" id="detailBackBtn" aria-label="返回">
+          <button class="round-control" type="button" id="detailBackBtn" aria-label="返回" onclick="location.hash=detailParentRoute&&detailParentRoute!==document.body.dataset.detailRoute?detailParentRoute:'home'">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
           </button>
         </div>
@@ -10363,7 +10363,7 @@
       return `
         <div class="exercise-shell">
           <div class="exercise-hero">
-            <button class="exercise-back" type="button" data-action="exercise-back" aria-label="返回">
+            <button class="exercise-back" type="button" data-action="exercise-back" onclick="location.hash='home'" aria-label="返回">
               <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
             </button>
             <div>
@@ -10614,7 +10614,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       return `
         <div class="ai-chat-page">
           <canvas class="ai-chat-canvas" id="aiChatCanvas"></canvas>
-          <button class="ai-chat-back" type="button" onclick="location.hash='home'; applyRoute('home')" aria-label="返回">
+          <button class="ai-chat-back" type="button" onclick="location.hash=detailParentRoute||'home'" aria-label="返回">
             <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
           </button>
           <div class="ai-chat-messages" id="aiChatMessages">
@@ -10679,11 +10679,6 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
         : '<div class="weekly-plan-empty"><div class="weekly-plan-empty-text">还没有训练计划，添加动作开始规划</div></div>';
 
       return '<div class="weekly-plan-editor">' +
-        '<div style="position:relative;margin-bottom:8px;">' +
-          '<button class="exercise-back" type="button" onclick="location.hash=\'exercise\'; applyRoute(\'exercise\')" aria-label="返回" style="position:absolute;top:0;left:0;z-index:10;">' +
-            '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
-          '</button>' +
-        '</div>' +
         '<div class="weekly-plan-tabs">' + tabsHtml + '</div>' +
         '<div class="weekly-plan-card">' +
           '<div class="weekly-plan-card-blob"></div>' +
@@ -10757,7 +10752,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
 
       return '<div class="exercise-set-page">' +
         '<div class="exercise-set-header">' +
-          '<button class="exercise-back" type="button" onclick="location.hash=\'exercise\'; applyRoute(\'exercise\')" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
+          '<button class="exercise-back" type="button" onclick="location.hash='exercise'" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
             '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
           '</button>' +
           '<h1 class="exercise-set-title">' + escapeHtml(move.name) + '</h1>' +
@@ -10890,11 +10885,6 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
         : '<div class="calendar-empty">这一天还没有运动记录<br />可以从运动页面添加训练</div>';
 
       return `
-        <div style="position:relative;">
-          <button class="exercise-back" type="button" onclick="location.hash='exercise'; applyRoute('exercise')" aria-label="返回" style="position:absolute;top:0;left:0;z-index:10;">
-            <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
-          </button>
-        </div>
         <section class="calendar-card">
           <div class="calendar-month">
             <strong>${year} 年 ${month} 月</strong>
@@ -10969,7 +10959,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
 
       return '<div class="exercise-set-page">' +
         '<div class="exercise-set-header">' +
-          '<button class="exercise-back" type="button" onclick="location.hash=\'exercise\'; applyRoute(\'exercise\')" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
+          '<button class="exercise-back" type="button" onclick="location.hash='exercise'" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
             '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
           '</button>' +
           '<h1 class="exercise-set-title">' + escapeHtml(move.name) + '</h1>' +
@@ -11038,12 +11028,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
         meals: {
           eyebrow: "饮食记录",
           title: `今天 ${appState.meals.length} 餐`,
-          body: `<div style="margin-bottom:12px;">
-            <button class="exercise-back" type="button" onclick="location.hash='home'; applyRoute('home')" aria-label="返回">
-              <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
-            </button>
-          </div>
-          <div class="detail-list">${appState.meals.map(detailMealTemplate).join("")}</div>`
+          body: `<div class="detail-list">${appState.meals.map(detailMealTemplate).join("")}</div>`
         },
         settings: {
           eyebrow: "个人中心",
@@ -11329,11 +11314,6 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
             eyebrow: `${selectedMeal.time} · ${selectedMeal.type}`,
             title: selectedMeal.name,
             body: `
-              <div style="margin-bottom:12px;">
-                <button class="exercise-back" type="button" onclick="location.hash='meals'; applyRoute('meals')" aria-label="返回">
-                  <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
-                </button>
-              </div>
               <div class="meal-detail-shell">
                 <div class="meal-visual-card">
                   <img class="meal-hero-img" src="${escapeHtml(selectedMeal.image)}" alt="${escapeHtml(selectedMeal.name)}" />
@@ -12214,9 +12194,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       }
       if (actionNode && actionNode.dataset.action === "exercise-back") {
         haptic("light");
-        var target = detailParentRoute || "home";
-        window.location.hash = target;
-        applyRoute(target);
+        window.location.hash = detailParentRoute || "home";
         return;
       }
       if (actionNode && actionNode.dataset.action === "exercise-toggle-plan") {
@@ -12432,9 +12410,8 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
     });
 
     document.getElementById("detailBackBtn").addEventListener("click", function() {
-      var backRoute = detailParentRoute || "home";
-      window.location.hash = backRoute;
-      applyRoute(backRoute);
+      haptic("light");
+      window.location.hash = detailParentRoute || "home";
     });
 
     window.addEventListener("hashchange", () => {
