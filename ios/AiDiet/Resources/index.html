@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
   <title>饮食减肥 App</title>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
   <style>
     :root {
       --page: #f4f1ea;
@@ -518,9 +519,6 @@
       width: 100%;
       height: auto;
       display: block;
-    }
-
-    /* chart-end-ring animated via inline SVG <animate> — no CSS needed */
     }
 
     .weight-chart-empty {
@@ -1055,12 +1053,25 @@
       height: 88px;
       border-radius: 44px;
       background: rgba(251, 250, 246, 0.92);
-      display: grid;
-      grid-template-columns: 1fr 112px 1fr;
+      display: flex;
       align-items: center;
-      text-align: center;
+      justify-content: space-around;
       backdrop-filter: blur(16px);
       z-index: 100;
+      padding: 0 20px;
+    }
+
+    .bottom-nav .nav-item {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .bottom-nav .camera-button {
+      flex: 0 0 auto;
+      margin: 0 8px;
     }
 
     .nav-item {
@@ -1072,6 +1083,7 @@
       gap: 5px;
       color: var(--muted);
       font-size: 14px;
+      font-weight: 600;
     }
 
     .nav-item.active {
@@ -4043,7 +4055,7 @@
     }
     .exercise-shell {
       margin: -10px -4px 0;
-      padding: 0 0 26px;
+      padding: 60px 0 26px;
       color: #101a13;
     }
 
@@ -4058,6 +4070,27 @@
 
     body[data-detail-kind="exercise"] .bottom-nav,
     body[data-detail-kind="exercise-set"] .bottom-nav {
+      display: none;
+    }
+
+    body[data-detail-kind="ai-chat"] .bottom-nav {
+      display: none;
+    }
+
+    body[data-detail-kind="ai-chat"] .detail-content {
+      padding: 0;
+    }
+
+    body[data-detail-kind="ai-chat"] .home-screen {
+      padding: 0;
+      min-height: 100vh;
+      height: 100vh;
+      background: transparent;
+    }
+
+    body[data-detail-kind="ai-chat"] .detail-nav,
+    body[data-detail-kind="ai-chat"] .detail-eyebrow,
+    body[data-detail-kind="ai-chat"] .detail-title {
       display: none;
     }
 
@@ -4146,6 +4179,27 @@
       stroke-width: 2.4;
     }
 
+    .exercise-back {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .exercise-back svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: #182018;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
     .exercise-card {
       border: 1px solid rgba(255, 255, 255, 0.78);
       border-radius: 28px;
@@ -4156,10 +4210,527 @@
     }
 
     .exercise-summary-card {
-      min-height: 184px;
-      padding: 24px 24px 22px;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 104px;
+      min-height: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .exercise-summary-card > div:first-child {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .exercise-plan-edit {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(111, 128, 95, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .exercise-plan-edit svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: #6f805f;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .exercise-plan-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .exercise-plan-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(24, 32, 24, 0.06);
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .exercise-plan-item:last-child {
+      border-bottom: none;
+    }
+
+    .exercise-plan-item.done {
+      opacity: 0.5;
+    }
+
+    .exercise-plan-idx {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: rgba(111, 128, 95, 0.12);
+      color: #6f805f;
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .exercise-plan-item.done .exercise-plan-idx {
+      background: #6f805f;
+      color: #fff;
+    }
+
+    .exercise-plan-name {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 600;
+      color: #182018;
+    }
+
+    .exercise-plan-item.done .exercise-plan-name {
+      text-decoration: line-through;
+      color: #7c8378;
+    }
+
+    .exercise-plan-check {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 2px solid rgba(111, 128, 95, 0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+
+    .exercise-plan-item.done .exercise-plan-check {
+      background: #6f805f;
+      border-color: #6f805f;
+    }
+
+    .exercise-plan-check svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0;
+    }
+
+    .exercise-plan-item.done .exercise-plan-check svg {
+      opacity: 1;
+    }
+
+    .exercise-plan-empty {
+      text-align: center;
+      padding: 20px;
+      color: #7c8378;
+      font-size: 15px;
+    }
+
+    .exercise-plan-summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      font-size: 14px;
+      color: #7c8378;
+    }
+
+    /* Weekly Plan Editor - Green Flow + Card */
+    .weekly-plan-editor {
+      padding: 0;
+    }
+
+    /* 日期导航卡片 */
+    .weekly-plan-tabs {
+      background: oklch(1 0 0);
+      border-radius: 20px;
+      padding: 16px 12px 12px;
+      margin: 12px 0 20px;
+      box-shadow: 0 4px 16px oklch(0.25 0.01 145 / 0.08);
+    }
+
+    .date-nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .day-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .day-number {
+      font-size: 15px;
+      font-weight: 600;
+      height: 32px;
+      width: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      color: oklch(0.25 0.01 145);
+      transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .day-name {
+      font-size: 11px;
+      height: 22px;
+      width: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+      color: oklch(0.55 0.01 145);
+      transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .day-active .day-number {
+      background: oklch(0.90 0.12 130);
+      color: oklch(0.25 0.08 130);
+    }
+
+    .day-active .day-name {
+      background: oklch(0.90 0.12 130);
+      color: oklch(0.30 0.08 130);
+    }
+
+    /* 指示器 */
+    .indicator-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+
+    .indicator-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: oklch(0.88 0.01 145);
+      position: relative;
+      z-index: 2;
+      transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .indicator-active {
+      background: oklch(0.40 0.08 130);
+      width: 8px;
+      height: 8px;
+    }
+
+    .indicator-line {
+      position: absolute;
+      top: 50%;
+      left: 20px;
+      right: 20px;
+      height: 1px;
+      border-top: 1.5px dashed oklch(0.88 0.01 145);
+      z-index: 1;
+      transform: translateY(-50%);
+    }
+
+    /* 计划卡片 - 毛玻璃 + 漂浮光斑 */
+    .weekly-plan-card {
+      position: relative;
+      width: 100%;
+      border-radius: 20px;
+      z-index: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 32px oklch(0.25 0.01 145 / 0.1);
+    }
+
+    .weekly-plan-card-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      background: oklch(1 0 0 / 0.85);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-radius: 20px;
+      overflow: hidden;
+      outline: 1.5px solid oklch(1 0 0 / 0.6);
+    }
+
+    .weekly-plan-card-blob {
+      position: absolute;
+      z-index: 1;
+      top: 50%;
+      left: 50%;
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: oklch(0.70 0.12 145);
+      opacity: 0.6;
+      filter: blur(40px);
+      animation: blob-bounce 8s infinite ease;
+    }
+
+    .weekly-plan-card-blob-2 {
+      background: oklch(0.75 0.10 120);
+      animation-delay: -4s;
+      animation-duration: 10s;
+    }
+
+    @keyframes blob-bounce {
+      0%   { transform: translate(-100%, -100%) translate3d(0, 0, 0); }
+      25%  { transform: translate(-100%, -100%) translate3d(120%, 0, 0); }
+      50%  { transform: translate(-100%, -100%) translate3d(120%, 120%, 0); }
+      75%  { transform: translate(-100%, -100%) translate3d(0, 120%, 0); }
+      100% { transform: translate(-100%, -100%) translate3d(0, 0, 0); }
+    }
+
+    .weekly-plan-card-content {
+      position: relative;
+      z-index: 3;
+      padding: 24px 20px 20px;
+    }
+
+    .weekly-plan-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .weekly-plan-card-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: oklch(0.15 0.005 145);
+      letter-spacing: -0.3px;
+    }
+
+    .weekly-plan-card-title-dot {
+      color: oklch(0.58 0.09 145);
+      margin: 0 4px;
+    }
+
+    .weekly-plan-card-edit {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: oklch(0.96 0.01 145);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .weekly-plan-card-edit svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: oklch(0.50 0.01 145);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .weekly-plan-card-edit:active {
+      background: oklch(0.92 0.02 145);
+      transform: scale(0.95);
+    }
+
+    /* 任务列表 */
+    .weekly-plan-items {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .weekly-plan-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 0;
+      border-bottom: 1px solid oklch(0.95 0.005 145);
+      transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .weekly-plan-item:last-child {
+      border-bottom: none;
+    }
+
+    .weekly-plan-item-idx {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: oklch(0.96 0.012 145);
+      color: oklch(0.45 0.04 145);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .weekly-plan-item-name {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 600;
+      color: oklch(0.18 0.005 145);
+    }
+
+    .weekly-plan-item-remove {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: oklch(0.98 0.005 145);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .weekly-plan-item-remove:active {
+      background: oklch(0.94 0.03 25);
+      transform: scale(0.93);
+    }
+
+    .weekly-plan-item-remove svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: oklch(0.60 0.08 25);
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    /* 空状态 */
+    .weekly-plan-empty {
+      padding: 32px 0;
+      text-align: center;
+    }
+
+    .weekly-plan-empty-text {
+      font-size: 14px;
+      color: oklch(0.65 0.01 145);
+      line-height: 1.6;
+    }
+
+    /* 底部统计 */
+    .weekly-plan-card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid oklch(0.95 0.005 145);
+      font-size: 14px;
+      color: oklch(0.60 0.01 145);
+    }
+
+    .weekly-plan-card-footer span {
+      font-weight: 500;
+    }
+
+    /* 添加区域 - 三行输入 */
+    .weekly-plan-add-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 16px 0 0;
+    }
+
+    .weekly-plan-add-main {
+      display: flex;
+      gap: 10px;
+    }
+
+    .weekly-plan-add-detail {
+      display: flex;
+      gap: 10px;
+    }
+
+    .weekly-plan-add-input {
+      flex: 1;
+      height: 44px;
+      border: 1.5px solid oklch(0.92 0.01 145);
+      border-radius: 12px;
+      padding: 0 14px;
+      font-size: 15px;
+      background: oklch(1 0 0 / 0.8);
+      color: oklch(0.18 0.005 145);
+      font-family: inherit;
+      font-weight: 500;
+      outline: none;
+      transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .weekly-plan-add-input:focus {
+      border-color: oklch(0.68 0.08 145);
+      background: oklch(1 0 0);
+      box-shadow: 0 0 0 3px oklch(0.68 0.08 145 / 0.08);
+    }
+
+    .weekly-plan-add-input::placeholder {
+      color: oklch(0.72 0.01 145);
+      font-weight: 400;
+    }
+
+    .weekly-plan-add-input-small {
+      width: 80px;
+      flex: none;
+    }
+
+    .weekly-plan-add-label {
+      font-size: 12px;
+      color: oklch(0.55 0.01 145);
+      font-weight: 500;
+    }
+
+    .weekly-plan-add-btn {
+      height: 44px;
+      min-width: 68px;
+      padding: 0 18px;
+      border-radius: 12px;
+      background: oklch(0.58 0.09 145);
+      color: oklch(1 0 0);
+      font-size: 15px;
+      font-weight: 600;
+      flex-shrink: 0;
+      box-shadow: 0 2px 8px oklch(0.58 0.09 145 / 0.25);
+      transition: all 200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .weekly-plan-add-btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 1px 4px oklch(0.58 0.09 145 / 0.3);
+    }
+
+    .weekly-plan-item-meta {
+      font-size: 13px;
+      color: oklch(0.60 0.01 145);
+      font-weight: 400;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
       gap: 10px;
       align-items: center;
     }
@@ -4269,40 +4840,428 @@
     }
 
     .exercise-ring-wrap {
-      justify-self: end;
-      display: grid;
-      gap: 20px;
-      justify-items: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 24px 0;
     }
 
     .exercise-ring {
       position: relative;
-      width: 100px;
-      height: 100px;
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
-      display: grid;
-      place-items: center;
-      background:
-        radial-gradient(circle at center, rgba(255, 255, 252, 0.95) 0 45%, transparent 47%),
-        conic-gradient(#8a9778 0 31%, rgba(224, 226, 216, 0.68) 31% 100%);
+      cursor: pointer;
+      transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .exercise-ring::before {
-      content: "";
-      position: absolute;
-      inset: 16px;
-      border-radius: 50%;
-      background: rgba(255, 255, 252, 0.78);
-      box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.72);
+    .exercise-ring:active {
+      transform: scale(0.95);
     }
 
     .exercise-ring svg {
+      width: 140px;
+      height: 140px;
+      transform: rotate(-90deg);
+    }
+
+    .exercise-ring-bg {
+      fill: none;
+      stroke: oklch(0.94 0.01 145);
+      stroke-width: 8;
+    }
+
+    .exercise-ring-progress {
+      fill: none;
+      stroke: oklch(0.58 0.09 145);
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 600ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .exercise-ring-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .exercise-ring-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: oklch(0.25 0.01 145);
+      line-height: 1;
+    }
+
+    .exercise-ring-label {
+      font-size: 12px;
+      color: oklch(0.55 0.01 145);
+      margin-top: 4px;
+    }
+
+    .exercise-ring-hint {
+      font-size: 13px;
+      color: oklch(0.60 0.01 145);
+    }
+
+    @keyframes ring-pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .exercise-ring.pulse {
+      animation: ring-pulse 300ms ease;
+    }
+
+    /* 训练进度页面 */
+    .exercise-set-page {
+      padding: 0;
       position: relative;
-      z-index: 1;
-      width: 38px;
-      height: 38px;
-      color: #738163;
-      stroke-width: 2.7;
+    }
+
+    .exercise-set-header {
+      text-align: center;
+      padding: 70px 0 10px;
+    }
+
+    .exercise-set-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: oklch(0.20 0.005 145);
+      margin: 0;
+    }
+
+    .exercise-set-target {
+      font-size: 14px;
+      color: oklch(0.55 0.01 145);
+      margin-top: 4px;
+    }
+
+    /* 训练进度卡片 */
+    .exercise-set-progress-card {
+      background: oklch(1 0 0);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 16px 0;
+      box-shadow: 0 2px 12px oklch(0.25 0.01 145 / 0.06);
+    }
+
+    .exercise-set-progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .exercise-set-progress-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: oklch(0.20 0.005 145);
+    }
+
+    .exercise-set-progress-badge {
+      font-size: 13px;
+      font-weight: 600;
+      color: oklch(0.45 0.12 145);
+      background: oklch(0.94 0.04 145);
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+
+    .exercise-set-dots {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .exercise-set-dot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Uiverse.io Checkbox - ilkhoeri */
+    .exercise-set-dot-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid hsl(0, 62%, 55%);
+      background: white;
+      transition: all 0.5s ease;
+    }
+
+    .exercise-set-dot-circle.completed {
+      background: hsl(108, 62%, 55%);
+      border-color: hsl(108, 62%, 55%);
+    }
+
+    .exercise-set-dot-circle.completed svg {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: white;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dashoffset: 0;
+      stroke-dasharray: 162.6;
+    }
+
+    .exercise-set-dot-circle.pending {
+      background: white;
+      border-color: hsl(0, 62%, 55%);
+    }
+
+    .exercise-set-dot-circle.pending span {
+      font-size: 18px;
+      font-weight: 700;
+      color: hsl(0, 62%, 55%);
+    }
+
+    .exercise-set-dot-label {
+      font-size: 12px;
+      color: oklch(0.55 0.01 145);
+      margin-top: 8px;
+    }
+
+    /* 中间圆环区域 */
+    .exercise-set-ring-area {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 280px;
+      margin: 20px 0;
+    }
+
+    .exercise-set-particles {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .exercise-set-particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: oklch(0.70 0.10 145);
+      opacity: 0;
+    }
+
+    /* Apple Liquid Glass Button */
+    .exercise-set-ring {
+      border: 1.5px solid rgba(255, 255, 255, 0.2);
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      cursor: pointer;
+      transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+
+    .exercise-set-ring:active {
+      transform: scale(0.92);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
+
+    .exercise-set-ring-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .exercise-set-sparkle {
+      fill: rgba(255, 255, 255, 0.5);
+      transition: all 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+      width: 28px;
+      height: 28px;
+    }
+
+    .exercise-set-ring-icon {
+      width: 40px;
+      height: 40px;
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.5);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: all 1200ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .exercise-set-ring-text {
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 14px;
+      transition: all 300ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* 点击激活态 - 紫色渐变 */
+    .exercise-set-ring.glow {
+      background: linear-gradient(0deg, #A47CF3, #683FEA);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow:
+        inset 0px 1px 0px 0px rgba(255, 255, 255, 0.4),
+        inset 0px -4px 0px 0px rgba(0, 0, 0, 0.2),
+        0px 0px 0px 4px rgba(255, 255, 255, 0.2),
+        0px 0px 180px 0px #9917FF;
+      transform: translateY(-2px);
+    }
+
+    .exercise-set-ring.glow .exercise-set-ring-text {
+      color: white;
+    }
+
+    .exercise-set-ring.glow .exercise-set-sparkle {
+      fill: white;
+      transform: scale(2.5) rotate(720deg);
+    }
+
+    .exercise-set-ring.glow .exercise-set-ring-icon {
+      stroke: white;
+      transform: scale(1.1);
+    }
+
+    /* 完成态 */
+    .exercise-set-ring.checkmark {
+      background: linear-gradient(0deg, #A47CF3, #683FEA);
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow:
+        inset 0px 1px 0px 0px rgba(255, 255, 255, 0.4),
+        inset 0px -4px 0px 0px rgba(0, 0, 0, 0.2),
+        0px 0px 0px 4px rgba(255, 255, 255, 0.2),
+        0px 0px 180px 0px #9917FF;
+    }
+
+    .exercise-set-ring.checkmark .exercise-set-ring-icon {
+      stroke: white;
+      transform: scale(1.2);
+    }
+
+    .exercise-set-ring.checkmark .exercise-set-ring-text {
+      color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    .exercise-set-ring.checkmark .exercise-set-ring-text .text-blue {
+      color: #683FEA !important;
+    }
+
+    .exercise-set-ring.checkmark .exercise-set-ring-text .text-colorful {
+      background: linear-gradient(135deg, #A47CF3, #683FEA, #FF6B9D, #FF9FFC);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .exercise-set-ring.checkmark .exercise-set-sparkle {
+      fill: white;
+    }
+
+    /* 点击脉冲动效 - 大范围 */
+    @keyframes ring-tap-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(164, 124, 243, 0.6); }
+      50% { box-shadow: 0 0 0 40px rgba(164, 124, 243, 0.2); }
+      100% { box-shadow: 0 0 0 80px rgba(164, 124, 243, 0); }
+    }
+
+    .exercise-set-ring.tap-pulse {
+      animation: ring-tap-pulse 1200ms ease-out;
+    }
+
+    /* 底部信息卡片 */
+    .exercise-set-info-card {
+      background: oklch(1 0 0);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      box-shadow: 0 2px 12px oklch(0.25 0.01 145 / 0.06);
+    }
+
+    .exercise-set-info-item {
+      flex: 1;
+      text-align: center;
+    }
+
+    .exercise-set-info-item:first-child {
+      border-right: 1px solid oklch(0.94 0.01 145);
+    }
+
+    .exercise-set-info-icon {
+      width: 32px;
+      height: 32px;
+      fill: none;
+      stroke: oklch(0.55 0.01 145);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      margin: 0 auto 8px;
+    }
+
+    .exercise-set-info-label {
+      font-size: 13px;
+      color: oklch(0.55 0.01 145);
+      margin-bottom: 4px;
+    }
+
+    .exercise-set-info-value {
+      font-size: 24px;
+      font-weight: 800;
+      color: oklch(0.20 0.005 145);
+    }
+
+    .exercise-set-info-value span {
+      font-size: 14px;
+      font-weight: 500;
+      color: oklch(0.55 0.01 145);
+      margin-left: 2px;
+    }
+
+    @keyframes particle-gather {
+      0% {
+        opacity: 0.8;
+        transform: translate(var(--tx), var(--ty)) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0);
+      }
+    }
+
+    .exercise-set-particle {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: oklch(0.70 0.10 145);
+      opacity: 0;
+    }
+
+    @keyframes ring-glow {
+      0% { box-shadow: 0 8px 32px oklch(0.25 0.01 145 / 0.1), 0 0 0 8px oklch(0.97 0.01 145); }
+      50% { box-shadow: 0 8px 32px oklch(0.58 0.09 145 / 0.3), 0 0 0 12px oklch(0.90 0.06 145); }
+      100% { box-shadow: 0 8px 32px oklch(0.25 0.01 145 / 0.1), 0 0 0 8px oklch(0.97 0.01 145); }
+    }
+
+    .exercise-set-ring.glow {
+      animation: ring-glow 600ms ease;
     }
 
     .exercise-section-card {
@@ -4327,8 +5286,44 @@
     }
 
     .exercise-strength-list {
-      display: grid;
+      display: flex;
+      flex-direction: column;
       gap: 10px;
+      overflow: hidden;
+    }
+
+    .exercise-strength-row-wrapper {
+      position: relative;
+      overflow: hidden;
+      border-radius: 24px;
+    }
+
+    .exercise-strength-delete {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 80px;
+      background: oklch(0.65 0.18 25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0 24px 24px 0;
+      opacity: 0;
+      transition: opacity 200ms ease;
+    }
+
+    .exercise-strength-delete svg {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: oklch(1 0 0);
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .exercise-strength-row-wrapper.swiped .exercise-strength-delete {
+      opacity: 1;
     }
 
     .exercise-strength-row {
@@ -4340,6 +5335,11 @@
       padding: 12px 10px;
       border-radius: 24px;
       background: rgba(249, 249, 244, 0.66);
+      position: relative;
+      z-index: 1;
+      transition: transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+      touch-action: pan-y;
+      cursor: default;
     }
 
     .exercise-index {
@@ -4405,6 +5405,24 @@
       color: #24352c;
       box-shadow: 0 14px 28px rgba(87, 111, 83, 0.16), 0 6px 18px rgba(122, 157, 225, 0.18);
       animation: exerciseActionFlow 3.6s ease-in-out infinite;
+    }
+
+    .exercise-add-small.completed {
+      background: linear-gradient(135deg, #A47CF3, #683FEA, #9B59B6, #A47CF3);
+      background-size: 300% 300%;
+      animation: completedFlow 3s ease infinite;
+      box-shadow: 0 8px 24px rgba(104, 63, 234, 0.4);
+    }
+
+    @keyframes completedFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .exercise-add-small.completed svg {
+      stroke: white;
+      stroke-width: 3;
     }
 
     .exercise-add-small::before {
@@ -4535,20 +5553,7 @@
       font-weight: 620;
     }
 
-    .exercise-set-page {
-      position: relative;
-      height: 100dvh;
-      min-height: 100dvh;
-      margin: 0 -24px -160px;
-      padding: 0 0 8px;
-      color: #0f1410;
-      overflow: hidden;
-      isolation: isolate;
-      background:
-        radial-gradient(circle at 18% 8%, rgba(255, 255, 255, 0.96), transparent 22%),
-        radial-gradient(circle at 88% 18%, rgba(226, 237, 216, 0.58), transparent 26%),
-        linear-gradient(180deg, #fbfaf7 0%, #f8f7f2 48%, #fbfaf6 100%);
-    }
+    /* Old exercise-set-page styles removed - using Grainient background instead */
 
     .exercise-set-page::before,
     .exercise-set-page::after {
@@ -4959,7 +5964,369 @@
       pointer-events: none;
     }
 
-    .exercise-vortex-pixel {
+    /* AI Chat Page - Aurora Dream Fullscreen */
+    .ai-chat-page {
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ai-chat-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .ai-chat-back,
+    .ai-chat-messages,
+    .ai-chat-input-area {
+      position: relative;
+      z-index: 1;
+    }
+
+    .ai-chat-back {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .ai-chat-back:active {
+      background: rgba(255, 255, 255, 0.25);
+      transform: scale(0.93);
+    }
+
+    .ai-chat-back svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: rgba(255, 255, 255, 0.8);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .ai-chat-messages {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      overflow-y: auto;
+      padding: 80px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(120, 80, 220, 0.3) transparent;
+    }
+
+    .ai-chat-messages::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .ai-chat-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .ai-chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(120, 80, 220, 0.3);
+      border-radius: 4px;
+    }
+
+    .ai-chat-messages::-webkit-scrollbar-thumb:hover {
+      background: rgba(120, 80, 220, 0.5);
+    }
+
+    .ai-message {
+      max-width: 80%;
+      padding: 14px 18px;
+      font-size: 15px;
+      line-height: 1.6;
+      animation: messageIn 0.4s ease;
+    }
+
+    @keyframes messageIn {
+      from { opacity: 0; transform: translateY(15px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .ai-message.ai {
+      align-self: flex-start;
+      background: rgba(120, 80, 220, 0.15);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      color: rgba(255, 255, 255, 0.9);
+      border-radius: 20px 20px 20px 6px;
+      border: 1px solid rgba(120, 80, 220, 0.3);
+      box-shadow: 0 0 20px rgba(120, 80, 220, 0.1);
+    }
+
+    .ai-message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, rgba(120, 80, 220, 0.6), rgba(80, 200, 220, 0.4));
+      color: white;
+      border-radius: 20px 20px 6px 20px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 25px rgba(120, 80, 220, 0.3);
+    }
+
+    .ai-chat-input-area {
+      position: relative;
+      z-index: 2;
+      padding: 12px 20px 28px;
+      display: flex;
+      gap: 10px;
+      background: rgba(26, 5, 51, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(120, 80, 220, 0.2);
+    }
+
+    .ai-chat-input-wrap {
+      flex: 1;
+      position: relative;
+    }
+
+    .ai-chat-input {
+      flex: 1;
+      height: 48px;
+      width: 100%;
+      border: none;
+      border-radius: 24px;
+      padding: 0 18px;
+      font-size: 15px;
+      background: #010201;
+      color: white;
+      font-family: inherit;
+      outline: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .ai-chat-input::placeholder {
+      color: #c0b9c0;
+    }
+
+    .ai-chat-input:focus {
+      outline: none;
+    }
+
+    .ai-chat-input-glow {
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border-radius: 26px;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .ai-chat-input-glow::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background-image: conic-gradient(
+        rgba(0,0,0,0) 0%,
+        #a099d8,
+        rgba(0,0,0,0) 8%,
+        rgba(0,0,0,0) 50%,
+        #dfa2da,
+        rgba(0,0,0,0) 58%
+      );
+      animation: input-glow-spin 4s linear infinite;
+    }
+
+    .ai-chat-input-glow::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px;
+      height: 600px;
+      background-image: conic-gradient(
+        #1c191c,
+        #402fb5 5%,
+        #1c191c 14%,
+        #1c191c 50%,
+        #cf30aa 60%,
+        #1c191c 64%
+      );
+      animation: input-glow-spin 4s 0.1s linear infinite;
+    }
+
+    @keyframes input-glow-spin {
+      100% { transform: translate(-50%, -50%) rotate(450deg); }
+    }
+
+    .ai-chat-send {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(120, 80, 220, 0.8), rgba(80, 200, 220, 0.6));
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(120, 80, 220, 0.4);
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+
+    .ai-chat-send:active {
+      transform: scale(0.95);
+      box-shadow: 0 0 30px rgba(120, 80, 220, 0.6);
+    }
+
+    .ai-chat-send svg {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: white;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* AI Loading Animation */
+    .ai-loader-wrapper {
+      display: none;
+      align-self: flex-start;
+      padding: 14px 18px;
+      background: rgba(120, 80, 220, 0.15);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px 20px 20px 6px;
+      border: 1px solid rgba(120, 80, 220, 0.3);
+      animation: messageIn 0.3s ease;
+    }
+
+    .ai-loader-wrapper.show {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ai-loader {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: transparent;
+      animation: loader-rotate 2s linear infinite;
+    }
+
+    @keyframes loader-rotate {
+      0% {
+        transform: rotate(90deg);
+        box-shadow:
+          0 5px 10px 0 #fff inset,
+          0 10px 15px 0 #ad5fff inset,
+          0 30px 30px 0 #471eec inset;
+      }
+      50% {
+        transform: rotate(270deg);
+        box-shadow:
+          0 5px 10px 0 #fff inset,
+          0 10px 5px 0 #d60a47 inset,
+          0 20px 30px 0 #311e80 inset;
+      }
+      100% {
+        transform: rotate(450deg);
+        box-shadow:
+          0 5px 10px 0 #fff inset,
+          0 10px 15px 0 #ad5fff inset,
+          0 30px 30px 0 #471eec inset;
+      }
+    }
+
+    .ai-loader-text {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .ai-loader-text span {
+      display: inline-block;
+      opacity: 0.4;
+      animation: loader-letter-anim 2s infinite;
+    }
+
+    .ai-loader-text span:nth-child(1) { animation-delay: 0s; }
+    .ai-loader-text span:nth-child(2) { animation-delay: 0.1s; }
+    .ai-loader-text span:nth-child(3) { animation-delay: 0.2s; }
+    .ai-loader-text span:nth-child(4) { animation-delay: 0.3s; }
+    .ai-loader-text span:nth-child(5) { animation-delay: 0.4s; }
+    .ai-loader-text span:nth-child(6) { animation-delay: 0.5s; }
+    .ai-loader-text span:nth-child(7) { animation-delay: 0.6s; }
+    .ai-loader-text span:nth-child(8) { animation-delay: 0.7s; }
+
+    @keyframes loader-letter-anim {
+      0%, 100% {
+        opacity: 0.4;
+        transform: translateY(0);
+      }
+      20% {
+        opacity: 1;
+        transform: scale(1.15);
+      }
+      40% {
+        opacity: 0.7;
+        transform: translateY(0);
+      }
+    }
+    .ai-data-card {
+      margin: 8px 0;
+      padding: 16px;
+      background: rgba(120, 80, 220, 0.1);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 16px;
+      border: 1px solid rgba(120, 80, 220, 0.25);
+    }
+
+    .ai-data-card-title {
+      font-size: 12px;
+      color: rgba(200, 180, 255, 0.7);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .ai-data-card-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .ai-data-item {
+      padding: 8px 14px;
+      background: rgba(120, 80, 220, 0.15);
+      border-radius: 10px;
+      border: 1px solid rgba(120, 80, 220, 0.2);
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.85);
+    }
       position: absolute;
       left: 50%;
       top: 50%;
@@ -5599,7 +6966,7 @@
             <span class="row-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24"><path d="M6 20v-5" /><path d="M18 20v-5" /><path d="M4 15h16" /><path d="M8 12l3-5 3 5" /><path d="M12 7V4" /></svg>
             </span>
-            <span><span class="row-title">体重每日记录</span><span class="row-desc">体重趋势图与每日称重</span></span>
+            <span><span class="row-title">运动健身</span><span class="row-desc">力量训练与有氧记录</span></span>
             <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
           </button>
           <button class="profile-row" type="button" data-route="body-data">
@@ -5844,11 +7211,29 @@
           </svg>
           <span>首页</span>
         </button>
+        <button class="nav-item" type="button" data-route="ai-chat" aria-label="AI 助手">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 2l1.5 5.5L19 9l-5.5 1.5L12 16l-1.5-5.5L5 9l5.5-1.5L12 2z" fill="currentColor" />
+            <path d="M19 15l.75 2.25L22 18l-2.25.75L19 21l-.75-2.25L16 18l2.25-.75L19 15z" fill="currentColor" opacity="0.6" />
+            <path d="M5 15l.5 1.5L7 17l-1.5.5L5 19l-.5-1.5L3 17l1.5-.5L5 15z" fill="currentColor" opacity="0.4" />
+          </svg>
+          <span>AI</span>
+        </button>
         <button class="camera-button" type="button" data-route="camera" aria-label="拍照识别食物">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 7h1.8L10 5h4l1.2 2H17a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3v-7a3 3 0 0 1 3-3Z" />
             <circle cx="12" cy="13.5" r="3.4" />
           </svg>
+        </button>
+        <button class="nav-item" type="button" data-route="exercise">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6.5 6.5h-2a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h2" />
+            <path d="M17.5 6.5h2a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-2" />
+            <rect x="6.5" y="4" width="2" height="16" rx="1" />
+            <rect x="15.5" y="4" width="2" height="16" rx="1" />
+            <rect x="9" y="9.5" width="6" height="5" rx="1" />
+          </svg>
+          <span>运动</span>
         </button>
         <button class="nav-item" type="button" data-route="profile">
           <span class="avatar" aria-hidden="true"></span>
@@ -5898,14 +7283,14 @@
       <h2 class="exercise-move-popup-title">添加动作</h2>
       <div class="exercise-move-field">
         <label for="exerciseMoveName">项目名称</label>
-                  <input class="form-input" type="text" placeholder="例如：番茄炒蛋" data-field="manualName" maxlength="40" />
+        <input class="exercise-move-input" id="exerciseMoveName" data-field="exerciseMoveName" type="text" maxlength="20" placeholder="例如：肩推" />
       </div>
       <div class="exercise-move-field">
         <label for="exerciseMoveSets">运动组数</label>
         <input class="exercise-move-input" id="exerciseMoveSets" data-field="exerciseMoveSets" type="number" min="1" max="12" inputmode="numeric" value="4" />
       </div>
       <div class="exercise-move-field">
-              <div><label for="targetWeightInput">目标体重</label><span>希望达到的健康体重</span></div>
+              <div><label for="targetWeightInput">重量</label></div>
         <input class="exercise-move-input" id="exerciseMoveWeight" data-field="exerciseMoveWeight" type="number" min="0" max="300" step="0.5" inputmode="decimal" value="20" />
       </div>
       <div class="exercise-move-popup-actions">
@@ -5937,6 +7322,9 @@
       "body-data",
       "weight-history",
       "exercise",
+      "exercise-calendar",
+      "weekly-plan",
+      "ai-chat",
       "diet-preference",
       "reminders",
       "sync",
@@ -5954,6 +7342,7 @@
     var detectionScanning = false;
     var detectionIntervalId = null;
     var detailParentRoute = "home";
+    var detailRootRoute = "home";
     var lastDetectionFrame = null;
     var lastRecognitionFrame = null;
     var foodDetected = false;
@@ -5984,7 +7373,7 @@
           { role: "system", content: DETECTION_PROMPT },
           { role: "user", content: [
             { type: "image_url", image_url: { url: thumb } },
-        <input class="exercise-move-input" id="exerciseMoveName" data-field="exerciseMoveName" type="text" maxlength="20" placeholder="例如：肩推" />
+            { type: "text", text: "请分析画面中是否有食物，返回JSON: {detected: bool, confidence: 0-1, food_name: string}" }
           ]}
         ]);
         if (!msg) return;
@@ -6230,14 +7619,33 @@
       ],
       exercise: {
         targetMinutes: 220,
+        selectedDate: "2026-06-04",
+        exerciseHistory: {
+          "2026-06-03": [
+            { id: "cardio", date: "2026-06-03", name: "跑步机快走", type: "有氧", minutes: 28, calories: 180, icon: "run" }
+          ],
+          "2026-06-02": [
+            { id: "lower", date: "2026-06-02", name: "下肢力量", type: "力量训练", minutes: 35, calories: 220, icon: "strength" }
+          ]
+        },
+        weeklyPlan: {
+          "周一": [{name:"深蹲",sets:4,weight:40}, {name:"硬拉",sets:4,weight:50}],
+          "周二": [{name:"卧推",sets:4,weight:25}, {name:"飞鸟",sets:3,weight:10}],
+          "周三": [{name:"跑步",sets:1,weight:0}],
+          "周四": [{name:"深蹲",sets:4,weight:40}, {name:"腿举",sets:4,weight:60}],
+          "周五": [{name:"卧推",sets:4,weight:25}, {name:"划船",sets:4,weight:30}],
+          "周六": [{name:"跑步",sets:1,weight:0}],
+          "周日": []
+        },
         moves: [
-          { id: "squat", name: "深蹲", weight: 40, targetSets: 4, reps: 10, completedSets: 4 },
-          { id: "bench", name: "卧推", weight: 25, targetSets: 4, reps: 12, completedSets: 3 },
-          { id: "deadlift", name: "硬拉", weight: 50, targetSets: 4, reps: 8, completedSets: 4 }
+          { id: "squat", name: "深蹲", weight: 40, targetSets: 4, completedSets: 4 },
+          { id: "bench", name: "卧推", weight: 25, targetSets: 4, completedSets: 3 },
+          { id: "deadlift", name: "硬拉", weight: 50, targetSets: 4, completedSets: 4 }
         ],
         records: [
-      { name:"黑巧克力", calories:160, summary:"黑巧克力30g", tags:["抗氧化","偶尔享用","解馋"], note:"70%以上可可含量的黑巧含丰富抗氧化物，适量食用。", category:"零食", image:"" }
-          { id: "upper", name: "上肢力量", type: "力量训练", minutes: 40, calories: 260, icon: "strength" }
+          { id: "upper", date: "2026-06-04", name: "上肢力量", type: "力量训练", minutes: 40, calories: 260, icon: "strength" },
+          { id: "cardio", date: "2026-06-03", name: "跑步机快走", type: "有氧", minutes: 28, calories: 180, icon: "run" },
+          { id: "lower", date: "2026-06-02", name: "下肢力量", type: "力量训练", minutes: 35, calories: 220, icon: "strength" }
         ]
       },
       selectedDate: "2026-06-04",
@@ -6788,9 +8196,7 @@
       return [
         "你是专业的食物识别与热量分析工具，只输出JSON，不要输出任何其他文字。",
         "只根据图片中实际可见的食物识别，绝对禁止猜测或编造不存在的食物。",
-        if (aiResult && aiResult.needs_retake && (!aiResult.foods || aiResult.foods.length === 0)) {
         "识别图片中所有可见的食物，明确区分每种食物的类型（如主食、肉类、蔬菜、水果、饮品、甜点等）。",
-          return { name: f.name || "未知食物", calories: Math.round(cal), description: f.description || "" };
         "最后给出整体 advice 评级：rating（优/良/注意/差）。",
         "只输出紧凑JSON：",
         "{\"needs_retake\":false,\"foods\":[{\"name\":\"菜名\",\"calories\":250,\"description\":\"减脂说明\"}],\"advice\":{\"rating\":\"良\"}}"
@@ -7156,7 +8562,6 @@
       for (var i = 0; i < FOOD_DB.length; i++) {
         if (FOOD_DB[i].name.indexOf(lower) !== -1 || lower.indexOf(FOOD_DB[i].name) !== -1) return FOOD_DB[i];
       }
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
       var bestMatch = null, bestScore = 0;
       for (var i = 0; i < FOOD_DB.length; i++) {
         var dbName = FOOD_DB[i].name;
@@ -7288,20 +8693,17 @@
 
       /* 根据食物标签给建议 */
       var tags = mealData.tags || [];
-        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
-        tips.push("热量控制得很好，份量合适");
+      if (tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; })) {
+        tips.push("蛋白质充足，有助增肌减脂");
       }
-        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
-        tips.push("热量控制得很好，份量合适");
-      }
-        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
+      if (tags.some(function(t) { return t.indexOf("低脂") !== -1 || t.indexOf("低卡") !== -1; })) {
         tips.push("低脂低卡，减脂期好选择");
       }
-        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
-        tips.push("热量偏高，建议今天其余餐清淡");
-      }
-        return f.tags.some(function(t) { return t.indexOf("蛋白质") !== -1 || t.indexOf("高蛋白") !== -1; });
+      if (tags.some(function(t) { return t.indexOf("维生素") !== -1; })) {
         tips.push("维生素含量高，提升免疫力");
+      }
+      if (ratio > 0.45 && tags.some(function(t) { return t.indexOf("注意") !== -1; })) {
+        tips.push("热量偏高，建议今天其余餐清淡");
       }
 
       /* 确保至少有2条建议 */
@@ -7576,7 +8978,7 @@
         var tags = (Array.isArray(result.tags) && result.tags.length > 0) ? result.tags.slice() : ["轻盈午餐", "蛋白质充足", "符合减脂目标"];
         /* 根据 AI 评级动态调整第三个标签 */
         var rating = (result.aiAdvice && result.aiAdvice.rating) || "";
-        var rating = (result.aiAdvice && result.aiAdvice.rating) || "";
+        if (rating === "注意" || rating === "差") {
           tags[2] = "偏离减脂目标";
         } else {
           tags[2] = "符合减脂目标";
@@ -8447,104 +9849,6 @@
       });
     }
 
-    function renderExerciseDetail() {
-      const strengthRows = [
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-      ];
-
-      const strengthHtml = strengthRows.map((item) => `
-        <div class="exercise-strength-row">
-          <span class="exercise-index">${item.index}</span>
-          <span class="exercise-line">
-            <span class="exercise-move"><strong>${item.name}</strong><span> · ${item.weight}</span></span>
-            <span class="exercise-reps">${item.reps}</span>
-          </span>
-          <button class="exercise-add-small" type="button" aria-label="记录${item.name}组数">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
-          </button>
-        </div>
-      `).join("");
-
-      return `
-        <div class="exercise-shell">
-          <div class="exercise-hero">
-            <div>
-              <h1 class="exercise-title">运动</h1>
-              <span class="exercise-subtitle">记录运动 · 力量训练</span>
-            </div>
-            <button class="exercise-calendar" type="button" aria-label="查看运动日历">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2v4M16 2v4" /><rect x="3" y="5" width="18" height="16" rx="3" /><path d="M3 10h18" /><path d="m9 15 2 2 4-5" /></svg>
-            </button>
-          </div>
-
-          <section class="exercise-card exercise-summary-card">
-            <div>
-              <h2 class="exercise-card-title">今日运动</h2>
-              <div class="exercise-total">68 <span>min</span></div>
-              <div class="exercise-stats">
-                <div class="exercise-stat">
-                  <span class="exercise-stat-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4-3 5-3 9a5 5 0 0 0 10 0c0-3-2-5-4-7 .5 4-3 5-3 8" /></svg>
-                  </span>
-                  <span><span class="exercise-stat-label">消耗</span><span class="exercise-stat-value">420 <span>kcal</span></span></span>
-                </div>
-                <span class="exercise-stat-divider"></span>
-                <div class="exercise-stat">
-                  <span class="exercise-stat-icon check">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6" /></svg>
-                  </span>
-                  <span><span class="exercise-stat-label">完成</span><span class="exercise-stat-value">2 <span>项训练</span></span></span>
-                </div>
-              </div>
-            </div>
-            <div class="exercise-ring-wrap">
-              <span class="exercise-pill">查看详情 <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></span>
-              <div class="exercise-ring" aria-label="今日运动进度 31%">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /><path d="m12 8 3 3 3-1" /><path d="m10 10-2 4-3 2" /><path d="m13 13-2 3 3 4" /></svg>
-              </div>
-            </div>
-          </section>
-
-          <section class="exercise-card exercise-section-card">
-            <div class="exercise-section-head">
-              <h2 class="exercise-section-title">力量训练</h2>
-              <span class="exercise-pill">记录组数</span>
-            </div>
-            <div class="exercise-strength-list">${strengthHtml}</div>
-          </section>
-
-          <section class="exercise-card exercise-history-card">
-            <div class="exercise-section-head" style="margin:0 0 14px;">
-              <h2 class="exercise-section-title">今日训练记录</h2>
-              <span class="exercise-pill">查看全部 <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></span>
-            </div>
-            <div class="exercise-history-list">
-              <button class="exercise-history-row" type="button">
-                <span class="exercise-history-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /><path d="m12 8 3 3 3-1" /><path d="m10 10-2 4-3 2" /><path d="M6 21h12" /></svg></span>
-                <span class="exercise-history-copy"><strong>跑步机快走</strong><span>有氧</span></span>
-                <span class="exercise-history-time">28<span>min</span></span>
-                <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
-              </button>
-              <button class="exercise-history-row" type="button">
-                <span class="exercise-history-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 7v10M18 7v10M3 10v4M21 10v4M6 12h12" /></svg></span>
-                <span class="exercise-history-copy"><strong>上肢力量</strong><span>力量训练</span></span>
-                <span class="exercise-history-time">40<span>min</span></span>
-                <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
-              </button>
-            </div>
-          </section>
-
-          <button class="exercise-card exercise-start-card" type="button">
-            <span class="exercise-start-plus">+</span>
-            <span class="exercise-start-copy"><strong>开始记录训练</strong><span>记录有氧或力量训练</span></span>
-            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
-          </button>
-        </div>
-      `;
-    }
-
     function exerciseTotals() {
       const records = (appState.exercise && appState.exercise.records) || [];
       const moves = (appState.exercise && appState.exercise.moves) || [];
@@ -8612,8 +9916,10 @@
       if (move.completedSets >= (move.targetSets || 4)) {
         const existing = appState.exercise.records.find((record) => record.id === "strength-" + move.id);
         if (!existing) {
+          const today = new Date().toISOString().slice(0, 10);
           appState.exercise.records.unshift({
             id: "strength-" + move.id,
+            date: today,
             name: move.name,
             type: "力量训练",
             minutes: 10,
@@ -8661,7 +9967,7 @@
       const data = moveData || {};
       appState.exercise.moves.push({
         id: "custom-" + Date.now(),
-      if (data && data.name) {
+        name: data.name || "新动作",
         weight: Number(data.weight) || 20,
         targetSets: Number(data.sets) || 4,
         reps: 10,
@@ -8685,10 +9991,129 @@
       closeExerciseMovePopup();
     }
 
+    function deleteExerciseMove(moveId) {
+      if (!appState.exercise) return;
+      appState.exercise.moves = appState.exercise.moves.filter(function(m) { return m.id !== moveId; });
+      appState.exercise.records = appState.exercise.records.filter(function(r) { return r.id !== "strength-" + moveId; });
+      saveState();
+      renderDetailPage("exercise");
+      haptic("light");
+      showToast("已删除");
+    }
+
+    function setupExerciseSwipeRows() {
+      const wrappers = document.querySelectorAll('.exercise-strength-row-wrapper');
+      wrappers.forEach(function(wrapper) {
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+        const row = wrapper.querySelector('.exercise-strength-row');
+        if (!row) return;
+
+        row.addEventListener('touchstart', function(e) {
+          startX = e.touches[0].clientX;
+          isDragging = true;
+          row.style.transition = 'none';
+        }, { passive: true });
+
+        row.addEventListener('touchmove', function(e) {
+          if (!isDragging) return;
+          currentX = e.touches[0].clientX;
+          const diff = currentX - startX;
+          if (diff < 0) {
+            const translateX = Math.max(diff, -80);
+            row.style.transform = 'translateX(' + translateX + 'px)';
+            if (translateX < -40) {
+              wrapper.classList.add('swiped');
+            } else {
+              wrapper.classList.remove('swiped');
+            }
+          }
+        }, { passive: true });
+
+        row.addEventListener('touchend', function() {
+          isDragging = false;
+          row.style.transition = 'transform 250ms cubic-bezier(0.16, 1, 0.3, 1)';
+          if (wrapper.classList.contains('swiped')) {
+            row.style.transform = 'translateX(-80px)';
+          } else {
+            row.style.transform = 'translateX(0)';
+          }
+        });
+      });
+    }
+
+    /* ── 北京时间工具函数 ── */
+    function getBeijingDate() {
+      const now = new Date();
+      const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
+      return new Date(utc + (8 * 3600000));
+    }
+
+    function getBeijingDayOfWeek() {
+      const days = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+      return days[getBeijingDate().getDay()];
+    }
+
+    function getTodayPlan() {
+      if (!appState.exercise || !appState.exercise.weeklyPlan) return [];
+      const day = getBeijingDayOfWeek();
+      return appState.exercise.weeklyPlan[day] || [];
+    }
+
+    function syncPlanToMoves() {
+      const plan = getTodayPlan();
+      if (plan.length === 0) return;
+      const existingNames = appState.exercise.moves.map(function(m) { return m.name; });
+      plan.forEach(function(item) {
+        const name = typeof item === 'string' ? item : item.name;
+        const sets = typeof item === 'object' ? item.sets : 4;
+        const weight = typeof item === 'object' ? item.weight : 20;
+        if (!existingNames.includes(name)) {
+          appState.exercise.moves.push({
+            id: "plan-" + Date.now() + "-" + Math.random().toString(36).substr(2, 5),
+            name: name,
+            weight: weight || 20,
+            targetSets: sets || 4,
+            completedSets: 0
+          });
+        }
+      });
+      saveState();
+    }
+
+    /* 每日00:00北京时间刷新 */
+    function scheduleExerciseDailyRefresh() {
+      const now = new Date();
+      const beijingNow = getBeijingDate();
+      const tomorrow = new Date(beijingNow);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      tomorrow.setHours(0, 0, 0, 0);
+      const msUntilMidnight = tomorrow.getTime() - beijingNow.getTime();
+      setTimeout(function() {
+        /* 归档今日记录到历史 */
+        const today = getBeijingDate().toISOString().slice(0, 10);
+        if (appState.exercise.records && appState.exercise.records.length > 0) {
+          if (!appState.exercise.exerciseHistory) appState.exercise.exerciseHistory = {};
+          appState.exercise.exerciseHistory[today] = appState.exercise.records;
+        }
+        /* 重置今日完成状态 */
+        appState.exercise.moves.forEach(function(m) { m.completedSets = 0; });
+        appState.exercise.records = [];
+        syncPlanToMoves();
+        saveState();
+        renderDetailPage("exercise");
+        scheduleExerciseDailyRefresh();
+      }, msUntilMidnight);
+    }
+    scheduleExerciseDailyRefresh();
+
     function startExerciseRecord() {
       const id = "record-" + Date.now();
+      const today = new Date().toISOString().slice(0, 10);
       appState.exercise.records.unshift({
         id,
+        date: today,
         name: "自由训练",
         type: "有氧",
         minutes: 15,
@@ -8702,19 +10127,39 @@
 
     function renderExerciseDetail() {
       if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
+      if (!appState.exercise.weeklyPlan) appState.exercise.weeklyPlan = JSON.parse(JSON.stringify(defaultState.exercise.weeklyPlan));
+      syncPlanToMoves();
       const totals = exerciseTotals();
+      const todayPlan = getTodayPlan();
+      const beijingDay = getBeijingDayOfWeek();
+      const planHtml = todayPlan.length > 0
+        ? todayPlan.map(function(name, i) {
+            const move = appState.exercise.moves.find(function(m) { return m.name === name; });
+            const done = move && move.completedSets >= (move.targetSets || 4);
+            return '<div class="exercise-plan-item' + (done ? ' done' : '') + '" data-action="exercise-toggle-plan" data-move-name="' + escapeHtml(name) + '">' +
+              '<span class="exercise-plan-idx">' + (i + 1) + '</span>' +
+              '<span class="exercise-plan-name">' + escapeHtml(name) + '</span>' +
+              '<span class="exercise-plan-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>' +
+            '</div>';
+          }).join("")
+        : '<div class="exercise-plan-empty">今天没有训练计划，享受休息日 🎉</div>';
       const strengthHtml = totals.moves.map((item, index) => {
         const targetSets = Number(item.targetSets) || 4;
         return `
-          <div class="exercise-strength-row">
-            <span class="exercise-index">${index + 1}</span>
-            <span class="exercise-line">
-              <span class="exercise-move"><strong>${escapeHtml(item.name)}</strong><span> · ${Number(item.weight) || 0} kg</span></span>
-              <span class="exercise-reps">${targetSets} 组 × ${Number(item.reps) || 10} 次</span>
-            </span>
-            <button class="exercise-add-small" type="button" data-route="exercise-set-${escapeHtml(item.id)}" aria-label="记录${escapeHtml(item.name)}组数">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>
-            </button>
+          <div class="exercise-strength-row-wrapper" data-move-id="${escapeHtml(item.id)}">
+            <div class="exercise-strength-delete" data-action="delete-exercise-move" data-move-id="${escapeHtml(item.id)}">
+              <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+            </div>
+            <div class="exercise-strength-row">
+              <span class="exercise-index">${index + 1}</span>
+              <span class="exercise-line">
+                <span class="exercise-move"><strong>${escapeHtml(item.name)}</strong><span> · ${Number(item.weight) || 0} kg</span></span>
+                <span class="exercise-reps">${targetSets} 组</span>
+              </span>
+              <button class="exercise-add-small${item.completedSets >= targetSets ? ' completed' : ''}" type="button" data-route="exercise-set-${escapeHtml(item.id)}" aria-label="记录${escapeHtml(item.name)}组数">
+                ${item.completedSets >= targetSets ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6" /></svg>' : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>'}
+              </button>
+            </div>
           </div>
         `;
       }).join("");
@@ -8731,6 +10176,9 @@
       return `
         <div class="exercise-shell">
           <div class="exercise-hero">
+            <button class="exercise-back" type="button" onclick="location.hash=detailRootRoute||'home'" aria-label="返回">
+              <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+            </button>
             <div>
               <h1 class="exercise-title">运动</h1>
               <span class="exercise-subtitle">记录运动 · 力量训练</span>
@@ -8742,29 +10190,15 @@
 
           <section class="exercise-card exercise-summary-card">
             <div>
-              <h2 class="exercise-card-title">今日运动</h2>
-              <div class="exercise-total">${totals.minutes} <span>min</span></div>
-              <div class="exercise-stats">
-                <div class="exercise-stat">
-                  <span class="exercise-stat-icon">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1 4-3 5-3 9a5 5 0 0 0 10 0c0-3-2-5-4-7 .5 4-3 5-3 8" /></svg>
-                  </span>
-                  <span><span class="exercise-stat-label">消耗</span><span class="exercise-stat-value">${totals.calories} <span>kcal</span></span></span>
-                </div>
-                <span class="exercise-stat-divider"></span>
-                <div class="exercise-stat">
-                  <span class="exercise-stat-icon check">
-                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6" /></svg>
-                  </span>
-                  <span><span class="exercise-stat-label">完成</span><span class="exercise-stat-value">${totals.completed} <span>项训练</span></span></span>
-                </div>
-              </div>
+              <h2 class="exercise-card-title">每日计划 · ${escapeHtml(beijingDay)}</h2>
+              <button class="exercise-plan-edit" type="button" data-action="exercise-edit-plan" aria-label="编辑每周计划">
+                <svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z"/></svg>
+              </button>
             </div>
-            <div class="exercise-ring-wrap">
-              <button class="exercise-pill" type="button" data-action="exercise-show-summary">查看详情 <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>
-              <div class="exercise-ring" style="background: radial-gradient(circle at center, rgba(255, 255, 252, 0.95) 0 45%, transparent 47%), conic-gradient(#8a9778 0 ${totals.progress}%, rgba(224, 226, 216, 0.68) ${totals.progress}% 100%);" aria-label="今日运动进度 ${totals.progress}%">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /><path d="m12 8 3 3 3-1" /><path d="m10 10-2 4-3 2" /><path d="m13 13-2 3 3 4" /></svg>
-              </div>
+            <div class="exercise-plan-list">${planHtml}</div>
+            <div class="exercise-plan-summary">
+              <span>${todayPlan.length} 项计划</span>
+              <span>${totals.completed}/${todayPlan.length} 已完成</span>
             </div>
           </section>
 
@@ -8775,119 +10209,543 @@
             </div>
             <div class="exercise-strength-list">${strengthHtml}</div>
           </section>
-
-          <section class="exercise-card exercise-history-card">
-            <div class="exercise-section-head" style="margin:0 0 14px;">
-              <h2 class="exercise-section-title">今日训练记录</h2>
-              <button class="exercise-pill" type="button" data-action="exercise-show-all">查看全部 <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg></button>
-            </div>
-            <div class="exercise-history-list">${recordsHtml}</div>
-          </section>
-
-          <button class="exercise-card exercise-start-card" type="button" data-action="exercise-start-record">
-            <span class="exercise-start-plus">+</span>
-            <span class="exercise-start-copy"><strong>开始记录训练</strong><span>记录有氧或力量训练</span></span>
-            <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
-          </button>
         </div>
       `;
     }
-    function renderExerciseSetDetail(moveId) {
-      if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
-      const move = appState.exercise.moves.find((item) => item.id === moveId);
-      if (!move) {
-        return `
-          <section class="detail-card">
-            <p class="detail-summary">\u672a\u627e\u5230\u8fd9\u4e2a\u8bad\u7ec3\u52a8\u4f5c\uff0c\u8bf7\u8fd4\u56de\u8fd0\u52a8\u9875\u91cd\u65b0\u9009\u62e9\u3002</p>
-            <button class="detail-empty-action" type="button" data-route="exercise">\u8fd4\u56de\u8fd0\u52a8</button>
-          </section>
-        `;
+
+    /* AI Chat Helper Functions */
+    const AI_CHAT_SYSTEM_PROMPT = `你是「小暖」，用户的健康女友助手。你的性格温柔、体贴、关心用户的健康。
+回答要求：
+1. 用女友式温柔语气，适当使用emoji
+2. 回答简洁，不超过150字
+3. 关心用户健康，给出实用建议
+4. 如果用户提到放弃/累，温柔鼓励
+5. 使用中文回答`;
+
+    function getAIChatHistory() {
+      if (!appState.aiChatHistory) appState.aiChatHistory = [];
+      return appState.aiChatHistory;
+    }
+
+    function addAIChatMessage(role, text) {
+      const container = document.getElementById('aiChatMessages');
+      if (!container) return;
+
+      // 保存到历史记录
+      if (!appState.aiChatHistory) appState.aiChatHistory = [];
+      appState.aiChatHistory.push({ role, text, time: Date.now() });
+      saveState();
+
+      const div = document.createElement('div');
+      div.className = 'ai-message ' + role;
+      div.textContent = text;
+      // 移除之前的加载动画
+      const oldLoader = container.querySelector('.ai-loader-wrapper');
+      if (oldLoader) oldLoader.remove();
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function showAILoader() {
+      const container = document.getElementById('aiChatMessages');
+      if (!container) return;
+      const loader = document.createElement('div');
+      loader.className = 'ai-loader-wrapper show';
+      loader.innerHTML = '<div class="ai-loader"></div><div class="ai-loader-text"><span>思</span><span>考</span><span>中</span><span>.</span><span>.</span><span>.</span></div>';
+      container.appendChild(loader);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function hideAILoader() {
+      const container = document.getElementById('aiChatMessages');
+      if (!container) return;
+      const loader = container.querySelector('.ai-loader-wrapper');
+      if (loader) loader.remove();
+    }
+
+    async function generateAIResponse(userMsg) {
+      const userName = appState.user ? appState.user.name : '宝贝';
+      const currentWeight = appState.user ? appState.user.currentWeight : 0;
+      const targetWeight = appState.user ? appState.user.targetWeight : 0;
+      const diff = (currentWeight - targetWeight).toFixed(1);
+      const todayPlan = getTodayPlan();
+
+      const systemPrompt = AI_CHAT_SYSTEM_PROMPT + `
+用户信息：
+- 名字：${userName}
+- 当前体重：${currentWeight}kg
+- 目标体重：${targetWeight}kg
+- 体重差：${diff}kg
+- 今日训练计划：${todayPlan.join('、') || '无'}`;
+
+      // 构建对话历史（最近20条）
+      const history = getAIChatHistory();
+      const recentHistory = history.slice(-20);
+      const messages = [
+        { role: "user", content: systemPrompt + "\n\n" + userMsg }
+      ];
+
+      try {
+        const response = await fetch("https://token-plan-cn.xiaomimimo.com/anthropic/v1/messages", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": "tp-ctz8lotmfiwedz3exop47u73msmi9zecei7pnjqvejisqfl1",
+            "anthropic-version": "2023-06-01"
+          },
+          body: JSON.stringify({
+            model: "mimo-v2.5",
+            max_tokens: 500,
+            messages: messages
+          })
+        });
+
+        const data = await response.json();
+        if (data.content && data.content.length > 0) {
+          const textBlocks = data.content.filter(function(b) { return b.type === 'text'; });
+          if (textBlocks.length > 0) return textBlocks[0].text;
+        }
+      } catch(e) {
+        console.error("AI Chat error:", e);
       }
-      const targetSets = Number(move.targetSets) || 4;
-      const completedSets = Math.max(0, Math.min(Number(move.completedSets) || 0, targetSets));
-      const reps = Number(move.reps) || 10;
-      const weight = Number(move.weight) || 0;
-      const referenceCompletedSets = Math.min(3, Math.max(0, targetSets - 1));
-      const currentSet = Math.min(referenceCompletedSets + 1, targetSets);
-      const progressRowClass = targetSets > 4 ? " is-scrollable" : "";
-      const progressItems = Array.from({ length: targetSets }, (_, index) => {
-        const setNumber = index + 1;
-        const done = setNumber <= referenceCompletedSets;
-        const current = !done && setNumber === currentSet;
-        return `
-          <span class="exercise-set-progress-item${done ? " done" : ""}${current ? " current" : ""}">
-            <span class="exercise-set-progress-dot">${done ? `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4.2 4.2L19 6.8" /></svg>` : setNumber}</span>
-            <span>${current ? `\u7b2c ${setNumber} \u7ec4` : `${setNumber} \u7ec4`}</span>
-          </span>
-        `;
-      }).join("");
-      const pixels = Array.from({ length: 900 }, (_, index) => {
-        const angle = (index * 137.508 + (index % 17) * 11 + (index % 23) * 3) % 360;
-        const radius = 88 + (index % 67) * 5 + (index % 13) * 11 + (index % 5) * 17;
-        const radians = angle * Math.PI / 180;
-        const jitterX = ((index * 29) % 41) - 20;
-        const jitterY = ((index * 31) % 47) - 23;
-        const x = Math.round(Math.cos(radians) * radius + jitterX);
-        const y = Math.round(Math.sin(radians) * radius + jitterY);
-        const dx = Math.round(Math.cos(radians) * (18 + (index % 9) * 5) + (((index * 7) % 19) - 9));
-        const dy = Math.round(Math.sin(radians) * (18 + (index % 11) * 4) + (((index * 11) % 23) - 11));
-        const size = 2 + (index % 12);
-        const delay = ((index % 64) * -0.037).toFixed(3);
-        const spin = 24 + (index % 9) * 18;
-        const lowAlpha = (0.2 + (index % 5) * 0.035).toFixed(2);
-        const midAlpha = (0.5 + (index % 7) * 0.045).toFixed(2);
-        const highAlpha = (0.74 + (index % 6) * 0.04).toFixed(2);
-        const startScale = (0.54 + (index % 4) * 0.08).toFixed(2);
-        const endScale = (0.92 + (index % 5) * 0.08).toFixed(2);
-        return `<span class="exercise-vortex-pixel" style="--vx:${x}px;--vy:${y}px;--dx:${dx}px;--dy:${dy}px;--s:${size}px;--delay:${delay}s;--rot:${Math.round(angle)}deg;--spin:${spin}deg;--low-alpha:${lowAlpha};--mid-alpha:${midAlpha};--high-alpha:${highAlpha};--start-scale:${startScale};--end-scale:${endScale};"></span>`;
-      }).join("");
-      return `
-        <div class="exercise-set-page">
-          <div class="exercise-set-statusbar">
-            <span>9:41</span>
-            <span class="exercise-set-status-icons" aria-hidden="true">
-              <span class="exercise-set-signal"><span></span><span></span><span></span><span></span></span>
-              <span class="exercise-set-wifi"></span>
-              <span class="exercise-set-battery"></span>
-            </span>
+
+      // 兜底回复
+      return `${userName}，人家现在有点忙，稍后再聊好吗～ 💚`;
+    }
+
+    /* AI Chat Page */
+    function renderAIChatPage() {
+      const userName = appState.user ? appState.user.name : '宝贝';
+      const currentWeight = appState.user ? appState.user.currentWeight : 0;
+      const targetWeight = appState.user ? appState.user.targetWeight : 0;
+      const todayMeals = appState.meals ? appState.meals.length : 0;
+      const exerciseMoves = appState.exercise ? appState.exercise.moves.length : 0;
+
+      const dataCard = `
+        <div class="ai-data-card">
+          <div class="ai-data-card-title">📊 你的健康数据</div>
+          <div class="ai-data-card-items">
+            <span class="ai-data-item">体重 ${currentWeight}kg</span>
+            <span class="ai-data-item">目标 ${targetWeight}kg</span>
+            <span class="ai-data-item">今日 ${todayMeals} 餐</span>
+            <span class="ai-data-item">${exerciseMoves} 项训练</span>
           </div>
-          <div class="exercise-set-top">
-            <button class="exercise-set-round-btn" type="button" data-route="exercise" aria-label="\u8fd4\u56de\u8fd0\u52a8">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
-            </button>
-            <div class="exercise-set-title-wrap">
-              <h2 class="exercise-set-title">${escapeHtml(move.name)}</h2>
-              <div class="exercise-set-subtitle">\u76ee\u6807 ${targetSets} \u7ec4</div>
-            </div>
-            <span class="exercise-set-top-spacer" aria-hidden="true"></span>
-          </div>
-          <section class="exercise-set-glass-progress" aria-label="\u8bad\u7ec3\u8fdb\u5ea6">
-            <div class="exercise-set-progress-head">
-              <strong>\u8bad\u7ec3\u8fdb\u5ea6</strong>
-              <span class="exercise-set-progress-pill">\u5b8c\u6210 ${referenceCompletedSets}/${targetSets} \u7ec4</span>
-            </div>
-            <div class="exercise-set-progress-row${progressRowClass}">${progressItems}</div>
-          </section>
-          <button class="exercise-vortex-stage" type="button" data-action="exercise-record-set" data-move-id="${escapeHtml(move.id)}" aria-label="\u5b8c\u6210\u672c\u7ec4">
-            <span class="exercise-vortex">
-              <span class="exercise-vortex-pixels">${pixels}</span>
-              <span class="exercise-vortex-core"></span>
-            </span>
-          </button>
-          <section class="exercise-set-glass-stats" aria-label="\u672c\u7ec4\u6570\u636e">
-            <div class="exercise-set-stat">
-              <span class="exercise-set-stat-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h3l2-6 4 13 3-9 2 5h4" /></svg></span>
-              <span class="exercise-set-stat-copy"><span class="exercise-set-stat-label">\u672c\u7ec4\u91cd\u91cf</span><span class="exercise-set-stat-value">${weight}<span>kg</span></span></span>
-            </div>
-            <span class="exercise-set-stat-divider"></span>
-            <div class="exercise-set-stat">
-              <span class="exercise-set-stat-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14.3-4.9L4 8" /><path d="M4 4v4h4" /><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16" /><path d="M20 20v-4h-4" /></svg></span>
-              <span class="exercise-set-stat-copy"><span class="exercise-set-stat-label">\u672c\u7ec4\u6b21\u6570</span><span class="exercise-set-stat-value">${reps}<span>\u6b21</span></span></span>
-            </div>
-          </section>
-          <div class="exercise-set-swipe-hint">\u2191 \u5411\u4e0a\u6ed1\u52a8\u5b8c\u6210\u672c\u7ec4 \u2191</div>
         </div>
       `;
+
+      const welcomeMessages = [
+        { role: 'ai', text: `嗨，${userName}～ 我是小暖，你的健康女友 💚` },
+        { role: 'ai', text: '有什么想聊的都可以告诉我哦～' },
+        { role: 'ai', text: dataCard, isHtml: true }
+      ];
+
+      // 加载历史对话
+      const history = getAIChatHistory();
+      const historyHtml = history.map(function(msg) {
+        return '<div class="ai-message ' + msg.role + '">' + escapeHtml(msg.text) + '</div>';
+      }).join("");
+
+      const messagesHtml = welcomeMessages.map(function(msg) {
+        if (msg.isHtml) {
+          return '<div class="ai-message ai">' + msg.text + '</div>';
+        }
+        return '<div class="ai-message ai">' + escapeHtml(msg.text) + '</div>';
+      }).join("") + historyHtml;
+
+      // 渲染完成后滚动到底部
+      setTimeout(function() {
+        const messages = document.getElementById('aiChatMessages');
+        if (messages) messages.scrollTop = messages.scrollHeight;
+      }, 100);
+
+      return `
+        <div class="ai-chat-page">
+          <canvas class="ai-chat-canvas" id="aiChatCanvas"></canvas>
+          <button class="ai-chat-back" type="button" onclick="location.hash='home'; applyRoute('home')" aria-label="返回">
+            <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+          </button>
+          <div class="ai-chat-messages" id="aiChatMessages">
+            ${messagesHtml}
+          </div>
+          <div class="ai-chat-input-area">
+            <div class="ai-chat-input-wrap">
+              <input class="ai-chat-input" type="text" placeholder="说点什么吧..." id="aiChatInput" />
+              <div class="ai-chat-input-glow"></div>
+            </div>
+            <button class="ai-chat-send" type="button" data-action="ai-chat-send">
+              <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderWeeklyPlanEditor() {
+      if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
+      if (!appState.exercise.weeklyPlan) appState.exercise.weeklyPlan = JSON.parse(JSON.stringify(defaultState.exercise.weeklyPlan));
+      const today = getBeijingDayOfWeek();
+      const days = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
+      const selectedDay = appState.exercise.planEditDay || today;
+
+      // 日期导航卡片
+      const dayChars = ["一", "二", "三", "四", "五", "六", "日"];
+      const selectedIdx = days.indexOf(selectedDay);
+
+      const daysHtml = days.map(function(day, i) {
+        const isActive = day === selectedDay;
+        return '<div class="day-item' + (isActive ? ' day-active' : '') + '" data-action="select-plan-day" data-day="' + day + '">' +
+          '<div class="day-number">' + (i + 1) + '</div>' +
+          '<div class="day-name">' + dayChars[i] + '</div>' +
+        '</div>';
+      }).join("");
+
+      const dotsHtml = days.map(function(day, i) {
+        const isActive = day === selectedDay;
+        return '<div class="indicator-dot' + (isActive ? ' indicator-active' : '') + '"></div>';
+      }).join("");
+
+      const tabsHtml = '<div class="date-nav-container">' + daysHtml + '</div>' +
+        '<div class="indicator-container"><div class="indicator-line"></div>' + dotsHtml + '</div>';
+
+      // 选中天的计划
+      const plan = appState.exercise.weeklyPlan[selectedDay] || [];
+      const itemsHtml = plan.length > 0
+        ? plan.map(function(item, idx) {
+            const name = typeof item === 'string' ? item : item.name;
+            const sets = typeof item === 'object' ? item.sets : 4;
+            const weight = typeof item === 'object' ? item.weight : 20;
+            return '<div class="weekly-plan-item">' +
+              '<span class="weekly-plan-item-idx">' + (idx + 1) + '</span>' +
+              '<span class="weekly-plan-item-name">' + escapeHtml(name) + '</span>' +
+              '<span class="weekly-plan-item-meta">' + (sets || 4) + '组 · ' + (weight || 20) + 'kg</span>' +
+              '<button class="weekly-plan-item-remove" type="button" data-action="remove-plan-item" data-day="' + selectedDay + '" data-idx="' + idx + '" aria-label="删除' + escapeHtml(name) + '">' +
+                '<svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+              '</button>' +
+            '</div>';
+          }).join("")
+        : '<div class="weekly-plan-empty"><div class="weekly-plan-empty-text">还没有训练计划，添加动作开始规划</div></div>';
+
+      return '<div class="weekly-plan-editor">' +
+        '<div class="weekly-plan-tabs">' + tabsHtml + '</div>' +
+        '<div class="weekly-plan-card">' +
+          '<div class="weekly-plan-card-blob"></div>' +
+          '<div class="weekly-plan-card-blob weekly-plan-card-blob-2"></div>' +
+          '<div class="weekly-plan-card-bg"></div>' +
+          '<div class="weekly-plan-card-content">' +
+            '<div class="weekly-plan-card-header">' +
+              '<span class="weekly-plan-card-title">每日计划<span class="weekly-plan-card-title-dot"> · </span>' + escapeHtml(selectedDay) + '</span>' +
+            '</div>' +
+            '<div class="weekly-plan-items">' + itemsHtml + '</div>' +
+            '<div class="weekly-plan-card-footer">' +
+              '<span>' + plan.length + ' 项计划</span>' +
+              '<span>' + plan.filter(function(n) {
+                var m = appState.exercise.moves.find(function(x) { return x.name === n; });
+                return m && m.completedSets >= (m.targetSets || 4);
+              }).length + '/' + plan.length + ' 已完成</span>' +
+            '</div>' +
+            '<div class="weekly-plan-add-row">' +
+              '<div class="weekly-plan-add-main">' +
+                '<input class="weekly-plan-add-input" type="text" placeholder="动作名称" data-plan-day="' + selectedDay + '" />' +
+                '<button class="weekly-plan-add-btn" type="button" data-action="add-plan-item" data-day="' + selectedDay + '">添加</button>' +
+              '</div>' +
+              '<div class="weekly-plan-add-detail">' +
+                '<div class="weekly-plan-add-field"><div class="weekly-plan-add-label">组数</div><input class="weekly-plan-add-input" type="number" min="1" max="12" value="4" data-plan-day="' + selectedDay + '" data-field="planSets" /></div>' +
+                '<div class="weekly-plan-add-field"><div class="weekly-plan-add-label">重量 (kg)</div><input class="weekly-plan-add-input" type="number" min="0" max="300" step="0.5" value="20" data-plan-day="' + selectedDay + '" data-field="planWeight" /></div>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    function renderExerciseSetProgress(moveId) {
+      if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
+      const move = appState.exercise.moves.find(function(m) { return m.id === moveId; });
+      if (!move) {
+        return '<div style="padding:40px;text-align:center;color:oklch(0.55 0.01 145)">未找到该训练动作</div>';
+      }
+
+      const targetSets = Number(move.targetSets) || 4;
+      const completedSets = Number(move.completedSets) || 0;
+      const weight = Number(move.weight) || 0;
+
+      // 组数点
+      let dotsHtml = '';
+      for (let i = 1; i <= targetSets; i++) {
+        const isCompleted = i <= completedSets;
+        dotsHtml += '<div class="exercise-set-dot">' +
+          '<div class="exercise-set-dot-circle ' + (isCompleted ? 'completed' : 'pending') + '">' +
+            (isCompleted ? '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' : '<span>' + i + '</span>') +
+          '</div>' +
+          '<div class="exercise-set-dot-label">' + (isCompleted ? i + '组' : '第' + i + '组') + '</div>' +
+        '</div>';
+      }
+
+      // 粒子
+      let particlesHtml = '';
+      for (let i = 0; i < 40; i++) {
+        const angle = (i / 20) * Math.PI * 2;
+        const dist = 200 + Math.random() * 100;
+        const tx = Math.cos(angle) * dist;
+        const ty = Math.sin(angle) * dist;
+        particlesHtml += '<div class="exercise-set-particle" style="left:50%;top:50%;--tx:' + tx + 'px;--ty:' + ty + 'px"></div>';
+      }
+
+      const isAllCompleted = completedSets >= targetSets;
+      const ringIcon = isAllCompleted
+        ? '<svg class="exercise-set-ring-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+        : '<svg class="exercise-set-ring-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>';
+
+      return '<div class="exercise-set-page">' +
+        '<div class="exercise-set-header">' +
+          '<button class="exercise-back" type="button" onclick="window.history.back()" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
+            '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
+          '</button>' +
+          '<h1 class="exercise-set-title">' + escapeHtml(move.name) + '</h1>' +
+          '<div class="exercise-set-target">目标' + targetSets + '组</div>' +
+        '</div>' +
+
+        '<div class="exercise-set-progress-card">' +
+          '<div class="exercise-set-progress-header">' +
+            '<span class="exercise-set-progress-title">训练进度</span>' +
+            '<span class="exercise-set-progress-badge">完成 ' + completedSets + '/' + targetSets + ' 组</span>' +
+          '</div>' +
+          '<div class="exercise-set-dots">' + dotsHtml + '</div>' +
+        '</div>' +
+
+        '<div class="exercise-set-ring-area">' +
+          '<div class="exercise-set-particles" id="exerciseParticles">' + particlesHtml + '</div>' +
+          '<div class="exercise-set-ring' + (isAllCompleted ? ' checkmark' : '') + '" data-action="exercise-set-tap" data-move-id="' + escapeHtml(move.id) + '">' +
+            '<svg class="exercise-set-sparkle" viewBox="0 0 24 24"><path d="M10,21.236,6.755,14.745.264,11.5,6.755,8.255,10,1.764l3.245,6.491L19.736,11.5l-6.491,3.245ZM18,21l1.5,3L21,21l3-1.5L21,18l-1.5-3L18,18l-3,1.5ZM19.333,4.667,20.5,7l1.167-2.333L24,3.5,21.667,2.333,20.5,0,19.333,2.333,17,3.5Z"/></svg>' +
+            '<div class="exercise-set-ring-inner">' +
+              ringIcon +
+              '<div class="exercise-set-ring-text">' + (isAllCompleted ? '<span class="text-red">全部完成！</span>' : '点击完成') + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="exercise-set-info-card">' +
+          '<div class="exercise-set-info-item">' +
+            '<svg class="exercise-set-info-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>' +
+            '<div class="exercise-set-info-label">本组重量</div>' +
+            '<div class="exercise-set-info-value">' + weight + '<span>kg</span></div>' +
+          '</div>' +
+          '<div class="exercise-set-info-item">' +
+            '<svg class="exercise-set-info-icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v9h-9"/></svg>' +
+            '<div class="exercise-set-info-label">目标组数</div>' +
+            '<div class="exercise-set-info-value">' + targetSets + '<span>组</span></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    }
+
+    /* GSAP 按钮点击动效 */
+    function initButtonAnimations() {
+      if (typeof gsap === 'undefined') return;
+
+      // 所有可点击按钮的通用动效
+      document.addEventListener('click', function(e) {
+        var btn = e.target.closest('button, [data-action], [data-route]');
+        if (!btn) return;
+
+        // 跳过特殊按钮
+        if (btn.closest('.exercise-set-ring')) return;
+
+        // 弹性缩放动效
+        gsap.fromTo(btn,
+          { scale: 1 },
+          {
+            scale: 0.92,
+            duration: 0.1,
+            ease: 'power2.in',
+            yoyo: true,
+            repeat: 1,
+            onComplete: function() {
+              gsap.set(btn, { scale: 1 });
+            }
+          }
+        );
+      }, true);
+    }
+
+    // 页面加载后初始化
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initButtonAnimations);
+    } else {
+      initButtonAnimations();
+    }
+
+    function triggerParticleAnimation() {
+      const particles = document.querySelectorAll('.exercise-set-particle');
+      particles.forEach(function(p, i) {
+        p.style.animation = 'none';
+        p.offsetHeight; // force reflow
+        p.style.animation = 'particle-gather 1500ms ' + (i * 20) + 'ms forwards';
+      });
+    }
+
+    function renderExerciseCalendarDetail() {
+      if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
+      const now = new Date();
+      const today = now.toISOString().slice(0, 10);
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+      const daysInMonth = new Date(year, month, 0).getDate();
+      const firstDayOffset = (new Date(year, month - 1, 1).getDay() + 6) % 7;
+      const calendarCells = [
+        ...Array.from({ length: firstDayOffset }, () => null),
+        ...Array.from({ length: daysInMonth }, (_, index) => index + 1)
+      ];
+      const monthPrefix = year + "-" + String(month).padStart(2, "0");
+      const selectedDate = appState.exercise.selectedDate || today;
+      const weekdayLabels = ["一", "二", "三", "四", "五", "六", "日"];
+
+      // 获取有运动记录的日期（当前 + 历史）
+      const exerciseDates = new Set();
+      (appState.exercise.records || []).forEach(function(record) {
+        if (record.date) exerciseDates.add(record.date);
+      });
+      Object.keys(appState.exercise.exerciseHistory || {}).forEach(function(date) {
+        exerciseDates.add(date);
+      });
+
+      // 获取选中日期的运动记录（当前 + 历史）
+      let selectedRecords = [];
+      if (selectedDate === today) {
+        selectedRecords = appState.exercise.records || [];
+      } else {
+        selectedRecords = (appState.exercise.exerciseHistory && appState.exercise.exerciseHistory[selectedDate]) || [];
+      }
+      const totalMinutes = selectedRecords.reduce(function(sum, r) { return sum + (r.minutes || 0); }, 0);
+      const totalCalories = selectedRecords.reduce(function(sum, r) { return sum + (r.calories || 0); }, 0);
+
+      const recordsHtml = selectedRecords.length > 0
+        ? selectedRecords.map(function(item) {
+            return `
+              <button class="exercise-history-row" type="button" data-action="exercise-record-detail" data-record-id="${item.id}">
+                <span class="exercise-history-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /><path d="m12 8 3 3 3-1" /><path d="m10 10-2 4-3 2" /><path d="M6 21h12" /></svg></span>
+                <span class="exercise-history-copy"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.type)}</span></span>
+                <span class="exercise-history-time">${item.minutes}<span>min</span></span>
+                <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
+              </button>
+            `;
+          }).join("")
+        : '<div class="calendar-empty">这一天还没有运动记录<br />可以从运动页面添加训练</div>';
+
+      return `
+        <section class="calendar-card">
+          <div class="calendar-month">
+            <strong>${year} 年 ${month} 月</strong>
+            <span>${selectedDate === today ? "今天" : selectedDate}</span>
+          </div>
+          <div class="calendar-weekdays">
+            ${weekdayLabels.map(function(day) { return '<span>' + day + '</span>'; }).join("")}
+          </div>
+          <div class="calendar-grid">
+            ${calendarCells.map(function(day) {
+              if (!day) return '<span class="calendar-day is-muted"></span>';
+              const date = monthPrefix + "-" + String(day).padStart(2, "0");
+              const isSelected = date === selectedDate;
+              const hasExercise = exerciseDates.has(date);
+              return '<button class="calendar-day' + (isSelected ? ' is-selected' : '') + (hasExercise ? ' has-meal' : '') + '" type="button" data-exercise-calendar-date="' + date + '">' + day + '</button>';
+            }).join("")}
+          </div>
+          <div class="calendar-summary">
+            <div class="detail-metric"><strong>${totalMinutes}</strong><span>运动分钟</span></div>
+            <div class="detail-metric"><strong>${totalCalories}</strong><span>消耗 kcal</span></div>
+            <div class="detail-metric"><strong>${selectedRecords.length}</strong><span>训练记录</span></div>
+          </div>
+        </section>
+        <section class="calendar-meals" data-exercise-calendar-records>
+          ${recordsHtml}
+        </section>
+      `;
+    }
+
+    function selectExerciseCalendarDate(date) {
+      if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
+      appState.exercise.selectedDate = date;
+      saveState();
+      renderDetailPage("exercise-calendar");
+    }
+
+    function renderExerciseSetDetail(moveId) {
+      if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
+      const move = appState.exercise.moves.find(function(m) { return m.id === moveId; });
+      if (!move) {
+        return '<div style="padding:40px;text-align:center;color:oklch(0.55 0.01 145)">未找到该训练动作</div>';
+      }
+
+      const targetSets = Number(move.targetSets) || 4;
+      const completedSets = Number(move.completedSets) || 0;
+      const weight = Number(move.weight) || 0;
+
+      let dotsHtml = '';
+      for (let i = 1; i <= targetSets; i++) {
+        const isCompleted = i <= completedSets;
+        dotsHtml += '<div class="exercise-set-dot">' +
+          '<div class="exercise-set-dot-circle ' + (isCompleted ? 'completed' : 'pending') + '">' +
+            (isCompleted ? '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' : '<span>' + i + '</span>') +
+          '</div>' +
+          '<div class="exercise-set-dot-label">' + (isCompleted ? i + '组' : '第' + i + '组') + '</div>' +
+        '</div>';
+      }
+
+      let particlesHtml = '';
+      for (let i = 0; i < 20; i++) {
+        const angle = (i / 20) * Math.PI * 2;
+        const dist = 100 + Math.random() * 60;
+        const tx = Math.cos(angle) * dist;
+        const ty = Math.sin(angle) * dist;
+        particlesHtml += '<div class="exercise-set-particle" style="left:50%;top:50%;--tx:' + tx + 'px;--ty:' + ty + 'px"></div>';
+      }
+
+      const isAllCompleted = completedSets >= targetSets;
+      const ringIcon = isAllCompleted
+        ? '<svg class="exercise-set-ring-icon" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>'
+        : '<svg class="exercise-set-ring-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l2 2"/></svg>';
+
+      return '<div class="exercise-set-page">' +
+        '<div class="exercise-set-header">' +
+          '<button class="exercise-back" type="button" onclick="window.history.back()" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
+            '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
+          '</button>' +
+          '<h1 class="exercise-set-title">' + escapeHtml(move.name) + '</h1>' +
+          '<div class="exercise-set-target">目标' + targetSets + '组</div>' +
+        '</div>' +
+
+        '<div class="exercise-set-progress-card">' +
+          '<div class="exercise-set-progress-header">' +
+            '<span class="exercise-set-progress-title">训练进度</span>' +
+            '<span class="exercise-set-progress-badge">完成 ' + completedSets + '/' + targetSets + ' 组</span>' +
+          '</div>' +
+          '<div class="exercise-set-dots">' + dotsHtml + '</div>' +
+        '</div>' +
+
+        '<div class="exercise-set-ring-area">' +
+          '<div class="exercise-set-particles" id="exerciseParticles">' + particlesHtml + '</div>' +
+          '<div class="exercise-set-ring' + (isAllCompleted ? ' checkmark' : '') + '" data-action="exercise-set-tap" data-move-id="' + escapeHtml(move.id) + '">' +
+            '<svg class="exercise-set-sparkle" viewBox="0 0 24 24"><path d="M10,21.236,6.755,14.745.264,11.5,6.755,8.255,10,1.764l3.245,6.491L19.736,11.5l-6.491,3.245ZM18,21l1.5,3L21,21l3-1.5L21,18l-1.5-3L18,18l-3,1.5ZM19.333,4.667,20.5,7l1.167-2.333L24,3.5,21.667,2.333,20.5,0,19.333,2.333,17,3.5Z"/></svg>' +
+            '<div class="exercise-set-ring-inner">' +
+              ringIcon +
+              '<div class="exercise-set-ring-text">' + (isAllCompleted ? '<span class="text-red">全部完成！</span>' : '点击完成') + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+
+        '<div class="exercise-set-info-card">' +
+          '<div class="exercise-set-info-item">' +
+            '<svg class="exercise-set-info-icon" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>' +
+            '<div class="exercise-set-info-label">本组重量</div>' +
+            '<div class="exercise-set-info-value">' + weight + '<span>kg</span></div>' +
+          '</div>' +
+          '<div class="exercise-set-info-item">' +
+            '<svg class="exercise-set-info-icon" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9"/><path d="M21 3v9h-9"/></svg>' +
+            '<div class="exercise-set-info-label">目标组数</div>' +
+            '<div class="exercise-set-info-value">' + targetSets + '<span>组</span></div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
     }
 
     function renderDetailPage(route) {
@@ -8983,6 +10841,21 @@
           eyebrow: "运动",
           title: "运动",
           body: renderExerciseDetail()
+        },
+        "exercise-calendar": {
+          eyebrow: "运动日历",
+          title: "运动日历",
+          body: renderExerciseCalendarDetail()
+        },
+        "weekly-plan": {
+          eyebrow: "每周计划",
+          title: "编辑训练计划",
+          body: renderWeeklyPlanEditor()
+        },
+        "ai-chat": {
+          eyebrow: "AI 助手",
+          title: "健康小助手",
+          body: renderAIChatPage()
         },
         "diet-preference": {
           eyebrow: "饮食偏好",
@@ -9263,6 +11136,168 @@
         albumSelectedName = "";
         attachAlbumFileInput();
       }
+      if (route === "exercise") {
+        setupExerciseSwipeRows();
+      }
+      if (route === "ai-chat") {
+        initAIGradientCanvas();
+        // 键盘弹出时输入框跟随
+        const chatInput = document.getElementById('aiChatInput');
+        const inputArea = document.querySelector('.ai-chat-input-area');
+        const messages = document.getElementById('aiChatMessages');
+
+        function scrollToBottom() {
+          if (messages) {
+            requestAnimationFrame(function() {
+              messages.scrollTop = messages.scrollHeight;
+            });
+          }
+        }
+
+        // 聚焦时滚动到底部
+        if (chatInput) {
+          chatInput.addEventListener('focus', function() {
+            setTimeout(scrollToBottom, 300);
+          });
+        }
+
+        // 监听 viewport 变化（键盘弹出/收起）
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', function() {
+            const viewportHeight = window.visualViewport.height;
+            const windowHeight = window.innerHeight;
+            const keyboardHeight = windowHeight - viewportHeight;
+
+            if (inputArea) {
+              if (keyboardHeight > 100) {
+                // 键盘弹出，固定输入框在键盘上方
+                inputArea.style.position = 'fixed';
+                inputArea.style.bottom = keyboardHeight + 'px';
+                inputArea.style.left = '0';
+                inputArea.style.right = '0';
+                inputArea.style.zIndex = '100';
+              } else {
+                // 键盘收起，恢复原位
+                inputArea.style.position = '';
+                inputArea.style.bottom = '';
+                inputArea.style.left = '';
+                inputArea.style.right = '';
+                inputArea.style.zIndex = '';
+              }
+            }
+            scrollToBottom();
+          });
+        }
+
+        // 兼容方案：监听 focusin/focusout
+        document.addEventListener('focusin', function(e) {
+          if (e.target.id === 'aiChatInput') {
+            setTimeout(scrollToBottom, 300);
+          }
+        });
+      }
+    }
+
+    function initAIGradientCanvas() {
+      const canvas = document.getElementById('aiChatCanvas');
+      if (!canvas) return;
+      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+      if (!gl) return;
+
+      const vertSrc = 'attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}';
+      const fragSrc = [
+        'precision highp float;',
+        'uniform vec2 uResolution;',
+        'uniform float uTime;',
+        'uniform vec3 uColor1;',
+        'uniform vec3 uColor2;',
+        'uniform vec3 uColor3;',
+        'vec2 hash(vec2 p){p=vec2(dot(p,vec2(127.1,311.7)),dot(p,vec2(269.5,183.3)));return fract(sin(p)*43758.5453);}',
+        'float noise(vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.0-2.0*f);return mix(mix(dot(-1.+2.*hash(i),f),dot(-1.+2.*hash(i+vec2(1,0)),f-vec2(1,0)),u.x),mix(dot(-1.+2.*hash(i+vec2(0,1)),f-vec2(0,1)),dot(-1.+2.*hash(i+vec2(1,1)),f-vec2(1,1)),u.x),u.y);}',
+        'mat2 rot(float a){float s=sin(a),c=cos(a);return mat2(c,-s,s,c);}',
+        'void main(){',
+        '  vec2 C=gl_FragCoord.xy;',
+        '  float t=uTime*0.2;',
+        '  vec2 uv=C/uResolution;',
+        '  float ratio=uResolution.x/uResolution.y;',
+        '  vec2 tuv=uv-0.5;',
+        '  tuv/=0.9;',
+        '  float degree=noise(vec2(t*0.1,tuv.x*tuv.y)*1.5);',
+        '  tuv.y/=ratio;',
+        '  tuv*=rot(radians((degree-0.5)*500.+180.));',
+        '  tuv.y*=ratio;',
+        '  tuv.x+=sin(tuv.y*5.+t*2.)/50.;',
+        '  tuv.y+=sin(tuv.x*7.5+t*2.)/25.;',
+        '  vec3 c1=uColor1,c2=uColor2,c3=uColor3;',
+        '  vec3 l1=mix(c3,c2,smoothstep(-.3,.2,tuv.x));',
+        '  vec3 l2=mix(c2,c1,smoothstep(-.3,.2,tuv.x));',
+        '  vec3 col=mix(l1,l2,smoothstep(.5,-.3,tuv.y));',
+        '  vec2 guv=uv*2.;',
+        '  float grain=fract(sin(dot(guv,vec2(12.9898,78.233)))*43758.5453);',
+        '  col+=(grain-.5)*.06;',
+        '  col=(col-.5)*1.3+.5;',
+        '  col=clamp(col,0.,1.);',
+        '  gl_FragColor=vec4(col,1.);',
+        '}'
+      ].join('\n');
+
+      function compile(src, type) {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+          console.error('Shader error:', gl.getShaderInfoLog(s));
+          return null;
+        }
+        return s;
+      }
+
+      const vs = compile(vertSrc, gl.VERTEX_SHADER);
+      const fs = compile(fragSrc, gl.FRAGMENT_SHADER);
+      if (!vs || !fs) return;
+
+      const pg = gl.createProgram();
+      gl.attachShader(pg, vs);
+      gl.attachShader(pg, fs);
+      gl.linkProgram(pg);
+      gl.useProgram(pg);
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(pg, 'p');
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+      const uResolution = gl.getUniformLocation(pg, 'uResolution');
+      const uTime = gl.getUniformLocation(pg, 'uTime');
+      const uColor1 = gl.getUniformLocation(pg, 'uColor1');
+      const uColor2 = gl.getUniformLocation(pg, 'uColor2');
+      const uColor3 = gl.getUniformLocation(pg, 'uColor3');
+
+      gl.uniform3f(uColor1, 0.64, 0.49, 0.95);
+      gl.uniform3f(uColor2, 0.41, 0.25, 0.92);
+      gl.uniform3f(uColor3, 0.29, 0.11, 0.59);
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio, 2);
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.uniform2f(uResolution, canvas.width, canvas.height);
+      }
+
+      resize();
+      window.addEventListener('resize', resize);
+
+      let raf;
+      const t0 = performance.now();
+      function loop(t) {
+        gl.uniform1f(uTime, (t - t0) * 0.001);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        raf = requestAnimationFrame(loop);
+      }
+      raf = requestAnimationFrame(loop);
     }
 
     function openDropdown(field) {
@@ -9600,9 +11635,19 @@
           ? "detail"
           : document.body.dataset.activeRoute || "home";
       const activeRoute = safeRoute || "home";
-      /* 进入详情页时记录来源 tab，供返回按钮使用 */
-      if (activeRoute === "detail" && mainRoutes.has(document.body.dataset.activeRoute)) {
-        detailParentRoute = document.body.dataset.activeRoute;
+      /* 进入详情页时记录来源路由，供返回按钮使用 */
+      if (activeRoute === "detail") {
+        var currentRoute = document.body.dataset.activeRoute || "home";
+        if (mainRoutes.has(currentRoute)) {
+          detailParentRoute = currentRoute;
+          detailRootRoute = currentRoute;
+        } else if (currentRoute === "detail") {
+          var prevDetailRoute = document.body.dataset.detailRoute || "home";
+          detailParentRoute = prevDetailRoute;
+        }
+      }
+      if (activeRoute === "detail") {
+        document.body.dataset.detailRoute = normalizedRoute;
       }
       document.body.dataset.activeRoute = activeRoute;
       document.querySelectorAll(".nav-item").forEach((item) => {
@@ -9872,7 +11917,186 @@
       }
       if (actionNode && actionNode.dataset.action === "exercise-calendar") {
         haptic("light");
-        showToast("运动日历已连接");
+        window.location.hash = "exercise-calendar";
+        applyRoute("exercise-calendar");
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-back") {
+        haptic("light");
+        var target = detailParentRoute || "home";
+        window.location.hash = target;
+        applyRoute(target);
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-toggle-plan") {
+        var moveName = actionNode.dataset.moveName;
+        if (moveName) {
+          var move = appState.exercise.moves.find(function(m) { return m.name === moveName; });
+          if (move) {
+            if (move.completedSets >= (move.targetSets || 4)) {
+              move.completedSets = 0;
+            } else {
+              move.completedSets = move.targetSets || 4;
+            }
+          } else {
+            appState.exercise.moves.push({
+              id: "plan-" + Date.now(),
+              name: moveName,
+              weight: 20,
+              targetSets: 4,
+              reps: 10,
+              completedSets: 4
+            });
+          }
+          saveState();
+          renderDetailPage("exercise");
+          haptic("light");
+        }
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "delete-exercise-move") {
+        const moveId = actionNode.dataset.moveId;
+        if (moveId) {
+          deleteExerciseMove(moveId);
+        }
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-tap-progress") {
+        const ring = actionNode;
+        const todayPlan = getTodayPlan();
+        if (todayPlan.length === 0) {
+          haptic("error");
+          showToast("今天没有训练计划");
+          return;
+        }
+        // 找到第一个未完成的动作并完成它
+        const moves = appState.exercise.moves;
+        for (let i = 0; i < todayPlan.length; i++) {
+          const planItem = todayPlan[i];
+          const planName = typeof planItem === 'string' ? planItem : planItem.name;
+          const move = moves.find(function(m) { return m.name === planName; });
+          if (move && move.completedSets < (move.targetSets || 4)) {
+            move.completedSets = move.targetSets || 4;
+            break;
+          }
+        }
+        saveState();
+        // 添加脉冲动画
+        ring.classList.add('pulse');
+        setTimeout(function() { ring.classList.remove('pulse'); }, 300);
+        haptic("success");
+        showToast("完成一组训练！");
+        renderDetailPage("exercise");
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-set-tap") {
+        const moveId = actionNode.dataset.moveId;
+        const move = appState.exercise.moves.find(function(m) { return m.id === moveId; });
+        if (!move) return;
+        const targetSets = Number(move.targetSets) || 4;
+        if (move.completedSets >= targetSets) {
+          haptic("light");
+          showToast("已经全部完成了！");
+          return;
+        }
+        // 增加完成组数
+        move.completedSets = Math.min((move.completedSets || 0) + 1, targetSets);
+        saveState();
+        // 点击脉冲动效
+        const ring = actionNode;
+        ring.classList.add('tap-pulse');
+        setTimeout(function() { ring.classList.remove('tap-pulse'); }, 1200);
+        // 粒子聚集动画
+        triggerParticleAnimation();
+        // 圆环发光动画
+        setTimeout(function() {
+          ring.classList.add('glow');
+        }, 500);
+        // 显示对号
+        setTimeout(function() {
+          ring.classList.remove('glow');
+          ring.classList.add('checkmark');
+          haptic("success");
+          if (move.completedSets >= targetSets) {
+            showToast("全部完成！太棒了！");
+          } else {
+            showToast("完成第 " + move.completedSets + " 组！");
+          }
+        }, 1500);
+        // 刷新页面
+        setTimeout(function() {
+          renderDetailPage("exercise-set-" + moveId);
+        }, 800);
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "exercise-edit-plan") {
+        haptic("light");
+        window.location.hash = "weekly-plan";
+        applyRoute("weekly-plan");
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "select-plan-day") {
+        const day = actionNode.dataset.day;
+        if (day) {
+          appState.exercise.planEditDay = day;
+          renderDetailPage("weekly-plan");
+          haptic("light");
+        }
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "add-plan-item") {
+        const day = actionNode.dataset.day;
+        const nameInput = document.querySelector('[data-plan-day="' + day + '"]:not([data-field])');
+        const setsInput = document.querySelector('[data-plan-day="' + day + '"][data-field="planSets"]');
+        const weightInput = document.querySelector('[data-plan-day="' + day + '"][data-field="planWeight"]');
+        if (nameInput && nameInput.value.trim()) {
+          if (!appState.exercise.weeklyPlan[day]) appState.exercise.weeklyPlan[day] = [];
+          const newItem = {
+            name: nameInput.value.trim(),
+            sets: parseInt(setsInput && setsInput.value, 10) || 4,
+            weight: parseFloat(weightInput && weightInput.value) || 20
+          };
+          appState.exercise.weeklyPlan[day].push(newItem);
+          nameInput.value = "";
+          if (setsInput) setsInput.value = "4";
+          if (weightInput) weightInput.value = "20";
+          saveState();
+          renderDetailPage("weekly-plan");
+          haptic("success");
+          showToast("已添加 " + newItem.name);
+        } else {
+          haptic("error");
+          showToast("请输入动作名称");
+        }
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "remove-plan-item") {
+        const day = actionNode.dataset.day;
+        const idx = parseInt(actionNode.dataset.idx, 10);
+        if (appState.exercise.weeklyPlan[day] && appState.exercise.weeklyPlan[day][idx]) {
+          appState.exercise.weeklyPlan[day].splice(idx, 1);
+          saveState();
+          renderDetailPage("weekly-plan");
+          haptic("light");
+          showToast("已移除");
+        }
+        return;
+      }
+      if (actionNode && actionNode.dataset.action === "ai-chat-send") {
+        const input = document.getElementById('aiChatInput');
+        if (input && input.value.trim()) {
+          const userMsg = input.value.trim();
+          input.value = '';
+          addAIChatMessage('user', userMsg);
+          // 显示加载动画（紧跟在用户消息后面）
+          showAILoader();
+          // 调用API获取回复
+          generateAIResponse(userMsg).then(function(response) {
+            hideAILoader();
+            addAIChatMessage('ai', response);
+          });
+          haptic("light");
+        }
         return;
       }
       if (actionNode && actionNode.dataset.action === "exercise-record-detail") {
@@ -9885,6 +12109,13 @@
       const calendarDate = event.target.closest("[data-calendar-date]");
       if (calendarDate) {
         selectCalendarDate(calendarDate.dataset.calendarDate);
+        haptic("select");
+        return;
+      }
+
+      const exerciseCalendarDate = event.target.closest("[data-exercise-calendar-date]");
+      if (exerciseCalendarDate) {
+        selectExerciseCalendarDate(exerciseCalendarDate.dataset.exerciseCalendarDate);
         haptic("select");
         return;
       }
@@ -9910,9 +12141,7 @@
     });
 
     document.getElementById("detailBackBtn").addEventListener("click", function() {
-      var target = detailParentRoute || "home";
-      window.location.hash = target;
-      applyRoute(target);
+      window.history.back();
     });
 
     window.addEventListener("hashchange", () => {
