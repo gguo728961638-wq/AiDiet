@@ -2,9 +2,9 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "ai-diet-app",
+      "name": "ai-diet-preview",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["serve", "-l", "3001"],
+      "runtimeArgs": ["-y", "http-server", "D:/Ai 工具/超级无敌牛的app/ios/AiDiet/Resources", "-p", "3001", "-c-1"],
       "port": 3001
     }
   ]

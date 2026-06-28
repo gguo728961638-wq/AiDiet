@@ -7576,6 +7576,7 @@
         name: "林小满",
         status: "轻量减脂中",
         streakDays: 18,
+        startWeight: 61,
         targetWeight: 54.0,
         currentWeight: 57.8,
         lostWeight: 3.2,
@@ -7894,7 +7895,7 @@
     }
 
     function consumedCalories() {
-      return appState.meals.reduce((total, meal) => total + meal.calories, appState.nutrition.extraCalories || 0);
+      return appState.meals.reduce((total, meal) => total + (Number(meal.calories) || 0), appState.nutrition.extraCalories || 0);
     }
 
     function remainingCalories() {
@@ -7932,12 +7933,68 @@
       } catch (e) { /* 忽略不支持的环境 */ }
     }
 
+    /* ── Apple Health 桥接 ── */
+    var _healthData = null;
+    var _healthFetchTime = 0;
+    var HEALTH_CACHE_MS = 3 * 60 * 1000; // 3分钟缓存
+
+    /* 原生层调用此函数回传健康数据
+       window.receiveHealthData({
+         steps: 6800,
+         activeCalories: 320,
+         exerciseMinutes: 45,
+         distanceKm: 4.2,
+         heartRate: 72,
+         standHours: 8
+       })
+    */
+    window.receiveHealthData = function(data) {
+      if (data && typeof data === "object") {
+        _healthData = {
+          steps: Number(data.steps) || 0,
+          activeCalories: Number(data.activeCalories) || 0,
+          exerciseMinutes: Number(data.exerciseMinutes) || 0,
+          distanceKm: Number(data.distanceKm) || 0,
+          heartRate: Number(data.heartRate) || 0,
+          standHours: Number(data.standHours) || 0,
+          fetchedAt: Date.now()
+        };
+        _healthFetchTime = Date.now();
+        console.log("[Health] 收到健康数据:", _healthData);
+      }
+    };
+
+    /* 向原生层请求健康数据（如可用） */
+    function requestHealthData() {
+      if (Date.now() - _healthFetchTime < HEALTH_CACHE_MS && _healthData) return;
+      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.healthHandler) {
+        try {
+          window.webkit.messageHandlers.healthHandler.postMessage({ action: "fetch" });
+        } catch (e) {
+          console.log("[Health] 请求健康数据失败:", e.message);
+        }
+      }
+    }
+
+    /* 格式化健康数据供 AI 使用 */
+    function formatHealthForAI() {
+      if (!_healthData) return "";
+      var parts = [];
+      if (_healthData.steps > 0) parts.push("今日步数：" + _healthData.steps + "步");
+      if (_healthData.activeCalories > 0) parts.push("活动消耗：" + _healthData.activeCalories + "kcal");
+      if (_healthData.exerciseMinutes > 0) parts.push("运动时长：" + _healthData.exerciseMinutes + "分钟");
+      if (_healthData.distanceKm > 0) parts.push("步行距离：" + _healthData.distanceKm + "km");
+      if (_healthData.heartRate > 0) parts.push("静息心率：" + _healthData.heartRate + "bpm");
+      if (_healthData.standHours > 0) parts.push("站立时长：" + _healthData.standHours + "小时");
+      return parts.length > 0 ? parts.join("\n- ") : "";
+    }
+
     /* ── AI 拍照识别配置（仅用于食物识别） ── */
     var AI识别_CONFIG = {
-      baseUrl: "https://api.xiaomimimo.com/v1/chat/completions",
-      apiKey: "sk-c9ijfnili2azlr4b6depllwmohpg8s5oxsly6vl6vpxdqtb4",
+      baseUrl: "https://token-plan-cn.xiaomimimo.com/anthropic/v1/messages",
+      apiKey: "tp-ctz8lotmfiwedz3exop47u73msmi9zecei7pnjqvejisqfl1",
       model: "mimo-v2.5",
-      timeout: 15000
+      timeout: 30000
     };
 
     /* 直接调 API，429 限流自动重试 */
@@ -7950,19 +8007,19 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": "Bearer " + AI识别_CONFIG.apiKey
+            "x-api-key": AI识别_CONFIG.apiKey,
+            "anthropic-version": "2023-06-01"
           },
           body: JSON.stringify({
             model: AI识别_CONFIG.model,
-            messages: messages,
-            response_format: { type: "json_object" },
             max_tokens: 2000,
-            temperature: 0.1
+            temperature: 0.1,
+            messages: messages,
+            stream: false
           }),
           signal: controller.signal
         }).then(function(resp) {
           clearTimeout(timer);
-          /* 429 限流：等待 3 秒后重试，最多 3 次 */
           if (resp.status === 429 && _retryCount < 1) {
             return new Promise(function(r) { setTimeout(r, 1200); }).then(function() {
               return callAI识别(messages, _retryCount + 1);
@@ -7971,10 +8028,13 @@
           if (!resp.ok) { console.error("[API] HTTP " + resp.status); return resolve(null); }
           return resp.json();
         }).then(function(data) {
-          if (data && data.choices && data.choices[0] && data.choices[0].message) {
-            var msg = data.choices[0].message;
-            /* 返回完整消息对象，供 recognizeFoodAI 分别尝试 content 和 reasoning_content */
-            resolve(msg);
+          if (data && data.content && data.content.length > 0) {
+            var textBlocks = data.content.filter(function(b) { return b.type === 'text'; });
+            if (textBlocks.length > 0) {
+              resolve({ content: textBlocks[0].text });
+            } else {
+              resolve(null);
+            }
           } else {
             resolve(null);
           }
@@ -8261,11 +8321,18 @@
     }
 
     function parseAIRecognitionResponse(raw) {
-      logRecognitionStep("AI 原始返回", raw);
+      logRecognitionStep("AI 原始返回", typeof raw === "string" ? raw.slice(0, 500) : raw);
       var jsonText = typeof raw === "string" ? extractJsonObject(raw) : null;
-      var parsed = typeof raw === "object" && raw ? raw : jsonText ? JSON.parse(jsonText) : null;
+      var parsed = null;
+      try {
+        parsed = typeof raw === "object" && raw ? raw : jsonText ? JSON.parse(jsonText) : null;
+      } catch (parseErr) {
+        logRecognitionStep("JSON 解析失败", { error: parseErr.message, jsonText: (jsonText || "").slice(0, 300) });
+        return { needs_retake: true, foods: [], reason: "AI 返回的数据格式有误，请重试" };
+      }
       if (!parsed) {
-        return { needs_retake: true, foods: [], reason: "AI 未返回可解析 JSON" };
+        logRecognitionStep("无有效 JSON", { rawType: typeof raw, rawLength: raw ? raw.length : 0, hasJson: !!jsonText });
+        return { needs_retake: true, foods: [], reason: "AI 未返回可解析 JSON，请重试" };
       }
       var dishCandidates = normalizeDishCandidates(parsed);
       var ingredients = Array.isArray(parsed.visible_ingredients) ? parsed.visible_ingredients : [];
@@ -8433,25 +8500,129 @@
           return cached;
         }
 
-        var imageContent = { type: "image_url", image_url: { url: prepared.uploadDataUrl } };
+        var imageBase64 = prepared.uploadDataUrl.split(",")[1];
+        var systemPrompt = buildFoodRecognitionPrompt();
         var messages = [
-          { role: "system", content: buildFoodRecognitionPrompt() },
           { role: "user", content: [
-            imageContent,
-            { type: "text", text: "请识别图片中的所有食物，明确区分食物类型，每种食物返回 name（含类型）、calories、description（减脂说明）三个字段。" }
+            { type: "image", source: { type: "base64", media_type: "image/jpeg", data: imageBase64 } },
+            { type: "text", text: "请识别这张图片中的食物并输出JSON。" }
           ]}
         ];
-        var msg = await callAI识别(messages);
-        var raw = msg ? (msg.content || msg.reasoning_content || "") : "";
-        var hasApiResponse = Boolean(raw);
-        var parsed = raw ? parseAIRecognitionResponse(raw) : { needs_retake: false, foods: [] };
+        // 调用API，带 system 消息和重试
+        var controller = new AbortController();
+        var timer = setTimeout(function() { controller.abort(); }, 30000);
+        logRecognitionStep("API 请求开始", { model: AI识别_CONFIG.model, url: AI识别_CONFIG.baseUrl });
+        var resp;
+        try {
+          resp = await fetch(AI识别_CONFIG.baseUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-api-key": AI识别_CONFIG.apiKey,
+              "anthropic-version": "2023-06-01"
+            },
+            body: JSON.stringify({
+              model: AI识别_CONFIG.model,
+              max_tokens: 2000,
+              temperature: 0.1,
+              system: systemPrompt,
+              messages: messages
+            }),
+            signal: controller.signal
+          });
+        } catch (fetchErr) {
+          logRecognitionStep("API 网络错误", fetchErr.message || fetchErr);
+          // 429 限流重试一次
+          if (fetchErr.name !== "AbortError") {
+            await new Promise(function(r) { setTimeout(r, 1500); });
+            try {
+              resp = await fetch(AI识别_CONFIG.baseUrl, {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                  "x-api-key": AI识别_CONFIG.apiKey,
+                  "anthropic-version": "2023-06-01"
+                },
+                body: JSON.stringify({
+                  model: AI识别_CONFIG.model,
+                  max_tokens: 2000,
+                  temperature: 0.1,
+                  system: systemPrompt,
+                  messages: messages
+                })
+              });
+            } catch (retryErr) {
+              logRecognitionStep("API 重试失败", retryErr.message || retryErr);
+              throw retryErr;
+            }
+          } else {
+            throw fetchErr;
+          }
+        }
+        clearTimeout(timer);
+
+        if (!resp.ok) {
+          var errBody = "";
+          try { errBody = await resp.text(); } catch(e) {}
+          logRecognitionStep("API HTTP 错误", { status: resp.status, body: errBody.slice(0, 500) });
+          return {
+            needs_retake: true, foods: [],
+            reason: "AI 服务暂时不可用(" + resp.status + ")，请稍后重试",
+            meta: prepared.meta, quality: prepared.quality
+          };
+        }
+
+        var data = await resp.json();
+        logRecognitionStep("API 原始响应", JSON.stringify(data).slice(0, 800));
+        var raw = "";
+        var hasApiResponse = false;
+
+        // ── 兼容 Anthropic 格式 ──
+        if (data && Array.isArray(data.content) && data.content.length > 0) {
+          var textBlocks = data.content.filter(function(b) { return b.type === 'text'; });
+          var thinkingBlocks = data.content.filter(function(b) { return b.type === 'thinking'; });
+
+          // 优先使用 text 块
+          if (textBlocks.length > 0 && textBlocks[0].text) {
+            raw = textBlocks[0].text;
+            hasApiResponse = true;
+          }
+          // 没有 text 块时，从 thinking 块提取
+          else if (thinkingBlocks.length > 0 && thinkingBlocks[0].thinking) {
+            raw = thinkingBlocks[0].thinking;
+            hasApiResponse = true;
+          }
+        }
+        // ── 兼容 OpenAI 格式 ──
+        else if (data && Array.isArray(data.choices) && data.choices.length > 0) {
+          var choice = data.choices[0];
+          if (choice.message && choice.message.content) {
+            raw = choice.message.content;
+            hasApiResponse = true;
+          }
+        }
+
+        if (!raw || !hasApiResponse) {
+          logRecognitionStep("API 无有效内容", { hasContent: !!(data && data.content), hasChoices: !!(data && data.choices), keys: data ? Object.keys(data) : [] });
+          return {
+            needs_retake: true, foods: [],
+            reason: "未识别成功，请重新拍摄或手动选择食物",
+            meta: prepared.meta, quality: prepared.quality
+          };
+        }
+
+        var parsed = parseAIRecognitionResponse(raw);
         parsed.meta = prepared.meta;
         parsed.quality = prepared.quality;
+
         if (!parsed.foods || parsed.foods.length === 0) {
-          parsed.foods = fallbackFoodsFromLocal(imageSrc, getAutoMealType(), "");
-          parsed.dish_candidates = parsed.foods;
-          parsed.best_display_name = (parsed.foods[0] && parsed.foods[0].name) || "";
-          parsed.visible_ingredients = [];
+          return {
+            needs_retake: true,
+            foods: [],
+            reason: "未识别成功，请重新拍摄或手动选择食物",
+            meta: prepared.meta,
+            quality: prepared.quality
+          };
         }
         if (hasApiResponse && parsed.foods && parsed.foods.length && !parsed.needs_retake) {
           writeRecognitionCache(cacheKey, parsed);
@@ -8624,7 +8795,7 @@
         var today = getToday();
         return m.date === today || !m.date;
       });
-      var totalCal = meals.reduce(function(s, m) { return s + m.calories; }, 0);
+      var totalCal = meals.reduce(function(s, m) { return s + (Number(m.calories) || 0); }, 0);
       var target = appState.nutrition.targetCalories;
       var remaining = Math.max(target - totalCal, 200);
 
@@ -8669,7 +8840,7 @@
         var today = getToday();
         return m.date === today || !m.date;
       });
-      var totalCal = meals.reduce(function(s, m) { return s + m.calories; }, 0);
+      var totalCal = meals.reduce(function(s, m) { return s + (Number(m.calories) || 0); }, 0);
       var target = appState.nutrition.targetCalories;
 
       var rating = "良";
@@ -8886,7 +9057,7 @@
       if (metrics[2]) metrics[2].textContent = user.lostWeight.toFixed(1);
       if (planCopy) planCopy.textContent = `每日 ${appState.nutrition.targetCalories} kcal，${appState.nutrition.planMode}节奏。`;
 
-      const startWeight = 61;
+      const startWeight = appState.user.startWeight || 61;
       const targetWeight = appState.user.targetWeight;
       const currentWeight = appState.user.currentWeight;
       const totalLoss = Math.max(startWeight - targetWeight, 0.1);
@@ -9139,7 +9310,7 @@
       result.perFood = newFoods;
       result.name = newFoods.map(function(f) { return f.name; }).join("、");
       result.best_display_name = result.name;
-      result.calories = newFoods.reduce(function(sum, f) { return sum + f.calories; }, 0);
+      result.calories = newFoods.reduce(function(sum, f) { return sum + (Number(f.calories) || 0); }, 0);
       result.baseCalories = result.calories;
       result.goalPercent = Math.round((result.calories / appState.nutrition.targetCalories) * 100);
       saveState();
@@ -9203,7 +9374,7 @@
     }
 
     function caloriesForMeals(meals, includeExtra = false) {
-      return meals.reduce((total, meal) => total + meal.calories, includeExtra ? appState.nutrition.extraCalories || 0 : 0);
+      return meals.reduce((total, meal) => total + (Number(meal.calories) || 0), includeExtra ? appState.nutrition.extraCalories || 0 : 0);
     }
 
     function renderCalendarDetail() {
@@ -9320,7 +9491,7 @@
 
       appState.user.targetWeight = Math.round(targetWeight * 10) / 10;
       appState.user.currentWeight = Math.round(currentWeight * 10) / 10;
-      appState.user.lostWeight = Math.max(Math.round((61 - appState.user.currentWeight) * 10) / 10, 0);
+      appState.user.lostWeight = Math.max(Math.round(((appState.user.startWeight || 61) - appState.user.currentWeight) * 10) / 10, 0);
       appState.nutrition.targetCalories = Math.round(targetCalories);
       appState.nutrition.planMode = planMode;
 
@@ -9343,7 +9514,7 @@
 
       appState.user.currentWeight = Math.round(currentWeight * 10) / 10;
       appState.user.targetWeight = Math.round(targetWeight * 10) / 10;
-      appState.user.lostWeight = Math.max(Math.round((61 - appState.user.currentWeight) * 10) / 10, 0);
+      appState.user.lostWeight = Math.max(Math.round(((appState.user.startWeight || 61) - appState.user.currentWeight) * 10) / 10, 0);
       addWeightRecord(appState.user.currentWeight);
       if (Number.isFinite(waistline)) {
         appState.user.waistline = Math.round(waistline * 10) / 10;
@@ -9785,7 +9956,7 @@
       }
       haptic("medium");
       appState.user.currentWeight = Math.round(val * 10) / 10;
-      appState.user.lostWeight = Math.max(Math.round((61 - appState.user.currentWeight) * 10) / 10, 0);
+      appState.user.lostWeight = Math.max(Math.round(((appState.user.startWeight || 61) - appState.user.currentWeight) * 10) / 10, 0);
       addWeightRecord(appState.user.currentWeight);
       saveState();
       renderAll();
@@ -10268,15 +10439,81 @@
       const currentWeight = appState.user ? appState.user.currentWeight : 0;
       const targetWeight = appState.user ? appState.user.targetWeight : 0;
       const diff = (currentWeight - targetWeight).toFixed(1);
+
+      // ── 运动数据汇总 ──
+      const ex = appState.exercise || {};
+      const totals = exerciseTotals();
       const todayPlan = getTodayPlan();
+      // 今日动作进度
+      const movesText = (ex.moves || []).map(function(m) {
+        const done = m.completedSets || 0;
+        const target = m.targetSets || 4;
+        return m.name + " " + done + "/" + target + "组" + (m.weight ? " " + m.weight + "kg" : "");
+      }).join("、") || "无";
+      // 今日训练记录
+      const recordsText = (ex.records || []).map(function(r) {
+        return r.name + "(" + r.minutes + "分钟/" + r.calories + "kcal)";
+      }).join("、") || "暂无";
+      // 周计划
+      const weekDays = ["周一","周二","周三","周四","周五","周六","周日"];
+      const weeklyPlan = ex.weeklyPlan || {};
+      const planLines = weekDays.map(function(day) {
+        const items = weeklyPlan[day];
+        if (!items || items.length === 0) return day + "：休息";
+        return day + "：" + items.map(function(it) {
+          return it.name + (it.sets ? it.sets + "组" : "") + (it.weight ? "@" + it.weight + "kg" : "");
+        }).join("、");
+      });
+      // 近期训练历史
+      const historyRecords = ex.exerciseHistory || {};
+      const historyDates = Object.keys(historyRecords).sort().reverse().slice(0, 5);
+      const historyText = historyDates.map(function(d) {
+        const items = historyRecords[d];
+        return d + "：" + items.map(function(r) { return r.name; }).join("、");
+      }).join("\n") || "暂无记录";
+
+      // ── 饮食数据 ──
+      const todayCalories = appState.meals ? appState.meals.reduce(function(s, m) { return s + (m.calories || 0); }, 0) : 0;
+      const targetCalories = (appState.nutrition && appState.nutrition.targetCalories) || 1800;
+      const remainingCalories = targetCalories - todayCalories;
+
+      const now = getBeijingDate();
+      const timeStr = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+      const dayOfWeek = getBeijingDayOfWeek();
+      const todayStr = getToday();
 
       const systemPrompt = AI_CHAT_SYSTEM_PROMPT + `
+当前时间：${todayStr} ${timeStr}（${dayOfWeek}）
+
 用户信息：
 - 名字：${userName}
 - 当前体重：${currentWeight}kg
 - 目标体重：${targetWeight}kg
 - 体重差：${diff}kg
-- 今日训练计划：${todayPlan.join('、') || '无'}`;
+
+饮食数据：
+- 今日目标热量：${targetCalories}kcal
+- 今日已摄入：${todayCalories}kcal
+- 今日剩余：${remainingCalories}kcal
+
+训练数据：
+- 本周训练时长：${totals.minutes}分钟（目标${ex.targetMinutes || 220}分钟，完成${totals.progress}%）
+- 本周训练消耗：${totals.calories}kcal
+- 今日训练动作及进度：${movesText}
+- 今日训练记录：${recordsText}
+- 今日训练计划：${todayPlan.join('、') || '无'}
+
+每周训练计划：
+${planLines.join('\n')}
+
+近期训练历史：
+${historyText}
+
+苹果健康数据（实时）：
+${formatHealthForAI() || '暂未获取到健康数据'}`;
+
+      // 请求最新健康数据（异步，下次对话即可使用）
+      requestHealthData();
 
       // 构建对话历史（最近20条）
       const history = getAIChatHistory();
@@ -10286,15 +10523,15 @@
       ];
 
       try {
-        const response = await fetch("https://token-plan-cn.xiaomimimo.com/anthropic/v1/messages", {
+        const response = await fetch(AI识别_CONFIG.baseUrl, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": "tp-ctz8lotmfiwedz3exop47u73msmi9zecei7pnjqvejisqfl1",
+            "x-api-key": AI识别_CONFIG.apiKey,
             "anthropic-version": "2023-06-01"
           },
           body: JSON.stringify({
-            model: "mimo-v2.5",
+            model: AI识别_CONFIG.model,
             max_tokens: 500,
             messages: messages
           })
@@ -10498,7 +10735,7 @@
 
       return '<div class="exercise-set-page">' +
         '<div class="exercise-set-header">' +
-          '<button class="exercise-back" type="button" onclick="window.history.back()" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
+          '<button class="exercise-back" type="button" onclick="location.hash=detailRootRoute||\'home\'" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
             '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
           '</button>' +
           '<h1 class="exercise-set-title">' + escapeHtml(move.name) + '</h1>' +
@@ -10707,7 +10944,7 @@
 
       return '<div class="exercise-set-page">' +
         '<div class="exercise-set-header">' +
-          '<button class="exercise-back" type="button" onclick="window.history.back()" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
+          '<button class="exercise-back" type="button" onclick="location.hash=detailRootRoute||\'home\'" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
             '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
           '</button>' +
           '<h1 class="exercise-set-title">' + escapeHtml(move.name) + '</h1>' +
@@ -11141,6 +11378,7 @@
       }
       if (route === "ai-chat") {
         initAIGradientCanvas();
+        requestHealthData(); // 进入聊天页时预拉取健康数据
         // 键盘弹出时输入框跟随
         const chatInput = document.getElementById('aiChatInput');
         const inputArea = document.querySelector('.ai-chat-input-area');
@@ -11154,6 +11392,16 @@
           }
         }
 
+        // 清理上次注册的 document/window 级别监听器，防止泄漏
+        if (window._aiChatViewportHandler) {
+          window.visualViewport && window.visualViewport.removeEventListener('resize', window._aiChatViewportHandler);
+          window._aiChatViewportHandler = null;
+        }
+        if (window._aiChatFocusinHandler) {
+          document.removeEventListener('focusin', window._aiChatFocusinHandler);
+          window._aiChatFocusinHandler = null;
+        }
+
         // 聚焦时滚动到底部
         if (chatInput) {
           chatInput.addEventListener('focus', function() {
@@ -11163,7 +11411,7 @@
 
         // 监听 viewport 变化（键盘弹出/收起）
         if (window.visualViewport) {
-          window.visualViewport.addEventListener('resize', function() {
+          window._aiChatViewportHandler = function() {
             const viewportHeight = window.visualViewport.height;
             const windowHeight = window.innerHeight;
             const keyboardHeight = windowHeight - viewportHeight;
@@ -11186,15 +11434,17 @@
               }
             }
             scrollToBottom();
-          });
+          };
+          window.visualViewport.addEventListener('resize', window._aiChatViewportHandler);
         }
 
         // 兼容方案：监听 focusin/focusout
-        document.addEventListener('focusin', function(e) {
+        window._aiChatFocusinHandler = function(e) {
           if (e.target.id === 'aiChatInput') {
             setTimeout(scrollToBottom, 300);
           }
-        });
+        };
+        document.addEventListener('focusin', window._aiChatFocusinHandler);
       }
     }
 
@@ -11573,6 +11823,7 @@
       const existingIndex = appState.meals.findIndex((meal) => meal.id === result.id);
       const meal = {
         id: result.id,
+        date: getToday(),
         time: result.time,
         type: result.type,
         name: result.name,
@@ -11651,7 +11902,7 @@
       }
       document.body.dataset.activeRoute = activeRoute;
       document.querySelectorAll(".nav-item").forEach((item) => {
-        item.classList.toggle("active", item.dataset.route === activeRoute);
+        item.classList.toggle("active", item.dataset.route === normalizedRoute);
       });
 
       if (cameraTimer) {
@@ -12141,7 +12392,9 @@
     });
 
     document.getElementById("detailBackBtn").addEventListener("click", function() {
-      window.history.back();
+      var backRoute = detailParentRoute || "home";
+      window.location.hash = backRoute;
+      applyRoute(backRoute);
     });
 
     window.addEventListener("hashchange", () => {
