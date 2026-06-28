@@ -48,8 +48,6 @@
       color: inherit;
       background: transparent;
       cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
     }
 
     .phone-frame {
@@ -1061,7 +1059,6 @@
       backdrop-filter: blur(16px);
       z-index: 100;
       padding: 0 20px;
-      -webkit-tap-highlight-color: transparent;
     }
 
     .bottom-nav .nav-item {
@@ -1087,9 +1084,6 @@
       color: var(--muted);
       font-size: 14px;
       font-weight: 600;
-      -webkit-tap-highlight-color: transparent;
-      will-change: transform;
-      transform: translateZ(0);
     }
 
     .nav-item.active {
@@ -1627,9 +1621,6 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: relative;
-      z-index: 10;
-      min-height: 54px;
     }
 
     .detail-eyebrow {
@@ -7088,7 +7079,7 @@
 
       <section class="page-content result-content" aria-label="识别结果页">
         <div class="result-nav">
-          <button class="round-control" type="button" data-route="camera" aria-label="返回">
+          <button class="round-control" type="button" data-action="route-back" aria-label="返回">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
           </button>
         </div>
@@ -7204,7 +7195,7 @@
 
       <section class="page-content detail-content" aria-label="功能详情页">
         <div class="detail-nav">
-          <button class="round-control" type="button" id="detailBackBtn" aria-label="返回" onclick="location.hash=detailParentRoute&&detailParentRoute!==document.body.dataset.detailRoute?detailParentRoute:'home'">
+          <button class="round-control" type="button" id="detailBackBtn" data-action="route-back" aria-label="返回">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
           </button>
         </div>
@@ -7350,8 +7341,9 @@
     var flashOn = false;
     var detectionScanning = false;
     var detectionIntervalId = null;
-    var detailParentRoute = "home";
-    var detailRootRoute = "home";
+    var routeHistory = [];
+    var currentAppRoute = null;
+    var isRouteBackNavigation = false;
     var lastDetectionFrame = null;
     var lastRecognitionFrame = null;
     var foodDetected = false;
@@ -7892,21 +7884,26 @@
       return copy;
     }
 
-    var _saveStateTimer = null;
+    function postNativeMessage(handlerName, message) {
+      try {
+        var handlers = window.webkit && window.webkit.messageHandlers;
+        var handler = handlers && handlers[handlerName];
+        if (!handler || typeof handler.postMessage !== "function") return false;
+        handler.postMessage(message);
+        return true;
+      } catch (error) {
+        console.warn("[Native Bridge] " + handlerName + " 调用失败，已降级为网页模式", error);
+        return false;
+      }
+    }
+
     function saveState() {
-      // 防抖：合并 16ms 内的多次 saveState 调用，减少 JSON.stringify 开销
-      if (_saveStateTimer) return;
-      _saveStateTimer = requestAnimationFrame(function() {
-        _saveStateTimer = null;
-        var rawData = JSON.stringify(appState);
-        var safeData = JSON.stringify(sanitizeStateForStorage(appState));
-        /* iOS 原生存储优先 —— 用原始数据，让 extractAndSaveImages 能处理 base64 图片 */
-        if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.storageHandler) {
-          window.webkit.messageHandlers.storageHandler.postMessage({ action: "save", data: rawData });
-        }
-        /* localStorage 用 sanitize 后的数据（大图已丢弃，防止配额超出） */
-        try { localStorage.setItem("aiDietAppState", safeData); } catch (e) { /* quota exceeded, native storage handles persistence */ }
-      });
+      var rawData = JSON.stringify(appState);
+      var safeData = JSON.stringify(sanitizeStateForStorage(appState));
+      /* iOS 原生存储优先 —— 用原始数据，让 extractAndSaveImages 能处理 base64 图片 */
+      postNativeMessage("storageHandler", { action: "save", data: rawData });
+      /* localStorage 用 sanitize 后的数据（大图已丢弃，防止配额超出） */
+      try { localStorage.setItem("aiDietAppState", safeData); } catch (e) { /* quota exceeded, native storage handles persistence */ }
     }
 
     function consumedCalories() {
@@ -7928,10 +7925,7 @@
     /* ── 触觉反馈 ── */
     var _vibrateSupported = typeof navigator !== "undefined" && "vibrate" in navigator;
     function haptic(pattern) {
-      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.hapticHandler) {
-        window.webkit.messageHandlers.hapticHandler.postMessage({pattern: pattern});
-        return;
-      }
+      if (postNativeMessage("hapticHandler", {pattern: pattern})) return;
       if (!_vibrateSupported) return;
       try {
         switch (pattern) {
@@ -7982,13 +7976,7 @@
     /* 向原生层请求健康数据（如可用） */
     function requestHealthData() {
       if (Date.now() - _healthFetchTime < HEALTH_CACHE_MS && _healthData) return;
-      if (window.webkit && window.webkit.messageHandlers && window.webkit.messageHandlers.healthHandler) {
-        try {
-          window.webkit.messageHandlers.healthHandler.postMessage({ action: "fetch" });
-        } catch (e) {
-          console.log("[Health] 请求健康数据失败:", e.message);
-        }
-      }
+      postNativeMessage("healthHandler", { action: "fetch" });
     }
 
     /* 格式化健康数据供 AI 使用 */
@@ -10319,13 +10307,12 @@
       const todayPlan = getTodayPlan();
       const beijingDay = getBeijingDayOfWeek();
       const planHtml = todayPlan.length > 0
-        ? todayPlan.map(function(item, i) {
-            const planName = typeof item === 'string' ? item : (item.name || '');
-            const move = appState.exercise.moves.find(function(m) { return m.name === planName; });
+        ? todayPlan.map(function(name, i) {
+            const move = appState.exercise.moves.find(function(m) { return m.name === name; });
             const done = move && move.completedSets >= (move.targetSets || 4);
-            return '<div class="exercise-plan-item' + (done ? ' done' : '') + '" data-action="exercise-toggle-plan" data-move-name="' + escapeHtml(planName) + '">' +
+            return '<div class="exercise-plan-item' + (done ? ' done' : '') + '" data-action="exercise-toggle-plan" data-move-name="' + escapeHtml(name) + '">' +
               '<span class="exercise-plan-idx">' + (i + 1) + '</span>' +
-              '<span class="exercise-plan-name">' + escapeHtml(planName) + '</span>' +
+              '<span class="exercise-plan-name">' + escapeHtml(name) + '</span>' +
               '<span class="exercise-plan-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>' +
             '</div>';
           }).join("")
@@ -10363,7 +10350,7 @@
       return `
         <div class="exercise-shell">
           <div class="exercise-hero">
-            <button class="exercise-back" type="button" data-action="exercise-back" onclick="location.hash='home'" aria-label="返回">
+            <button class="exercise-back" type="button" data-action="route-back" aria-label="返回">
               <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
             </button>
             <div>
@@ -10614,7 +10601,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       return `
         <div class="ai-chat-page">
           <canvas class="ai-chat-canvas" id="aiChatCanvas"></canvas>
-          <button class="ai-chat-back" type="button" onclick="location.hash=detailParentRoute||'home'" aria-label="返回">
+          <button class="ai-chat-back" type="button" data-action="route-back" aria-label="返回">
             <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
           </button>
           <div class="ai-chat-messages" id="aiChatMessages">
@@ -10691,9 +10678,8 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
             '<div class="weekly-plan-items">' + itemsHtml + '</div>' +
             '<div class="weekly-plan-card-footer">' +
               '<span>' + plan.length + ' 项计划</span>' +
-              '<span>' + plan.filter(function(item) {
-                var planName = typeof item === 'string' ? item : (item.name || '');
-                var m = appState.exercise.moves.find(function(x) { return x.name === planName; });
+              '<span>' + plan.filter(function(n) {
+                var m = appState.exercise.moves.find(function(x) { return x.name === n; });
                 return m && m.completedSets >= (m.targetSets || 4);
               }).length + '/' + plan.length + ' 已完成</span>' +
             '</div>' +
@@ -10752,7 +10738,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
 
       return '<div class="exercise-set-page">' +
         '<div class="exercise-set-header">' +
-          '<button class="exercise-back" type="button" onclick="location.hash='exercise'" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
+          '<button class="exercise-back" type="button" data-action="route-back" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
             '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
           '</button>' +
           '<h1 class="exercise-set-title">' + escapeHtml(move.name) + '</h1>' +
@@ -10793,15 +10779,32 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       '</div>';
     }
 
-    /* 按钮点击动效 — 仅视觉反馈，不改变布局 */
+    /* GSAP 按钮点击动效 */
     function initButtonAnimations() {
+      if (typeof gsap === 'undefined') return;
+
+      // 所有可点击按钮的通用动效
       document.addEventListener('click', function(e) {
-        var btn = e.target.closest('button');
+        var btn = e.target.closest('button, [data-action], [data-route]');
         if (!btn) return;
+
+        // 跳过特殊按钮
         if (btn.closest('.exercise-set-ring')) return;
-        // 使用 box-shadow 代替 transform，不影响触控坐标
-        btn.style.boxShadow = 'inset 0 0 0 2px rgba(0,0,0,0.08)';
-        setTimeout(function() { btn.style.boxShadow = ''; }, 150);
+
+        // 弹性缩放动效
+        gsap.fromTo(btn,
+          { scale: 1 },
+          {
+            scale: 0.92,
+            duration: 0.1,
+            ease: 'power2.in',
+            yoyo: true,
+            repeat: 1,
+            onComplete: function() {
+              gsap.set(btn, { scale: 1 });
+            }
+          }
+        );
       }, true);
     }
 
@@ -10944,7 +10947,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
 
       return '<div class="exercise-set-page">' +
         '<div class="exercise-set-header">' +
-          '<button class="exercise-back" type="button" onclick="location.hash='exercise'" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
+          '<button class="exercise-back" type="button" data-action="route-back" aria-label="返回" style="position:absolute;top:70px;left:20px;">' +
             '<svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>' +
           '</button>' +
           '<h1 class="exercise-set-title">' + escapeHtml(move.name) + '</h1>' +
@@ -11377,12 +11380,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
         setupExerciseSwipeRows();
       }
       if (route === "ai-chat") {
-        // 延迟初始化 WebGL canvas，不阻塞页面渲染
-        requestAnimationFrame(function() {
-          requestAnimationFrame(function() {
-            initAIGradientCanvas();
-          });
-        });
+        initAIGradientCanvas();
         requestHealthData(); // 进入聊天页时预拉取健康数据
         // 键盘弹出时输入框跟随
         const chatInput = document.getElementById('aiChatInput');
@@ -11891,17 +11889,14 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
           ? "detail"
           : document.body.dataset.activeRoute || "home";
       const activeRoute = safeRoute || "home";
-      /* 进入详情页时记录来源路由，供返回按钮使用 */
-      if (activeRoute === "detail") {
-        var currentRoute = document.body.dataset.activeRoute || "home";
-        if (mainRoutes.has(currentRoute)) {
-          detailParentRoute = currentRoute;
-          detailRootRoute = currentRoute;
-        } else if (currentRoute === "detail") {
-          var prevDetailRoute = document.body.dataset.detailRoute || "home";
-          detailParentRoute = prevDetailRoute;
+      const logicalRoute = activeRoute === "detail" ? normalizedRoute : activeRoute;
+      if (logicalRoute !== currentAppRoute) {
+        if (currentAppRoute && !isRouteBackNavigation) {
+          routeHistory.push(currentAppRoute);
         }
+        currentAppRoute = logicalRoute;
       }
+      isRouteBackNavigation = false;
       if (activeRoute === "detail") {
         document.body.dataset.detailRoute = normalizedRoute;
       }
@@ -12177,9 +12172,9 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
         applyRoute("exercise-calendar");
         return;
       }
-      if (actionNode && actionNode.dataset.action === "exercise-back") {
+      if (actionNode && actionNode.dataset.action === "route-back") {
         haptic("light");
-        window.location.hash = detailParentRoute || "home";
+        navigateBack();
         return;
       }
       if (actionNode && actionNode.dataset.action === "exercise-toggle-plan") {
@@ -12394,10 +12389,12 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       console.log(`Navigate: ${routeMap[route] || route}`);
     });
 
-    document.getElementById("detailBackBtn").addEventListener("click", function() {
-      haptic("light");
-      window.location.hash = detailParentRoute || "home";
-    });
+    function navigateBack() {
+      var backRoute = routeHistory.length > 0 ? routeHistory.pop() : "home";
+      isRouteBackNavigation = true;
+      window.location.hash = backRoute;
+      applyRoute(backRoute);
+    }
 
     window.addEventListener("hashchange", () => {
       applyRoute(window.location.hash.replace("#", ""));
