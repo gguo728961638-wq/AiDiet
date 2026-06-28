@@ -7639,16 +7639,8 @@
           "周六": [{name:"跑步",sets:1,weight:0}],
           "周日": []
         },
-        moves: [
-          { id: "squat", name: "深蹲", weight: 40, targetSets: 4, completedSets: 4 },
-          { id: "bench", name: "卧推", weight: 25, targetSets: 4, completedSets: 3 },
-          { id: "deadlift", name: "硬拉", weight: 50, targetSets: 4, completedSets: 4 }
-        ],
-        records: [
-          { id: "upper", date: "2026-06-04", name: "上肢力量", type: "力量训练", minutes: 40, calories: 260, icon: "strength" },
-          { id: "cardio", date: "2026-06-03", name: "跑步机快走", type: "有氧", minutes: 28, calories: 180, icon: "run" },
-          { id: "lower", date: "2026-06-02", name: "下肢力量", type: "力量训练", minutes: 35, calories: 220, icon: "strength" }
-        ]
+        moves: [],
+        records: []
       },
       selectedDate: "2026-06-04",
       meals: [
@@ -7812,6 +7804,34 @@
     }
 
     const appState = loadState();
+
+    // 清理旧的默认数据
+    (function() {
+      var defaultRecordIds = ['upper', 'cardio', 'lower'];
+      if (appState.exercise && appState.exercise.records) {
+        appState.exercise.records = appState.exercise.records.filter(function(r) { return !defaultRecordIds.includes(r.id) && r.name !== '收到项目'; });
+      }
+      var defaultMoveIds = ['squat', 'bench', 'deadlift'];
+      if (appState.exercise && appState.exercise.moves) {
+        appState.exercise.moves = appState.exercise.moves.filter(function(m) { return !defaultMoveIds.includes(m.id) && m.name !== '收到项目'; });
+      }
+      // 清理历史中的脏数据
+      if (appState.exercise && appState.exercise.exerciseHistory) {
+        Object.keys(appState.exercise.exerciseHistory).forEach(function(date) {
+          appState.exercise.exerciseHistory[date] = appState.exercise.exerciseHistory[date].filter(function(r) { return r.name !== '收到项目'; });
+          if (appState.exercise.exerciseHistory[date].length === 0) delete appState.exercise.exerciseHistory[date];
+        });
+      }
+      // 清理周计划中的脏数据
+      if (appState.exercise && appState.exercise.weeklyPlan) {
+        Object.keys(appState.exercise.weeklyPlan).forEach(function(day) {
+          appState.exercise.weeklyPlan[day] = appState.exercise.weeklyPlan[day].filter(function(item) {
+            var name = typeof item === 'string' ? item : (item.name || '');
+            return name !== '收到项目';
+          });
+        });
+      }
+    })();
 
     /* ── 跨天重置：将昨天的 meals 归档到 mealHistory，清空今日 meals ── */
     function checkDayRollover() {
@@ -10237,6 +10257,24 @@
 
     function syncPlanToMoves() {
       const plan = getTodayPlan();
+      const planNames = plan.map(function(item) { return typeof item === 'string' ? item : (item.name || ''); });
+      // 清理旧的默认数据（id 为 squat/bench/deadlift 的预置动作）
+      var defaultIds = ['squat', 'bench', 'deadlift'];
+      appState.exercise.moves = appState.exercise.moves.filter(function(m) {
+        return !defaultIds.includes(m.id);
+      });
+      // 只保留当天计划里的动作，同步组数和重量
+      appState.exercise.moves = appState.exercise.moves.filter(function(m) {
+        return planNames.includes(m.name);
+      });
+      // 更新已有动作的计划数据
+      appState.exercise.moves.forEach(function(m) {
+        var planItem = plan.find(function(p) { return (typeof p === 'string' ? p : p.name) === m.name; });
+        if (planItem && typeof planItem === 'object') {
+          m.weight = planItem.weight || m.weight;
+          m.targetSets = planItem.sets || m.targetSets;
+        }
+      });
       if (plan.length === 0) return;
       const existingNames = appState.exercise.moves.map(function(m) { return m.name; });
       plan.forEach(function(item) {
@@ -10252,6 +10290,36 @@
             completedSets: 0
           });
         }
+      });
+      saveState();
+    }
+
+    /* 完成训练时创建记录，供日历显示和历史归档 */
+    function addExerciseRecord(move) {
+      if (!appState.exercise.records) appState.exercise.records = [];
+      var today = getBeijingDate().toISOString().slice(0, 10);
+      var exists = appState.exercise.records.some(function(r) { return r.name === move.name && r.date === today; });
+      if (exists) return;
+      appState.exercise.records.push({
+        id: "done-" + Date.now() + "-" + Math.random().toString(36).substr(2, 4),
+        date: today,
+        name: move.name,
+        type: "力量训练",
+        weight: move.weight || 0,
+        sets: move.targetSets || 4,
+        minutes: (move.targetSets || 4) * 3,
+        calories: (move.targetSets || 4) * 10,
+        icon: "strength"
+      });
+      saveState();
+    }
+
+    /* 取消完成时移除记录 */
+    function removeExerciseRecord(moveName) {
+      if (!appState.exercise.records) return;
+      var today = getBeijingDate().toISOString().slice(0, 10);
+      appState.exercise.records = appState.exercise.records.filter(function(r) {
+        return !(r.name === moveName && r.date === today);
       });
       saveState();
     }
@@ -10307,17 +10375,23 @@
       const todayPlan = getTodayPlan();
       const beijingDay = getBeijingDayOfWeek();
       const planHtml = todayPlan.length > 0
-        ? todayPlan.map(function(name, i) {
-            const move = appState.exercise.moves.find(function(m) { return m.name === name; });
+        ? todayPlan.map(function(item, i) {
+            const planName = typeof item === 'string' ? item : (item.name || '');
+            const move = appState.exercise.moves.find(function(m) { return m.name === planName; });
             const done = move && move.completedSets >= (move.targetSets || 4);
-            return '<div class="exercise-plan-item' + (done ? ' done' : '') + '" data-action="exercise-toggle-plan" data-move-name="' + escapeHtml(name) + '">' +
+            return '<div class="exercise-plan-item' + (done ? ' done' : '') + '" data-action="exercise-toggle-plan" data-move-name="' + escapeHtml(planName) + '">' +
               '<span class="exercise-plan-idx">' + (i + 1) + '</span>' +
-              '<span class="exercise-plan-name">' + escapeHtml(name) + '</span>' +
+              '<span class="exercise-plan-name">' + escapeHtml(planName) + '</span>' +
               '<span class="exercise-plan-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>' +
             '</div>';
           }).join("")
-        : '<div class="exercise-plan-empty">今天没有训练计划，享受休息日 🎉</div>';
-      const strengthHtml = totals.moves.map((item, index) => {
+        : '';
+      // 力量训练只显示当天计划里的项目
+      const todayPlanNames = todayPlan.map(function(item) { return typeof item === 'string' ? item : (item.name || ''); });
+      const planMoves = todayPlanNames.length > 0
+        ? totals.moves.filter(function(m) { return todayPlanNames.includes(m.name); })
+        : [];
+      const strengthHtml = planMoves.map((item, index) => {
         const targetSets = Number(item.targetSets) || 4;
         return `
           <div class="exercise-strength-row-wrapper" data-move-id="${escapeHtml(item.id)}">
@@ -10369,20 +10443,23 @@
                 <svg viewBox="0 0 24 24"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z"/></svg>
               </button>
             </div>
+            ${todayPlan.length > 0 ? `
             <div class="exercise-plan-list">${planHtml}</div>
             <div class="exercise-plan-summary">
               <span>${todayPlan.length} 项计划</span>
-              <span>${totals.completed}/${todayPlan.length} 已完成</span>
+              <span>${planMoves.filter(function(m) { return m.completedSets >= (m.targetSets || 4); }).length}/${todayPlan.length} 已完成</span>
             </div>
+            ` : '<div class="exercise-plan-empty"><div class="exercise-plan-empty-text">暂无计划，点击右上角编辑添加</div></div>'}
           </section>
 
+          ${planMoves.length > 0 ? `
           <section class="exercise-card exercise-section-card">
             <div class="exercise-section-head">
               <h2 class="exercise-section-title">力量训练</h2>
-              <button class="exercise-pill" type="button" data-action="exercise-add-move">添加动作</button>
             </div>
             <div class="exercise-strength-list">${strengthHtml}</div>
           </section>
+          ` : ''}
         </div>
       `;
     }
@@ -10678,8 +10755,9 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
             '<div class="weekly-plan-items">' + itemsHtml + '</div>' +
             '<div class="weekly-plan-card-footer">' +
               '<span>' + plan.length + ' 项计划</span>' +
-              '<span>' + plan.filter(function(n) {
-                var m = appState.exercise.moves.find(function(x) { return x.name === n; });
+              '<span>' + plan.filter(function(item) {
+                var planName = typeof item === 'string' ? item : (item.name || '');
+                var m = appState.exercise.moves.find(function(x) { return x.name === planName; });
                 return m && m.completedSets >= (m.targetSets || 4);
               }).length + '/' + plan.length + ' 已完成</span>' +
             '</div>' +
@@ -10826,7 +10904,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
 
     function renderExerciseCalendarDetail() {
       if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
-      const now = new Date();
+      const now = getBeijingDate();
       const today = now.toISOString().slice(0, 10);
       const year = now.getFullYear();
       const month = now.getMonth() + 1;
@@ -10852,7 +10930,9 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       // 获取选中日期的运动记录（当前 + 历史）
       let selectedRecords = [];
       if (selectedDate === today) {
-        selectedRecords = appState.exercise.records || [];
+        // 今天只显示当天计划里的项目
+        var planNames = getTodayPlan().map(function(item) { return typeof item === 'string' ? item : (item.name || ''); });
+        selectedRecords = (appState.exercise.records || []).filter(function(r) { return planNames.includes(r.name); });
       } else {
         selectedRecords = (appState.exercise.exerciseHistory && appState.exercise.exerciseHistory[selectedDate]) || [];
       }
@@ -10860,16 +10940,15 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       const totalCalories = selectedRecords.reduce(function(sum, r) { return sum + (r.calories || 0); }, 0);
 
       const recordsHtml = selectedRecords.length > 0
-        ? selectedRecords.map(function(item) {
-            return `
-              <button class="exercise-history-row" type="button" data-action="exercise-record-detail" data-record-id="${item.id}">
-                <span class="exercise-history-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z" /><path d="m12 8 3 3 3-1" /><path d="m10 10-2 4-3 2" /><path d="M6 21h12" /></svg></span>
-                <span class="exercise-history-copy"><strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.type)}</span></span>
-                <span class="exercise-history-time">${item.minutes}<span>min</span></span>
-                <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6" /></svg>
-              </button>
-            `;
-          }).join("")
+        ? '<div style="display:flex;flex-wrap:wrap;gap:8px;padding:12px 0;">' +
+          selectedRecords.map(function(item) {
+            return '<span style="display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:20px;background:rgba(117,132,103,0.1);font-size:14px;color:#182018;">' +
+              '<strong>' + escapeHtml(item.name) + '</strong>' +
+              (item.weight ? '<span style="color:#64725c;">' + item.weight + 'kg</span>' : '') +
+              (item.sets ? '<span style="color:#64725c;">' + item.sets + '组</span>' : '') +
+            '</span>';
+          }).join("") +
+          '</div>'
         : '<div class="calendar-empty">这一天还没有运动记录<br />可以从运动页面添加训练</div>';
 
       return `
@@ -10891,8 +10970,6 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
             }).join("")}
           </div>
           <div class="calendar-summary">
-            <div class="detail-metric"><strong>${totalMinutes}</strong><span>运动分钟</span></div>
-            <div class="detail-metric"><strong>${totalCalories}</strong><span>消耗 kcal</span></div>
             <div class="detail-metric"><strong>${selectedRecords.length}</strong><span>训练记录</span></div>
           </div>
         </section>
@@ -12184,18 +12261,22 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
           if (move) {
             if (move.completedSets >= (move.targetSets || 4)) {
               move.completedSets = 0;
+              removeExerciseRecord(move.name);
             } else {
               move.completedSets = move.targetSets || 4;
+              addExerciseRecord(move);
             }
           } else {
-            appState.exercise.moves.push({
+            var newMove = {
               id: "plan-" + Date.now(),
               name: moveName,
               weight: 20,
               targetSets: 4,
               reps: 10,
               completedSets: 4
-            });
+            };
+            appState.exercise.moves.push(newMove);
+            addExerciseRecord(newMove);
           }
           saveState();
           renderDetailPage("exercise");
@@ -12226,6 +12307,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
           const move = moves.find(function(m) { return m.name === planName; });
           if (move && move.completedSets < (move.targetSets || 4)) {
             move.completedSets = move.targetSets || 4;
+            addExerciseRecord(move);
             break;
           }
         }
