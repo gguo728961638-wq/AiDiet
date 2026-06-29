@@ -6060,6 +6060,8 @@
       font-size: 15px;
       line-height: 1.6;
       animation: messageIn 0.4s ease;
+      -webkit-user-select: text;
+      user-select: text;
     }
 
     @keyframes messageIn {
@@ -7859,6 +7861,12 @@
         if (appState.currentDay !== today) {
           checkDayRollover();
           renderAll();
+        }
+        if (checkExerciseDayRollover()) {
+          var exerciseRoute = document.body.dataset.detailRoute;
+          if (exerciseRoute === "exercise" || exerciseRoute === "exercise-calendar") {
+            renderDetailPage(exerciseRoute);
+          }
         }
       }
     });
@@ -10108,19 +10116,7 @@
       if (!move) return;
       move.completedSets = Math.min((move.completedSets || 0) + 1, move.targetSets || 4);
       if (move.completedSets >= (move.targetSets || 4)) {
-        const existing = appState.exercise.records.find((record) => record.id === "strength-" + move.id);
-        if (!existing) {
-          const today = new Date().toISOString().slice(0, 10);
-          appState.exercise.records.unshift({
-            id: "strength-" + move.id,
-            date: today,
-            name: move.name,
-            type: "力量训练",
-            minutes: 10,
-            calories: 65,
-            icon: "strength"
-          });
-        }
+        addExerciseRecord(move);
       }
       saveState();
       if (!options.skipRender) {
@@ -10244,6 +10240,13 @@
       return new Date(utc + (8 * 3600000));
     }
 
+    function getBeijingDateKey(date) {
+      const beijingDate = date || getBeijingDate();
+      return beijingDate.getFullYear() + "-" + String(beijingDate.getMonth() + 1).padStart(2, "0") + "-" +
+        String(beijingDate.getDate()).padStart(2, "0");
+    }
+
+
     function getBeijingDayOfWeek() {
       const days = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
       return days[getBeijingDate().getDay()];
@@ -10297,7 +10300,7 @@
     /* 完成训练时创建记录，供日历显示和历史归档 */
     function addExerciseRecord(move) {
       if (!appState.exercise.records) appState.exercise.records = [];
-      var today = getBeijingDate().toISOString().slice(0, 10);
+      var today = getBeijingDateKey();
       var exists = appState.exercise.records.some(function(r) { return r.name === move.name && r.date === today; });
       if (exists) return;
       appState.exercise.records.push({
@@ -10317,34 +10320,69 @@
     /* 取消完成时移除记录 */
     function removeExerciseRecord(moveName) {
       if (!appState.exercise.records) return;
-      var today = getBeijingDate().toISOString().slice(0, 10);
+      var today = getBeijingDateKey();
       appState.exercise.records = appState.exercise.records.filter(function(r) {
         return !(r.name === moveName && r.date === today);
       });
       saveState();
     }
 
-    /* 每日00:00北京时间刷新 */
+    function checkExerciseDayRollover() {
+      if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
+      var today = getBeijingDateKey();
+      var records = Array.isArray(appState.exercise.records) ? appState.exercise.records : [];
+      var previousDay = appState.exercise.currentDay || (records[0] && records[0].date) || today;
+
+      if (previousDay === today) {
+        if (!appState.exercise.currentDay) {
+          appState.exercise.currentDay = today;
+          appState.exercise.selectedDate = today;
+          saveState();
+        }
+        return false;
+      }
+
+      if (!appState.exercise.exerciseHistory) appState.exercise.exerciseHistory = {};
+      var todayRecords = [];
+      records.forEach(function(record) {
+        var recordDate = record.date || previousDay;
+        if (recordDate === today) {
+          todayRecords.push(record);
+          return;
+        }
+        var history = appState.exercise.exerciseHistory[recordDate] || [];
+        var duplicate = history.some(function(item) {
+          return item.id === record.id || (item.name === record.name && item.date === recordDate);
+        });
+        if (!duplicate) history.push({ ...record, date: recordDate });
+        appState.exercise.exerciseHistory[recordDate] = history;
+      });
+
+      appState.exercise.records = todayRecords;
+      appState.exercise.moves.forEach(function(move) { move.completedSets = 0; });
+      appState.exercise.currentDay = today;
+      appState.exercise.selectedDate = today;
+      syncPlanToMoves();
+      saveState();
+      return true;
+    }
+
+    /* 每日00:00北京时间刷新，并在应用重新打开时补做跨日归档。 */
+    var exerciseDailyRefreshTimer = null;
     function scheduleExerciseDailyRefresh() {
-      const now = new Date();
+      checkExerciseDayRollover();
       const beijingNow = getBeijingDate();
       const tomorrow = new Date(beijingNow);
       tomorrow.setDate(tomorrow.getDate() + 1);
       tomorrow.setHours(0, 0, 0, 0);
-      const msUntilMidnight = tomorrow.getTime() - beijingNow.getTime();
-      setTimeout(function() {
-        /* 归档今日记录到历史 */
-        const today = getBeijingDate().toISOString().slice(0, 10);
-        if (appState.exercise.records && appState.exercise.records.length > 0) {
-          if (!appState.exercise.exerciseHistory) appState.exercise.exerciseHistory = {};
-          appState.exercise.exerciseHistory[today] = appState.exercise.records;
+      const msUntilMidnight = Math.max(tomorrow.getTime() - beijingNow.getTime(), 1000);
+      if (exerciseDailyRefreshTimer) window.clearTimeout(exerciseDailyRefreshTimer);
+      exerciseDailyRefreshTimer = window.setTimeout(function() {
+        var changed = checkExerciseDayRollover();
+        var exerciseRoute = document.body.dataset.detailRoute;
+        if (changed && (exerciseRoute === "exercise" || exerciseRoute === "exercise-calendar")) {
+          renderDetailPage(exerciseRoute);
         }
-        /* 重置今日完成状态 */
-        appState.exercise.moves.forEach(function(m) { m.completedSets = 0; });
-        appState.exercise.records = [];
-        syncPlanToMoves();
-        saveState();
-        renderDetailPage("exercise");
         scheduleExerciseDailyRefresh();
       }, msUntilMidnight);
     }
@@ -10352,7 +10390,7 @@
 
     function startExerciseRecord() {
       const id = "record-" + Date.now();
-      const today = new Date().toISOString().slice(0, 10);
+      const today = getBeijingDateKey();
       appState.exercise.records.unshift({
         id,
         date: today,
@@ -10465,13 +10503,14 @@
     }
 
     /* AI Chat Helper Functions */
-    const AI_CHAT_SYSTEM_PROMPT = `你是「小暖」，用户的健康女友助手。你的性格温柔、体贴、关心用户的健康。
+    const AI_CHAT_SYSTEM_PROMPT = `你是「小暖」，用户的AI女友。你性格温柔、体贴、有趣，像真实女朋友一样和用户聊天。
 回答要求：
-1. 用女友式温柔语气，适当使用emoji
+1. 自然对话，像真人女友一样，不要模板化回复
 2. 回答简洁，不超过150字
-3. 关心用户健康，给出实用建议
-4. 如果用户提到放弃/累，温柔鼓励
-5. 使用中文回答`;
+3. 适当使用emoji，但不要过多
+4. 用户聊什么话题就聊什么，不要主动把话题往健身、减脂、训练上扯
+5. 只有用户主动提到健康/饮食/运动相关话题时，才给出相关建议
+6. 使用中文回答`;
 
     function getAIChatHistory() {
       if (!appState.aiChatHistory) appState.aiChatHistory = [];
@@ -10520,37 +10559,13 @@
       const targetWeight = appState.user ? appState.user.targetWeight : 0;
       const diff = (currentWeight - targetWeight).toFixed(1);
 
-      // ── 运动数据汇总 ──
+      // ── 运动数据（精简） ──
       const ex = appState.exercise || {};
       const totals = exerciseTotals();
       const todayPlan = getTodayPlan();
-      // 今日动作进度
       const movesText = (ex.moves || []).map(function(m) {
-        const done = m.completedSets || 0;
-        const target = m.targetSets || 4;
-        return m.name + " " + done + "/" + target + "组" + (m.weight ? " " + m.weight + "kg" : "");
+        return m.name + (m.completedSets >= (m.targetSets || 4) ? " ✓" : "");
       }).join("、") || "无";
-      // 今日训练记录
-      const recordsText = (ex.records || []).map(function(r) {
-        return r.name + "(" + r.minutes + "分钟/" + r.calories + "kcal)";
-      }).join("、") || "暂无";
-      // 周计划
-      const weekDays = ["周一","周二","周三","周四","周五","周六","周日"];
-      const weeklyPlan = ex.weeklyPlan || {};
-      const planLines = weekDays.map(function(day) {
-        const items = weeklyPlan[day];
-        if (!items || items.length === 0) return day + "：休息";
-        return day + "：" + items.map(function(it) {
-          return it.name + (it.sets ? it.sets + "组" : "") + (it.weight ? "@" + it.weight + "kg" : "");
-        }).join("、");
-      });
-      // 近期训练历史
-      const historyRecords = ex.exerciseHistory || {};
-      const historyDates = Object.keys(historyRecords).sort().reverse().slice(0, 5);
-      const historyText = historyDates.map(function(d) {
-        const items = historyRecords[d];
-        return d + "：" + items.map(function(r) { return r.name; }).join("、");
-      }).join("\n") || "暂无记录";
 
       // ── 饮食数据 ──
       const todayCalories = appState.meals ? appState.meals.reduce(function(s, m) { return s + (m.calories || 0); }, 0) : 0;
@@ -10564,33 +10579,13 @@
 
       const systemPrompt = AI_CHAT_SYSTEM_PROMPT + `
 当前时间：${todayStr} ${timeStr}（${dayOfWeek}）
+用户名字：${userName}
 
-用户信息：
-- 名字：${userName}
-- 当前体重：${currentWeight}kg
-- 目标体重：${targetWeight}kg
-- 体重差：${diff}kg
-
-饮食数据：
-- 今日目标热量：${targetCalories}kcal
-- 今日已摄入：${todayCalories}kcal
-- 今日剩余：${remainingCalories}kcal
-
-训练数据：
-- 本周训练时长：${totals.minutes}分钟（目标${ex.targetMinutes || 220}分钟，完成${totals.progress}%）
-- 本周训练消耗：${totals.calories}kcal
-- 今日训练动作及进度：${movesText}
-- 今日训练记录：${recordsText}
-- 今日训练计划：${todayPlan.join('、') || '无'}
-
-每周训练计划：
-${planLines.join('\n')}
-
-近期训练历史：
-${historyText}
-
-苹果健康数据（实时）：
-${formatHealthForAI() || '暂未获取到健康数据'}`;
+注意：以下是用户的健康数据，仅在用户主动询问健康/饮食/运动相关问题时才参考，普通聊天不要提及。
+体重：${currentWeight}kg → 目标${targetWeight}kg
+今日热量：${todayCalories}/${targetCalories}kcal
+今日训练：${movesText || '无'}
+今日计划：${todayPlan.join('、') || '无'}`;
 
       // 请求最新健康数据（异步，下次对话即可使用）
       requestHealthData();
@@ -10603,6 +10598,8 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       ];
 
       try {
+        var controller = new AbortController();
+        var timer = setTimeout(function() { controller.abort(); }, AI识别_CONFIG.timeout);
         const response = await fetch(AI识别_CONFIG.baseUrl, {
           method: "POST",
           headers: {
@@ -10614,16 +10611,52 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
             model: AI识别_CONFIG.model,
             max_tokens: 500,
             messages: messages
-          })
+          }),
+          signal: controller.signal
         });
+        clearTimeout(timer);
 
         const data = await response.json();
         if (data.content && data.content.length > 0) {
           const textBlocks = data.content.filter(function(b) { return b.type === 'text'; });
           if (textBlocks.length > 0) return textBlocks[0].text;
         }
+        // 429 限流自动重试一次
+        if (response.status === 429) {
+          await new Promise(function(r) { setTimeout(r, 2000); });
+          return await generateAIResponse(userMsg);
+        }
       } catch(e) {
         console.error("AI Chat error:", e);
+        // 超时重试一次
+        if (e.name === 'AbortError') {
+          try {
+            var controller2 = new AbortController();
+            var timer2 = setTimeout(function() { controller2.abort(); }, AI识别_CONFIG.timeout);
+            const response2 = await fetch(AI识别_CONFIG.baseUrl, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-api-key": AI识别_CONFIG.apiKey,
+                "anthropic-version": "2023-06-01"
+              },
+              body: JSON.stringify({
+                model: AI识别_CONFIG.model,
+                max_tokens: 500,
+                messages: messages
+              }),
+              signal: controller2.signal
+            });
+            clearTimeout(timer2);
+            const data2 = await response2.json();
+            if (data2.content && data2.content.length > 0) {
+              const textBlocks2 = data2.content.filter(function(b) { return b.type === 'text'; });
+              if (textBlocks2.length > 0) return textBlocks2[0].text;
+            }
+          } catch(e2) {
+            console.error("AI Chat retry error:", e2);
+          }
+        }
       }
 
       // 兜底回复
@@ -10905,7 +10938,7 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
     function renderExerciseCalendarDetail() {
       if (!appState.exercise) appState.exercise = JSON.parse(JSON.stringify(defaultState.exercise));
       const now = getBeijingDate();
-      const today = now.toISOString().slice(0, 10);
+      const today = getBeijingDateKey(now);
       const year = now.getFullYear();
       const month = now.getMonth() + 1;
       const daysInMonth = new Date(year, month, 0).getDate();
@@ -10930,9 +10963,9 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       // 获取选中日期的运动记录（当前 + 历史）
       let selectedRecords = [];
       if (selectedDate === today) {
-        // 今天只显示当天计划里的项目
-        var planNames = getTodayPlan().map(function(item) { return typeof item === 'string' ? item : (item.name || ''); });
-        selectedRecords = (appState.exercise.records || []).filter(function(r) { return planNames.includes(r.name); });
+        selectedRecords = (appState.exercise.records || []).filter(function(record) {
+          return !record.date || record.date === today;
+        });
       } else {
         selectedRecords = (appState.exercise.exerciseHistory && appState.exercise.exerciseHistory[selectedDate]) || [];
       }
@@ -12245,6 +12278,8 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
       }
       if (actionNode && actionNode.dataset.action === "exercise-calendar") {
         haptic("light");
+        appState.exercise.selectedDate = getBeijingDateKey();
+        saveState();
         window.location.hash = "exercise-calendar";
         applyRoute("exercise-calendar");
         return;
@@ -12330,8 +12365,11 @@ ${formatHealthForAI() || '暂未获取到健康数据'}`;
           showToast("已经全部完成了！");
           return;
         }
-        // 增加完成组数
+        // 增加完成组数；最后一组完成时立即生成当天日历记录。
         move.completedSets = Math.min((move.completedSets || 0) + 1, targetSets);
+        if (move.completedSets >= targetSets) {
+          addExerciseRecord(move);
+        }
         saveState();
         // 点击脉冲动效
         const ring = actionNode;
