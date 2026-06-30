@@ -449,18 +449,75 @@
       overflow: hidden;
     }
 
-    .weight-delta {
-      font-size: 18px;
-      font-weight: 720;
-      letter-spacing: 0;
+    .weight-progress-summary {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 9px;
     }
 
-    .weight-sub {
-      margin-top: 3px;
-      color: #66725e;
-      font-size: 14px;
-      font-weight: 560;
+    .weight-progress-visual {
+      position: relative;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      display: grid;
+      place-items: center;
+    }
+
+    .weight-progress-svg {
+      width: 38px;
+      height: 38px;
+      transform: rotate(-90deg);
+      overflow: visible;
+    }
+
+    .weight-progress-track,
+    .weight-progress-fill {
+      fill: none;
+      stroke-width: 4;
+    }
+
+    .weight-progress-track {
+      stroke: #dfe4d7;
+    }
+
+    .weight-progress-fill {
+      stroke: var(--sage);
+      stroke-linecap: round;
+      stroke-dasharray: 94.25;
+      stroke-dashoffset: 94.25;
+      transition: stroke-dashoffset 420ms cubic-bezier(.22, 1, .36, 1);
+    }
+
+    .weight-progress-value {
+      position: absolute;
+      color: #526247;
+      font-size: 9px;
+      line-height: 1;
+      font-weight: 760;
+    }
+
+    .weight-progress-copy {
+      min-width: 78px;
       text-align: right;
+    }
+
+    .weight-progress-copy strong {
+      display: block;
+      color: #465c3d;
+      font-size: 14px;
+      line-height: 1.15;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .weight-progress-copy span {
+      display: block;
+      margin-top: 4px;
+      color: #66725e;
+      font-size: 11px;
+      font-weight: 560;
     }
 
     .trend-line {
@@ -3087,6 +3144,69 @@
       text-align: center;
       color: var(--muted);
       font-size: 14px;
+    }
+
+    body[data-active-route="camera"] {
+      overflow: hidden;
+    }
+
+    body[data-active-route="camera"] .bottom-nav,
+    body[data-active-route="camera"] .home-indicator {
+      display: none;
+    }
+
+    body[data-active-route="camera"] .phone-frame,
+    body[data-active-route="camera"] .home-screen {
+      width: 100vw;
+      height: 100dvh;
+      min-height: 100dvh;
+    }
+
+    body[data-active-route="camera"] .home-screen {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    body[data-active-route="camera"] .camera-content {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100dvh;
+      padding: calc(env(safe-area-inset-top, 0px) + 18px) 24px calc(env(safe-area-inset-bottom, 0px) + 24px);
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      gap: 12px;
+      overflow: hidden;
+      animation: none;
+    }
+
+    body[data-active-route="camera"] .camera-content::before {
+      inset: 0;
+    }
+
+    body[data-active-route="camera"] .camera-prompt {
+      margin: 0 auto;
+    }
+
+    body[data-active-route="camera"] .camera-stage {
+      width: 100%;
+      height: auto;
+      min-height: 0;
+      margin-top: 0;
+      overflow: hidden;
+    }
+
+    body[data-active-route="camera"] .viewfinder {
+      width: min(342px, 100%);
+      height: min(430px, 100%);
+    }
+
+    body[data-active-route="camera"] .camera-actions {
+      position: relative;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      width: 100%;
     }
 
     .camera-side-action {
@@ -6828,9 +6948,18 @@
           </div>
         </div>
         <div class="weight-side">
-          <div>
-            <div class="weight-delta" id="weightDelta"></div>
-            <div class="weight-sub">较目标</div>
+          <div class="weight-progress-summary" id="weightProgressRing" role="img" aria-label="减重进度">
+            <div class="weight-progress-visual">
+              <svg class="weight-progress-svg" viewBox="0 0 38 38" aria-hidden="true">
+                <circle class="weight-progress-track" cx="19" cy="19" r="15"></circle>
+                <circle class="weight-progress-fill" id="weightProgressCircle" cx="19" cy="19" r="15"></circle>
+              </svg>
+              <span class="weight-progress-value" id="weightProgressValue">--</span>
+            </div>
+            <div class="weight-progress-copy">
+              <strong id="weightRemaining">距目标 -- kg</strong>
+              <span id="weightLost">已减 -- kg</span>
+            </div>
           </div>
           <svg class="trend-line" id="trendLine" viewBox="0 0 135 42" aria-hidden="true">
             <path id="trendPath" d="M2 31c18-4 30 5 44-13 11-14 23 16 42 2 13-10 27 8 39-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
@@ -8937,6 +9066,72 @@
       `;
     }
 
+    function normalizeWeightTrendRecords(history, currentWeight, today) {
+      const byDate = new Map();
+      (Array.isArray(history) ? history : []).forEach(function(record) {
+        const date = String(record && record.date || "");
+        const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+        if (!match) return;
+        const year = Number(match[1]);
+        const month = Number(match[2]);
+        const day = Number(match[3]);
+        const parsed = new Date(Date.UTC(year, month - 1, day));
+        if (parsed.getUTCFullYear() !== year || parsed.getUTCMonth() !== month - 1 || parsed.getUTCDate() !== day) return;
+        const weight = Number(record.weight);
+        if (!Number.isFinite(weight) || weight <= 0) return;
+        byDate.set(date, { date: date, weight: weight });
+      });
+      const latestWeight = Number(currentWeight);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(today || "") && Number.isFinite(latestWeight) && latestWeight > 0) {
+        byDate.set(today, { date: today, weight: latestWeight });
+      }
+      return Array.from(byDate.values())
+        .sort(function(a, b) { return a.date.localeCompare(b.date); })
+        .slice(-7);
+    }
+
+    function calculateWeightProgress(user) {
+      const start = Number(user && user.startWeight);
+      const current = Number(user && user.currentWeight);
+      const target = Number(user && user.targetWeight);
+      const roundOne = function(value) { return Math.round(value * 10) / 10; };
+      const remaining = Number.isFinite(current) && Number.isFinite(target) ? roundOne(Math.max(current - target, 0)) : 0;
+      const lost = Number.isFinite(start) && Number.isFinite(current) ? roundOne(Math.max(start - current, 0)) : 0;
+      const total = start - target;
+      const valid = Number.isFinite(start) && Number.isFinite(current) && Number.isFinite(target) && total > 0;
+      const achieved = valid && current <= target;
+      return {
+        valid: valid,
+        achieved: achieved,
+        remaining: remaining,
+        lost: lost,
+        percent: valid ? Math.max(0, Math.min(100, Math.round((lost / total) * 100))) : null
+      };
+    }
+
+    function buildWeightTrendPoints(records, width, height, padding) {
+      const source = Array.isArray(records) ? records : [];
+      if (source.length === 0) {
+        return { points: [], domainRange: 1, min: 0, max: 1 };
+      }
+      const weights = source.map(function(record) { return Number(record.weight); });
+      const rawMin = Math.min.apply(null, weights);
+      const rawMax = Math.max.apply(null, weights);
+      const center = (rawMin + rawMax) / 2;
+      const domainRange = Math.max(rawMax - rawMin, 1);
+      const min = center - domainRange / 2;
+      const max = center + domainRange / 2;
+      const plotWidth = width - padding.left - padding.right;
+      const plotHeight = height - padding.top - padding.bottom;
+      const points = source.map(function(record, index) {
+        return {
+          x: padding.left + (source.length === 1 ? plotWidth : (index / (source.length - 1)) * plotWidth),
+          y: padding.top + ((max - record.weight) / domainRange) * plotHeight
+        };
+      });
+      return { points: points, domainRange: domainRange, min: min, max: max };
+    }
+
     function renderHome() {
       const consumed = consumedCalories();
       const remaining = remainingCalories();
@@ -8967,41 +9162,45 @@
       }
       if (weightNumber) weightNumber.textContent = appState.user.currentWeight.toFixed(1);
 
-      /* Update weight delta and trend line */
-      const deltaEl = document.getElementById("weightDelta");
+      /* Update weight progress ring and trend line */
+      const progressRing = document.getElementById("weightProgressRing");
+      const progressCircle = document.getElementById("weightProgressCircle");
+      const progressValue = document.getElementById("weightProgressValue");
+      const weightRemaining = document.getElementById("weightRemaining");
+      const weightLost = document.getElementById("weightLost");
       const trendPath = document.getElementById("trendPath");
       const trendDot = document.getElementById("trendDot");
-      if (deltaEl && trendPath && trendDot) {
-        const diff = Math.round((appState.user.currentWeight - appState.user.targetWeight) * 10) / 10;
-        const above = diff > 0;
-        const arrow = above ? "↓" : diff < 0 ? "↑" : "→";
-        deltaEl.textContent = `${arrow} ${Math.abs(diff).toFixed(1)} kg`;
-        deltaEl.style.color = above ? "#465c3d" : "#3f6f35";
+      const weightProgress = calculateWeightProgress(appState.user);
+      if (progressRing && progressCircle && progressValue && weightRemaining && weightLost) {
+        const circumference = 94.25;
+        const percent = weightProgress.percent;
+        progressCircle.style.strokeDashoffset = percent === null
+          ? String(circumference)
+          : (circumference * (1 - percent / 100)).toFixed(2);
+        progressValue.textContent = percent === null ? "--" : `${percent}%`;
+        weightRemaining.textContent = weightProgress.achieved
+          ? "目标达成"
+          : `距目标 ${weightProgress.remaining.toFixed(1)} kg`;
+        weightLost.textContent = `已减 ${weightProgress.lost.toFixed(1)} kg`;
+        progressRing.setAttribute("aria-label", percent === null
+          ? "减重进度不可计算"
+          : `减重进度 ${percent}%，${weightRemaining.textContent}，${weightLost.textContent}`);
+      }
 
-        /* Generate trend path from last 7 records */
-        const history = appState.weightHistory || [];
-        const last7 = history.slice(-7);
+      if (trendPath && trendDot) {
+        const records = normalizeWeightTrendRecords(appState.weightHistory, appState.user.currentWeight, getToday());
         const padding = { left: 8, right: 8, top: 8, bottom: 8 };
         const svgW = 135, svgH = 42;
-        const plotW = svgW - padding.left - padding.right;
-        const plotH = svgH - padding.top - padding.bottom;
-
-        if (last7.length >= 2) {
-          const weights = last7.map(r => r.weight);
-          const minW = Math.min(...weights);
-          const maxW = Math.max(...weights);
-          const range = maxW - minW || 1;
-          const points = last7.map((r, i) => ({
-            x: padding.left + (i / (last7.length - 1)) * plotW,
-            y: padding.top + plotH - ((r.weight - minW) / range) * plotH
-          }));
+        const geometry = buildWeightTrendPoints(records, svgW, svgH, padding);
+        const points = geometry.points;
+        if (points.length >= 2) {
           const d = "M" + points.map(p => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" L");
           trendPath.setAttribute("d", d);
           const last = points[points.length - 1];
           trendDot.setAttribute("cx", last.x.toFixed(1));
           trendDot.setAttribute("cy", last.y.toFixed(1));
         } else {
-          const y = svgH / 2;
+          const y = points.length === 1 ? points[0].y : svgH / 2;
           trendPath.setAttribute("d", `M${padding.left} ${y} L${svgW - padding.right} ${y}`);
           trendDot.setAttribute("cx", String(svgW - padding.right));
           trendDot.setAttribute("cy", String(y));
@@ -9523,6 +9722,7 @@
       appState.user.targetWeight = Math.round(targetWeight * 10) / 10;
       appState.user.currentWeight = Math.round(currentWeight * 10) / 10;
       appState.user.lostWeight = Math.max(Math.round(((appState.user.startWeight || 61) - appState.user.currentWeight) * 10) / 10, 0);
+      addWeightRecord(appState.user.currentWeight);
       appState.nutrition.targetCalories = Math.round(targetCalories);
       appState.nutrition.planMode = planMode;
 
