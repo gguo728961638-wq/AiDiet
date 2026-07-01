@@ -8417,6 +8417,8 @@
         "你是专业的食物识别与热量分析工具，只输出JSON，不要输出任何其他文字。",
         "只根据图片中实际可见的食物识别，绝对禁止猜测或编造不存在的食物。",
         "识别图片中所有可见的食物，明确区分每种食物的类型（如主食、肉类、蔬菜、水果、饮品、甜点等）。",
+        "白开水、纯净水、矿泉水，以及明确标注零糖或零卡的茶、黑咖啡、汽水等零热量饮品，calories 必须返回 0。",
+        "无糖不等于零热量：无糖牛奶、豆浆、酸奶、果汁、奶茶等仍需按实际营养成分估算热量。",
         "最后给出整体 advice 评级：rating（优/良/注意/差）。",
         "只输出紧凑JSON：",
         "{\"needs_retake\":false,\"foods\":[{\"name\":\"菜名\",\"calories\":250,\"description\":\"减脂说明\"}],\"advice\":{\"rating\":\"良\"}}"
@@ -8437,11 +8439,21 @@
     }
 
     function normalizeRecognitionItem(item, fallbackCategory) {
-      var cal = Number(item.calories || item.estimated_calories);
-      if (!Number.isFinite(cal) || cal <= 0) cal = 0;
+      var name = String(item.name || item.food_name || "").trim();
+      var rawCal = item.calories !== undefined && item.calories !== null && item.calories !== ""
+        ? item.calories
+        : item.estimated_calories;
+      var cal = Number(rawCal);
+      if (rawCal === undefined || rawCal === null || rawCal === "" || !Number.isFinite(cal) || cal < 0) cal = null;
+
+      var isCaloricUnsweetenedDrink = /牛奶|乳饮|豆浆|酸奶|果汁|椰汁|奶茶|燕麦奶|杏仁奶/.test(name);
+      var isPlainWater = /^(白开水|开水|纯净水|矿泉水|饮用水)$/.test(name);
+      var isExplicitZeroDrink = /(无糖|零糖|0糖|零卡|0卡).*(茶|黑咖啡|美式咖啡|咖啡|汽水|可乐|气泡水|苏打水|饮料)|(茶|黑咖啡|美式咖啡|咖啡|汽水|可乐|气泡水|苏打水|饮料).*(无糖|零糖|0糖|零卡|0卡)/.test(name);
+      if (!isCaloricUnsweetenedDrink && (isPlainWater || isExplicitZeroDrink)) cal = 0;
+
       return {
-        name: String(item.name || item.food_name || "").trim(),
-        calories: Math.round(cal),
+        name: name,
+        calories: cal === null ? null : Math.round(cal),
         description: String(item.description || "").trim()
       };
     }
@@ -8458,7 +8470,7 @@
       if (bestName && !candidates.some(function(item) { return item.name === bestName; })) {
         candidates.unshift({
           name: bestName,
-          calories: 0,
+          calories: null,
           description: "AI 给出的最佳展示名称"
         });
       }
@@ -8552,7 +8564,7 @@
       }
       return [{
         name: local.name,
-        calories: local.calories || 200,
+        calories: local.calories === undefined || local.calories === null ? 200 : local.calories,
         description: local.note || "使用本地食物数据库匹配"
       }];
     }
@@ -8566,8 +8578,12 @@
 
       for (var i = 0; i < foods.length; i++) {
         var food = foods[i];
-        var cal = food.calories || food.estimated_calories || 200;
-        cal = Math.max(1, Math.min(9999, Math.round(cal)));
+        var rawCal = food.calories !== undefined && food.calories !== null && food.calories !== ""
+          ? food.calories
+          : food.estimated_calories;
+        var cal = Number(rawCal);
+        if (rawCal === undefined || rawCal === null || rawCal === "" || !Number.isFinite(cal) || cal < 0) cal = 200;
+        cal = Math.max(0, Math.min(9999, Math.round(cal)));
         total += cal;
         var displayName = food.name || "未知食物";
         names.push(displayName);
@@ -8581,7 +8597,7 @@
         perFood.push({ name: "未知食物", calories: 300, category: "其他" });
       }
 
-      total = Math.max(1, Math.min(9999, total || 300));
+      total = Math.max(0, Math.min(9999, total));
       return {
         name: names.join(" + "),
         calories: total,
@@ -8605,7 +8621,9 @@
       result.dish_candidates = Array.isArray(recognition.dish_candidates) ? recognition.dish_candidates : [];
       result.visible_ingredients = Array.isArray(recognition.visible_ingredients) ? recognition.visible_ingredients : [];
       result.best_display_name = recognition.best_display_name || (result.dish_candidates[0] && result.dish_candidates[0].name) || (result.foods[0] && result.foods[0].name) || "";
-      result.uncertain = result.foods.some(function(food) { return !food.calories || food.calories <= 0; });
+      result.uncertain = result.foods.some(function(food) {
+        return food.calories === undefined || food.calories === null || food.calories === "" || !Number.isFinite(Number(food.calories)) || Number(food.calories) < 0;
+      });
       result.confirmed = true;
       result.recognitionMeta = meta || {};
       var nutrition = calculateConfirmedNutrition(result.foods.length ? result.foods : fallbackFoodsFromLocal(imageSrc, mealType));
@@ -8616,7 +8634,7 @@
       result.perFood = nutrition.perFood || [];
       /* 确保总热量 = perFood 热量之和，避免不同步 */
       var totalFromPerFood = result.perFood.reduce(function(s, f) { return s + (f.calories || 0); }, 0);
-      result.calories = totalFromPerFood > 0 ? totalFromPerFood : nutrition.calories;
+      result.calories = result.perFood.length > 0 ? totalFromPerFood : nutrition.calories;
       result.baseCalories = result.calories;
       console.log("[CALdebug] perFood=" + JSON.stringify(result.perFood.map(function(f){return {n:f.name,c:f.calories}})) + " totalFromPerFood=" + totalFromPerFood + " nutrition.calories=" + nutrition.calories + " result.calories=" + result.calories + " result.foods_count=" + result.foods.length);
       result.aiAdvice = recognition.advice || null;
@@ -9670,6 +9688,11 @@
     }
 
     function renderPlanSettingsDetail() {
+      var storedStartWeight = Number(appState.user.startWeight);
+      var editableStartWeight = Number.isFinite(storedStartWeight) && storedStartWeight >= 35 && storedStartWeight <= 160
+        ? storedStartWeight
+        : Number(appState.user.currentWeight);
+      if (!Number.isFinite(editableStartWeight)) editableStartWeight = 35;
       return `
         <section class="detail-card">
           <p class="detail-summary">调整目标后会同步影响首页热量目标、剩余热量，以及我的页计划卡片。</p>
@@ -9677,6 +9700,10 @@
             <div class="plan-field">
               <div><label for="targetWeightInput">目标体重</label><span>希望达到的健康体重</span></div>
               <input id="targetWeightInput" data-plan-field="targetWeight" type="number" min="35" max="120" step="0.1" value="${appState.user.targetWeight.toFixed(1)}" />
+            </div>
+            <div class="plan-field">
+              <div><label for="startWeightInput">初始体重</label><span>开始减脂时的体重</span></div>
+              <input id="startWeightInput" data-plan-field="startWeight" type="number" min="35" max="160" step="0.1" value="${editableStartWeight.toFixed(1)}" />
             </div>
             <div class="plan-field">
               <div><label for="currentWeightInput">当前体重</label><span>用于计算减脂进度</span></div>
@@ -9710,18 +9737,24 @@
 
     function savePlanSettings() {
       const targetWeight = readNumberField('[data-plan-field="targetWeight"]');
+      const startWeight = readNumberField('[data-plan-field="startWeight"]');
       const currentWeight = readNumberField('[data-plan-field="currentWeight"]');
       const targetCalories = readNumberField('[data-plan-field="targetCalories"]');
       const planMode = (document.querySelector('[data-plan-field="planMode"]') && document.querySelector('[data-plan-field="planMode"]').value) || appState.nutrition.planMode;
 
-      if (!Number.isFinite(targetWeight) || !Number.isFinite(currentWeight) || !Number.isFinite(targetCalories)) {
+      if (!Number.isFinite(targetWeight) || !Number.isFinite(startWeight) || !Number.isFinite(currentWeight) || !Number.isFinite(targetCalories)) {
         showToast("请输入有效的计划数据");
+        return;
+      }
+      if (startWeight <= targetWeight) {
+        showToast("初始体重需高于目标体重");
         return;
       }
 
       appState.user.targetWeight = Math.round(targetWeight * 10) / 10;
+      appState.user.startWeight = Math.round(startWeight * 10) / 10;
       appState.user.currentWeight = Math.round(currentWeight * 10) / 10;
-      appState.user.lostWeight = Math.max(Math.round(((appState.user.startWeight || 61) - appState.user.currentWeight) * 10) / 10, 0);
+      appState.user.lostWeight = Math.max(Math.round((appState.user.startWeight - appState.user.currentWeight) * 10) / 10, 0);
       addWeightRecord(appState.user.currentWeight);
       appState.nutrition.targetCalories = Math.round(targetCalories);
       appState.nutrition.planMode = planMode;
